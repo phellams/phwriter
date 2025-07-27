@@ -7,9 +7,10 @@
 # *---------------------------------------------
 function Write-PHAsciiLogo {
     param(
-        [parameter(mandatory = $true, HelpMessage = "Sets the Name of the module for the logo display.")]
-        [string]$ModuleName = 'PHWriter' # Default module name if not provided
+        [parameter(mandatory = $false, HelpMessage = "Sets the Name of the module for the logo display.")]
+        [string]$Name = 'PHWriter' # Default module name if not provided
     )
+    
     $logoLines = @(
         "╔═══════════════════════════════════════════════════════════╗",
         "║                      P H W R I T R                        ║",
