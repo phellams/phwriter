@@ -8,29 +8,25 @@ Features
 
  - Customizable Layout: Control indentation and spacing between parameter elements.
  - Colored Output: Enhance readability with distinct colors for different help sections and parameter components.
-
- - ASCII Art Logo: Includes a simple, elegant ASCII art banner for visual appeal.
-
-- Inline/Newline Descriptions: Choose whether parameter descriptions appear on the same line or a new line.
-
-- Automatic Alignment: Dynamically calculates padding to ensure perfect alignment of parameter types and descriptions.
-
-- Production Ready: Comes with a module manifest (.psd1) for proper PowerShell module management.
+ - ASCII Art Logo: Includes a simple, elegant ASCII art banner for visual appeal, or you can provide your own ascii art.
+ - Inline/Newline Descriptions: Choose whether parameter descriptions appear on the same line or a new line.
+ - Automatic Alignment: Dynamically calculates padding to ensure perfect alignment of parameter types and descriptions.
+ - Production Ready: Comes with a module manifest (.psd1) for proper PowerShell module management.
 
 ## Installation
 
 ### Manual
 
-Download the PHWriter module from GitHub and place it in your PowerShell Modules folder (e.g., C:\Users\<username>\Documents\WindowsPowerShell\Modules\PHWriter).
+Download the **PHWriter** module from GitHub and place it in your PowerShell Modules folder (e.g., `C:\Users\<username>\Documents\WindowsPowerShell\Modules\PHWriter`
 
-  1. Clone the repository: git clone https://github.com/your-username/PHWriter.git
+  1. Clone the repository: `git clone https://github.com/your-username/PHWriter.git`
   2. Open a PowerShell session and navigate to the cloned repository directory.
   3. Run the following command to install the module: `Import-Module .\PHWriter.psm1` or `import-module .\`
   4. Test the module by running `Get-Command -Module PHWriter` or `Get-Module -Name PHWriter`
 
 ### PowerShell Gallery
 
-Install the PHWriter module from the PowerShell Gallery using the following command:
+Install the **PHWriter** module from the **PowerShell Gallery** using the following command:
 
   1. Download the module: `Install-Module -Name PHWriter -Repository PSGallery`
   > Note that you might need to run this command as an administrator to install the module, and set the execution policy to "RemoteSigned" or "Unrestricted" if prompted.
@@ -40,7 +36,7 @@ Install the PHWriter module from the PowerShell Gallery using the following comm
 
 ## Usage
 
-The primary cmdlet provided by this module is New-PHWriter. Generates formatted help text based on an array of hashtables defining your cmdlet's parameters.
+The primary cmdlet provided by this module is `New-PHWriter`. Generates formatted help text based on an array of hashtables defining your cmdlet's parameters.
 
 #### 🏮 New-PHWriter
 
@@ -52,17 +48,17 @@ New-PHWriter -HelpTable <Hashtable[]> [-Padding <Int>] [-Indent <Int>]
 
   - **HelpTable** `<Hashtable[]>` Type: System.Array
     - **Description**: A mandatory array of hashtables. Each hashtable defines a parameter for which help text will be generated and must contain the following properties:
-      - **Name** (string): The full name of the parameter.
-      - **Param** (string): The parameter alias(es) (e.g., "p|Path").
-      - **Type** (string): The data type of the parameter (e.g., "string", "switch", "int").
-      - **Description** (string): A brief explanation of the parameter's purpose.
-      - **Inline** (boolean): If $true, the description appears on the same line as the parameter definition. If $false, it appears on a new, indented line.
-  - **Padding** <Int> Type: System.Int32
+      - **Name** (`<string>`): The full name of the parameter.
+      - **Param** (`<string>`): The parameter alias(es) (e.g., "p|Path").
+      - **Type** (`<string>`): The data type of the parameter (e.g., "string", "switch", "int").
+      - **Description** (`<string>`): A brief explanation of the parameter's purpose.
+      - **Inline** (`<boolean>`): If $true, the description appears on the same line as the parameter definition. If $false, it appears on a new, indented line.
+  - **Padding** (`<Int>`) Type: System.Int32
     - **Description**: The number of spaces for padding between the parameter alias/name, type, and description columns. Defaults to 4.
-  - **Indent** <Int> Type: System.Int32
+  - **Indent** (`<Int>`) Type: System.Int32
     - Description: The number of spaces for left indentation of the entire help output block. Defaults to 4.
 
-**Example**
+**Example:**
 
 ```powershell
 # Define the parameters for your custom cmdlet's help
@@ -98,10 +94,37 @@ $myCmdletParams = @(
 )
 ```
 
-> Generate the formatted help output with custom padding and indent
+**Generate the formatted help output with custom padding and indent:**
 
 ```powershell
 New-PHWriter -HelpTable $myCmdletParams -Padding 6 -Indent 2
+```
+
+**Output**
+
+```text
+╔═══════════════════════════════════════════════════════════╗
+║                      P H W R I T R                        ║
+╚═══════════════════════════════════════════════════════════╝
+
+   Phwriter version 1.2.1
+
+   SYNOPSIS
+       new-phwriter [-HelpTable <Hashtable[]>] [-Padding <Int>] [-Indent <Int>]
+
+   DESCRIPTION
+       This cmdlet generates formatted help text for PowerShell cmdlets with custom layouts and coloring, mimicking a man-page style.      
+
+   PARAMETERS
+   -s|Source            [string]      SourcePath
+                                       Specifies the source path for the operation. Wildcards are supported.
+
+   -d|Destination       [string]      DestinationPath Specifies the destination path where files will be copied.
+
+   -r|Recurse           [switch]      Recurse
+                                       Indicates that the operation should process subdirectories recursively.
+
+   -c|Confirm           [switch]      Confirm Prompts you for confirmation before running the cmdlet. (CommonParameter)
 ```
 
 ## Contributing
