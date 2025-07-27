@@ -144,28 +144,40 @@ New-PHWriter -HelpTable $myCmdletParams -Padding 6 -Indent 2
 **Output**
 
 ```text
-╔═══════════════════════════════════════════════════════════╗
-║                      P H W R I T R                        ║
-╚═══════════════════════════════════════════════════════════╝
+╔═======════════════════════════════════════════════════════════======═╗
+╟░░░░░░░░░░░░░░░░░░░░░░░░░░░░P H W R I T E R░░░░░░░░░░░░░░░░░░░░░░░░░░░╢                                                               
+╚═======════════════════════════════════════════════════════════======═╝
 
-   Phwriter version 1.2.1
+   MODULE  PHWRITER   CMDLET New-PHWriter      v1.2.1
 
-   SYNOPSIS
-       new-phwriter [-HelpTable <Hashtable[]>] [-Padding <Int>] [-Indent <Int>]
+    CMDLET SYNOPSIS
+       New-PHWriter [-HelpTable <Hashtable[]>] [-Padding <Int>] [-Indent <Int>]
 
-   DESCRIPTION
-       This cmdlet generates formatted help text for PowerShell cmdlets with custom layouts and coloring, mimicking a man-page style.      
+    DESCRIPTION
+       This cmdlet generates formatted help text for PowerShell cmdlets with custom layouts and
+       coloring, mimicking the style of the 'help' command. It supports custom layouts, coloring, and
+       inline/newline descriptions.
 
-   PARAMETERS
-   -s|Source            [string]      SourcePath
-                                       Specifies the source path for the operation. Wildcards are supported.
 
-   -d|Destination       [string]      DestinationPath Specifies the destination path where files will be copied.
+    PARAMETERS
 
-   -r|Recurse           [switch]      Recurse
-                                       Indicates that the operation should process subdirectories recursively.
+     -s|Source            [string]       (Req)  SourcePath
+                                          Specifies the source path for the operation. Wildcards are supported.
+     -d|Destination       [string]       (Req)  DestinationPath
+                                          Specifies the destination path where files will be copied.
+     -r|Recurse           [switch]        Recurse
+                                          Indicates that the operation should process subdirectories recursively.
+     -c|Confirm           [switch]        Confirmation
+                                          Prompts you for confirmation before running the cmdlet. (CommonParameter)
+   EXAMPLES
 
-   -c|Confirm           [switch]      Confirm Prompts you for confirmation before running the cmdlet. (CommonParameter)
+     New-PHWriter -SourcePath 'C:\Source' -DestinationPath 'C:\Destination' -Recurse
+
+     New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Confirm
+
+     New-PHWriter -SourcePath 'C:\Source' -DestinationPath 'C:\Destination' -Recurse -Confirm
+
+     New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Recurse -Confirm
 ```
 
 ## Contributing
