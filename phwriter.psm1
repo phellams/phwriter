@@ -2,67 +2,6 @@ using module .\cmdlets\New-Paragraph.psm1
 using module .\cmdlets\Format-StringWithCharSpacesAndHyphens.psm1
 using module .\cmdlets\New-ColorConsole.psm1
 
-# From psparagraph module
-# Add-Type -TypeDefinition @"
-# using System;
-# using System.Text;
-
-# public class Indenter
-# {
-#     public static string NewIndent(int position, int indent, string str)
-#     {
-#         var StringBuilder = new StringBuilder();
-#         var words = str.Split(' ');
-
-#         int currentLineLength = 0;
-#         StringBuilder.Append(' ', indent);
-#         foreach (var word in words)
-#         {
-#             if (currentLineLength + word.Length > position)
-#             {
-#                 StringBuilder.AppendLine();
-#                 StringBuilder.Append(' ', indent);
-#                 currentLineLength = 0;
-#             }
-
-#             StringBuilder.Append(word);
-#             StringBuilder.Append(' ');
-#             currentLineLength += word.Length + 1;
-#         }
-
-#         return StringBuilder.ToString();
-#     }
-# }
-# "@
-
-# function New-Paragraph() {
-#     [CmdletBinding()]
-#     [OutputType([string])]
-#     param(
-#         [
-#         Parameter(
-#             Mandatory = $true
-#         )
-#         ][int]$position,
-
-#         [
-#         Parameter(
-#             Mandatory = $true
-#         )
-#         ][int]$indent,
-       
-#         [  
-#         Parameter(
-#             Mandatory = $true
-#         )
-#         ]
-#         [string]$string
-#     )
-
-#     return [Indenter]::NewIndent($position, $indent, $string)
-
-# }
-
 $script:__phwriter = @{
     rootpath = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 }
@@ -133,6 +72,7 @@ function Write-PHAsciiLogo {
 
 function New-PHWriter {
     [CmdletBinding()] # Enables common cmdlet parameters like -Verbose, -Debug, etc.
+    [outputtype('void')]
     param(
         [Parameter(Mandatory = $false, HelpMessage = "JsonImporter object to import json data from file.")]
         [string]$JsonFile,
