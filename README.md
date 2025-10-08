@@ -1,6 +1,9 @@
-# PHWriter
+# <img width="46" src="https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png" alt="Phellams Logo" /> **PHWriter**
 
-![static license-badge][license-badge]
+<a href="https://gitlab.com/phellams/phwriter/-/blob/main/readme.md"><img src="https://img.shields.io/badge/License-_mit-License?style=flat-square&labelColor=%23383838&color=%237A5ACF23CD5C5C" alt="MIT License" /></a>
+<a href="https://gitlab.com/phellams/phwriter/-/pipelines"><img src="https://img.shields.io/gitlab/pipeline-status/phellams%2Fphwriter?style=flat-square&logo=Gitlab&logoColor=%233478BD&labelColor=%232D2D34" alt="Build Status"></a>
+<a href="https://codecov.io/gh/phellams/phwriter"><img src="https://img.shields.io/codecov/c/gitlab/phellams/phwriter?style=flat-square&logo=codecov&logoColor=%23E6746B&logoSize=auto&labelColor=%234A7A82" alt="Build Status"></a>
+<a href="https://gitlab.com/phellams/phwriter/-/issues"><img src="https://img.shields.io/gitlab/issues/open/phellams%2Fphwriter?style=flat-square&logo=gitlab&logoColor=red&labelColor=%23ffffff&color=%236B8D29" alt="gitlab issues"></a>
 
 ## Overview
 
@@ -16,23 +19,44 @@ Features
 
 ## Installation
 
-### 📥 Manual
+Phellams modules are available from [**PowerShell Gallery**](https://www.powershellgallery.com/packages/phwriter) and [**Chocolatey**](https://chocolatey.org/packages/phwriter). you can access the raw assets via [**Gitlab Generic Assets**](https://gitlab.com/phellams/phwriter/-/packages?orderBy=name&sort=desc&search[]=phwriter) or nuget repository via [**Gitlab Packages**](https://gitlab.com/phellams/phwriter/-/packages/?orderBy=name&sort=desc&search[]=phwriter&type=NuGet).
 
-Download the **PHWriter** module from GitHub and place it in your PowerShell Modules folder (e.g., `C:\Users\<username>\Documents\WindowsPowerShell\Modules\PHWriter`
+|▓▓▓▓▒▒▒▒░░░|▓▓▓▓▒▒▒▒░░░|▓▓▓▓▒▒▒▒░░░|
+|-|-|-|
+|📦 PSGallery | <a href="https://www.powershellgallery.com/packages/phwriter"> <img src="https://img.shields.io/powershellgallery/v/phwriter?label=version&style=flat-square&logoColor=blue&labelColor=23CD5C5C&color=%231E3D59" alt="powershellgallery"></a> | <img src="https://img.shields.io/powershellgallery/dt/phwriter?style=flat-square&logoColor=blue&label=downloads&labelColor=23CD5C5C&color=%231E3D59" alt="powershellgallery-downloads"> |
+|📦 Chocolatey | <a href="https://community.chocolatey.org/packages/phwriter/"><img src="https://img.shields.io/chocolatey/v/phwriter?label=version&include_prereleases&style=flat-square&logoColor=blue&labelColor=23CD5C5C&color=%231E3D59" alt="chocolatey"/></a> | <img src="https://img.shields.io/chocolatey/dt/phwriter?style=flat-square&logoColor=blue&label=downloads&include_prereleases&labelColor=23CD5C5C&color=%231E3D59" alt="chocolatey-downloads"> |
 
-  1. Clone the repository: `git clone https://github.com/your-username/PHWriter.git`
-  2. Open a PowerShell session and navigate to the cloned repository directory.
-  3. Run the following command to install the module: `Import-Module .\PHWriter.psm1` or `import-module .\`
-  4. Test the module by running `Get-Command -Module PHWriter` or `Get-Module -Name PHWriter`
+### Additinonal Installation Options:
+ 
+|▓▓▓▓▒▒▒▒░░░|▓▓▓▓▒▒▒▒░░░|▓▓▓▓▒▒▒▒░░░|
+|-|-|-|
+|💼 Releases/Tags | <a href="https://gitlab.com/phellams/phwriter/-/releases"> <img src="https://img.shields.io/gitlab/v/release/phellams%2Fphwriter?include_prereleases&style=flat-square&logoColor=%2300B2A9&labelColor=%23CD5C5C&color=%231E3D59" alt="gitlab-release"></a> | <a href="https://gitlab.com/phellams/phwriter/-/tags"> <img src="https://img.shields.io/gitlab/v/tag/phellams%2Fphwriter?include_prereleases&style=flat-square&logoColor=%&labelColor=%23CD5C5C&color=%231E3D59" alt="gitlab tags"></a> |
 
-### 📦 PowerShell Gallery
+#### 📦 GitLab Packages
 
-Install the **PHWriter** module from the **PowerShell Gallery** using the following command:
+Using `nuget`: See the [**packages**](https://gitlab.com/phellams/phwriter/-/packages?orderBy=name&sort=asc&search[]=phwriter&type=NuGet) page for installation instructions.
 
-  1. Download the module: `Install-Module -Name PHWriter -Repository PSGallery`
-  > Note that you might need to run this command as an administrator to install the module, and set the execution policy to "RemoteSigned" or "Unrestricted" if prompted.
-  2. Import the module: `Import-Module -Name PHWriter`
-  3. Test the module by running `Get-Command -Module PHWriter` or `Get-Module -Name PHWriter`
+> For instructions on adding `nuget` **sources** packages from *GitLab* see [**Releases**](https://github.com/sgkens/phwriter/releases) artifacts or via the [**Packages**](https://gitlab.com/phellams/phwriter/-/packages?orderBy=name&sort=asc&search[]=phwriter&type=NuGet) page.
+
+#### 🧺 Generic Asset
+
+The latest release artifacts can be downloaded from the [**Generic Assets Artifacts**](https://gitlab.com/phellams/phwriter/-/packages?orderBy=type&sort=desc&type=Generic) page.
+
+#### 💾 Git Clone
+
+```bash
+# Clone the repository
+git clone https://gitlab.com/phellams/phwriter.git
+cd phwriter
+import-module .\
+```
+
+## Quick Start
+
+```powershell
+# Import module from module directory
+Import-Module -name Phwriter
+```
 
 
 ## Usage
@@ -72,10 +96,19 @@ New-PHWriter -Name <String> `
  - **CustomLogo**: The logo to display at the top of the help text. Default: "P H W R I T E R"
  - **Help**: Display help for the cmdlet
 
+#### 🏮 Write-PHAsciiLogo
 
+Outputs the header logo for the module
 
-**Example:**
+```powershell
+Write-PHAsciiLogo -Name <String> # Has a Max char length
+```
 
+## **Examples:**
+
+You can call `New-PHWriter` to generate help text for your cmdlet with the following parameters either by using **params**, **params** via `hashtable`
+
+### 🟡 Option 1 By Variables
 ```powershell
 # Define the parameters for your custom cmdlet's help
 [hashtable] $MyCommandDiscription = @{
@@ -118,13 +151,17 @@ $myCmdletParams = @(
         Inline      = $false
     }
 )
+
 $myCmdletexamples = @(
     "New-PHWriter -SourcePath 'C:\Source' -DestinationPath 'C:\Destination' -Recurse",
     "New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Confirm",
     "New-PHWriter -SourcePath 'C:\Source' -DestinationPath 'C:\Destination' -Recurse -Confirm",
     "New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Recurse -Confirm"
 )
+```
+🟢 Call `PHWriter` with params
 
+```powershell
 
 New-PHWriter -Name "PHWRITER" `
              -ParamTable $myCmdletParams `
@@ -133,6 +170,68 @@ New-PHWriter -Name "PHWRITER" `
              -Version "1.2.1" `
              -Padding 6 `
              -Indent 2
+```
+
+### 🟡 Option 2 By Object Hashtable
+
+```powershell
+$phwriter_object = @{
+    Name =  "PHWRITER"
+    Version =  "1.2.1"
+    Padding =  6
+    Indent =  2
+    CommandInfo = @{
+        cmdlet = "New-PHWriter";
+        synopsis = "New-PHWriter [-HelpTable <Hashtable[]>] [-Padding <Int>] [-Indent <Int>]";
+        description = "This cmdlet generates formatted help text for PowerShell cmdlets with custom layouts and coloring, mimicking the style of the 'help' command. It supports custom layouts, coloring, and inline/newline descriptions. "; 
+    }
+    ParamTable         = @(
+        @{
+            Name        = "SourcePath"
+            Param       = "s|Source"
+            Type        = "string"
+            required   = $true
+            Description = "Specifies the source path for the operation. Wildcards are supported."
+            Inline      = $false # Description on a new line
+        },
+        @{
+            Name        = "DestinationPath"
+            Param       = "d|Destination"
+            Type        = "string"
+            required   = $true
+            Description = "Specifies the destination path where files will be copied."
+            Inline      = $false  # Description on the same line
+        },
+        @{
+            Name        = "Recurse"
+            Param       = "r|Recurse"
+            Type        = "switch"
+            required   = $false
+            Description = "Indicates that the operation should process subdirectories recursively."
+            Inline      = $false
+        },
+        @{
+            Name        = "Confirmation"
+            Param       = "c|Confirm"
+            Type        = "switch"
+            required   = $false
+            Description = "Prompts you for confirmation before running the cmdlet. (CommonParameter)"
+            Inline      = $false
+        }
+    )
+    Examples           = @(
+        "New-PHWriter -SourcePath 'C:\Source' -DestinationPath 'C:\Destination' -Recurse",
+        "New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Confirm",
+        "New-PHWriter -SourcePath 'C:\Source' -DestinationPath 'C:\Destination' -Recurse -Confirm",
+        "New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Recurse -Confirm"
+    )
+}
+```
+
+🟢 Call `PHWriter` with hashtable params
+
+```powershell
+New-PHWriter @phwriter_objects
 ```
 
 **Generate the formatted help output with custom padding and indent:**
@@ -179,10 +278,26 @@ New-PHWriter -HelpTable $myCmdletParams -Padding 6 -Indent 2
 
      New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Recurse -Confirm
 ```
+<!-- ROADMAP -->
+## Roadmap
+
+🟡 **Task List**
+
+- [ ] Add parameter validation as mandatory is not use, `modulename -help` needs to be called
+- [ ] Add Advance Parameter Section in output, make it *optional*
 
 ## Contributing
 
-Contributions are welcome! If you have suggestions for improvements or find any issues, please open an issue or submit a pull request on the GitHub repository.
+Feel free to contribute!  Fork the repo and submit a **merge request** with your improvements.  Or, open an **issue** with the `enhancement` tag to discuss your ideas.
+
+1. Fork the Project from `git clone https://gitlab.com/phellams/phwriter.git`
+2. Create your Feature Branch check out the branch dev `git switch dev`.
+   1. `git switch -c feature/AmazingFeature`
+   2. or 
+   3. `git checkout -b feature/AmazingFeature`
+3. Commit your Changes `git commit -m 'Add some AmazingFeature'`
+4. Push to the Branch `git push origin feature/AmazingFeature`
+5. [Open a Merge Request](https://gitlab.com/phellams/phwriter/-/merge_requests/new)
 
 ## 📑 License
 
