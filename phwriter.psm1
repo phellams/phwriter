@@ -1,34 +1,70 @@
+using module .\cmdlets\New-Paragraph.psm1
 using module .\cmdlets\Format-StringWithCharSpacesAndHyphens.psm1
-# using module .\cmdlets\psparagraph\libs\New-Paragraph.psm1
 using module .\cmdlets\New-ColorConsole.psm1
 
 # From psparagraph module
-function New-Paragraph() {
-    [CmdletBinding()]
-    [OutputType([string])]
-    param(
-        [
-        Parameter(
-            Mandatory = $true
-        )
-        ][int]$position,
+# Add-Type -TypeDefinition @"
+# using System;
+# using System.Text;
 
-        [
-        Parameter(
-            Mandatory = $true
-        )
-        ][int]$indent,
+# public class Indenter
+# {
+#     public static string NewIndent(int position, int indent, string str)
+#     {
+#         var StringBuilder = new StringBuilder();
+#         var words = str.Split(' ');
+
+#         int currentLineLength = 0;
+#         StringBuilder.Append(' ', indent);
+#         foreach (var word in words)
+#         {
+#             if (currentLineLength + word.Length > position)
+#             {
+#                 StringBuilder.AppendLine();
+#                 StringBuilder.Append(' ', indent);
+#                 currentLineLength = 0;
+#             }
+
+#             StringBuilder.Append(word);
+#             StringBuilder.Append(' ');
+#             currentLineLength += word.Length + 1;
+#         }
+
+#         return StringBuilder.ToString();
+#     }
+# }
+# "@
+
+# function New-Paragraph() {
+#     [CmdletBinding()]
+#     [OutputType([string])]
+#     param(
+#         [
+#         Parameter(
+#             Mandatory = $true
+#         )
+#         ][int]$position,
+
+#         [
+#         Parameter(
+#             Mandatory = $true
+#         )
+#         ][int]$indent,
        
-        [  
-        Parameter(
-            Mandatory = $true
-        )
-        ]
-        [string]$string
-    )
+#         [  
+#         Parameter(
+#             Mandatory = $true
+#         )
+#         ]
+#         [string]$string
+#     )
 
-    return [Indenter]::NewIndent($position, $indent, $string)
+#     return [Indenter]::NewIndent($position, $indent, $string)
 
+# }
+
+$script:__phwriter = @{
+    rootpath = Split-Path -Parent -Path $MyInvocation.MyCommand.Definition
 }
 
 # *=============================================
@@ -48,13 +84,13 @@ function Write-PHAsciiLogo {
     $logoLines = @()
 
     # if no name provided and custom logo is not set, use default logo
-    if (!$CustomLogo) {
+    if(!$CustomLogo) {
         $Name_Spaced = Format-StringWithCharSpacesAndHyphens -InputString "-$Name-" # Format the name with spaces and hyphens
         # Elements
         $top_border = "`▫▫▫▫▫▫▫▫════════════════════════════════════════════════════════▫▫▫▫▫▫═╗"
         $bottom_border = "`▫▫▫▫▫▫▫▫════════════════════════════════════════════════════════▫▫▫▫▫▫═╝"
         [int]$padding_left = ($top_border.Length) - ($top_border.Length / 2 ) - ($Name_Spaced.Length / 2) - 1 # Calculate padding for left side
-        [int]$padding_right = $null
+        [int]$padding_right  = $null
         if ($Name.Length % 2 -eq 0) { 
             # write-host "Value is even"
             $padding_right = $padding_left - 1  # If even, add one more space to the right
@@ -139,14 +175,16 @@ function New-PHWriter {
 
     Process {
 
-        if (!$version) {
+        if(!$version){
             $Version = '1.0.0' # Default version if not provided
         }
 
         # Create an indentation string based on the Indent parameter.
         $indentString = " " * $Indent
-        if (!$Description) { $Description = "-" }
-        $ParamTable = @(
+        if(!$Description){$Description = "-"}
+
+        # Indernal Help
+        $phwriter_ParamTable = @(
             @{
                 name        = "Name"
                 param       = "n|Name"
@@ -212,20 +250,20 @@ function New-PHWriter {
             }
         )
         $phwriter_commandinfo = @{
-            cmdlet      = "New-PHWriter";
-            synopsis    = "New-PHWriter [-HelpTable <Hashtable[]>] [-Padding <Int>] [-Indent <Int>]";
+            cmdlet = "New-PHWriter";
+            synopsis = "New-PHWriter [-HelpTable <Hashtable[]>] [-Padding <Int>] [-Indent <Int>]";
             description = "This cmdlet generates formatted help text for PowerShell cmdlets with custom layouts and coloring, mimicking the output of the 'help' command. It supports custom layouts, coloring, and inline/newline descriptions."
-            source      = "https://gitlab.com/phellams/phwriter/blob/main/README.md"
+            source = "https://gitlab.com/phellams/phwriter/blob/main/README.md"
         }
         $phwriter_examples = @(
             'New-PHWriter -Help',
             'New-PHWriter -Name "PHWriter" -ComandInfo [Hashtable] -ParamTable [HashTable[]] -Version [String] -Padding [int] -Indent [int]',
             'New-PHWriter -Name "PHWriter" -ComandInfo [Hashtable] -ParamTable [HashTable[]] -version [String] -Padding [int] -Indent [int]'
         )
-        if ($Help) {
+        if($Help){
             # If the Help switch is set, display the help information and exit.
             New-PHWriter -Name 'PHWRITER' -CommandInfo $phwriter_commandinfo -ParamTable $phwriter_ParamTable -Padding 4 -Indent 2 `
-                -CustomLogo $CustomLogo -Version '0.3.5' -Examples $phwriter_examples
+             -CustomLogo $CustomLogo -Version '0.3.5' -Examples $phwriter_examples
             [console]::write("`n") # Add a new line for spacing after the
             return
         }
@@ -233,9 +271,12 @@ function New-PHWriter {
         # Load JSON data if a JsonFile is provided
         [pscustomobject]$jsonData = $null
         if ($JsonFile) {
-            if (Test-Path $JsonFile) {
+            $jsonFile_FullPath = Get-ChildItem -Path $JsonFile | Select-Object -First 1
+            if ($null -ne $jsonFile_FullPath) {
                 try {
-                    $jsonData = ConvertFrom-Json $(get-content -path $JsonFile -raw) -AsHashtable
+                    # Get Property 
+                    $jsonFile_FullPath = Get-ChildItem -Path $JsonFile | Select-Object -First 1
+                    $jsonData = ConvertFrom-Json $(get-content -Path $jsonFile_FullPath.FullName -raw) -AsHashtable
                     # Override parameters with JSON data if they exist
                     if ($jsonData.name) { $Name = $jsonData.name } else { throw "Name is required." }
                     if ($jsonData.commandinfo) { $CommandInfo = $jsonData.commandinfo } else { throw "CommandInfo is required." }
@@ -245,13 +286,11 @@ function New-PHWriter {
                     if ($jsonData.padding) { $Padding = $jsonData.padding }
                     if ($jsonData.indent) { $Indent = $jsonData.indent }
                     if ($jsonData.customlogo) { $CustomLogo = $jsonData.customlogo }
-                }
-                catch {
+                } catch {
                     Write-Warning "Failed to parse JSON file: $_"
                     exit
                 }
-            }
-            else {
+            } else {
                 Write-Warning "JSON file not found: $JsonFile"
                 exit
             }
@@ -260,8 +299,8 @@ function New-PHWriter {
         # Fallback to default name if not provided
         if (!$name -or !$jsonfile) { $name = 'PHW' } 
         # Display the ASCII logo at the top of the help output.
-        if (!$CustomLogo -or !$JsonFile) { Write-PHAsciiLogo -Name $name }
-        else { Write-PHAsciiLogo -CustomLogo $CustomLogo -Name $name }
+        if(!$CustomLogo -or !$JsonFile) { Write-PHAsciiLogo -Name $name}
+        else{ Write-PHAsciiLogo -CustomLogo $CustomLogo -Name $name }
 
         $section_char = "$(csole -String "◉" -color darkgreen -format bold, italic)"
         $header_char = "$(csole -String "▶" -color darkgreen -format bold, italic)"
@@ -289,8 +328,7 @@ function New-PHWriter {
         if (!$ParamTable -or $ParamTable.Count -eq 0) {
             Write-Warning "No parameters provided in ParamTable. Skipping parameter display."
             return
-        }
-        else {
+        }else{
             [console]::write("$indentString$section_char$(csole -s PARAMETERS -color Yellow -format bold,underline)")
             [console]::write("`n`n")
 
@@ -384,7 +422,7 @@ $cmdlet_config = @{
         'New-PHWriter',
         'Write-PHAsciiLogo'
     )
-    alias    = @()
+    alias = @()
 }
 
 Export-ModuleMember @cmdlet_config
