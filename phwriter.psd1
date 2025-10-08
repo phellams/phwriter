@@ -5,7 +5,7 @@
     CompanyName       = 'Phallems'
     Copyright         = '(c) 2025 Phallems. All rights reserved.'
     Description       = 'A PowerShell module for generating custom, colored help text with a man-page-like layout.'
-    RootModule        = 'PHWriter.psm1'
+    RootModule        = 'phwriter.psm1'
     FunctionsToExport = @('New-PHWriter', 'Write-PHAsciiLogo')
     CmdletsToExport   = @()
     VariablesToExport = @()
