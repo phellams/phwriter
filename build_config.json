@@ -1,0 +1,32 @@
+{
+    "modulename": "phwriter",
+    "releasetype": "public",
+    "gituser": "sgkens",
+    "gitgroup": "phellams",
+    "gitlabid": "",
+    "gitlabid_public": "71983492",
+    "license": "MIT",
+    "iconurl": "https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png",
+    "phwriter": false,
+    "phwriter_source": "https://gitlab.com/phellams/phwriter/-/blob/main/readme.md",
+    "pester_test_files": [
+        ".\\cmdlets\\*.psm1", 
+        ".\\*.psm1"       
+    ], 
+    "modulefiles": [
+        "phwriter.psm1",
+        "phwriter.psd1",
+        "LICENSE",
+        "icon.png",
+        "readme.md",
+        "readme.txt"
+    ],
+    "modulefolders": [
+        "cmdlets",
+        "libs",
+        "tools"
+    ],
+    "moduleexclude": [
+        "commit-helper.ps1"
+    ]
+}
