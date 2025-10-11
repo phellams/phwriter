@@ -1,6 +1,6 @@
 @{
-    ModuleVersion     = '0.4.2'
-    GUID              = 'b40e340a-9d6c-4f7f-8c3b-2a7f8e0d9c1a'
+    ModuleVersion     = '0.4.3'
+    GUID              = '083f04e0-3fe0-42ec-a918-f799e1f1df39'
     Author            = 'Garvey K. Snow'
     CompanyName       = 'Phallems'
     Copyright         = '(c) 2025 Phallems. All rights reserved.'
@@ -16,17 +16,17 @@
             ReleaseNotes = @()
             RequireLicenseAcceptance = $false
             LicenseUri               = 'https://choosealicense.com/licenses/mit'
-            ProjectUri               = 'https://gitlab.com/phellams/zypline.git'
-            IconUri                  = 'https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/zypline/dist/png/zypline-logo-128x128.png'
+            ProjectUri               = 'https://gitlab.com/phellams/phwriter.git'
+            IconUri                  = 'https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png'
             # CHOCOLATE ---------------------
             LicenseUrl               = 'https://choosealicense.com/licenses/mit'
-            ProjectUrl               = 'https://github.com/phellams/zypline'
-            IconUrl                  = 'https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/zypline/zypline-logo-128x128.png'
+            ProjectUrl               = 'https://github.com/phellams/phwriter'
+            IconUrl                  = 'https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/zypline-logo-128x128.png'
             Docsurl                  = 'https://pages.gitlab.io/sgkens/ptoml'
-            MailingListUrl           = 'https://github.com/phellams/zypline/issues'
-            projectSourceUrl         = 'https://github.com/phellams/zypline'
-            bugTrackerUrl            = 'https://github.com/phellams/zypline/issues'
-            Summary                  = 'A PowerShell module for advanced file and folder searching with configuration management.'
+            MailingListUrl           = 'https://github.com/phellams/phwriter/issues'
+            projectSourceUrl         = 'https://github.com/phellams/phwriter'
+            bugTrackerUrl            = 'https://github.com/phellams/phwriter/issues'
+            Summary                  = 'A PowerShell module for generating custom, colored help text with a man-page-like layout.'
             chocoDescription         = @"
 ## Overview
 
