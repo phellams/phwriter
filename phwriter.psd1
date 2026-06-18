@@ -15,13 +15,13 @@
             Tags         = @('Help', 'Formatting', 'CLI', 'PowerShell', 'Documentation')
             ReleaseNotes = @()
             RequireLicenseAcceptance = $false
-            LicenseUri               = 'https://choosealicense.com/licenses/mit'
-            ProjectUri               = 'https://gitlab.com/phellams/phwriter.git'
             IconUri                  = 'https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png'
-            # CHOCOLATE ---------------------
             LicenseUrl               = 'https://choosealicense.com/licenses/mit'
             ProjectUrl               = 'https://github.com/phellams/phwriter'
-            IconUrl                  = 'https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/zypline-logo-128x128.png'
+            # CHOCOLATE ---------------------
+            LicenseUri               = 'https://choosealicense.com/licenses/mit'
+            ProjectUri               = 'https://gitlab.com/phellams/phwriter.git'
+            IconUrl                  = 'https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png'
             Docsurl                  = 'https://pages.gitlab.io/sgkens/ptoml'
             MailingListUrl           = 'https://github.com/phellams/phwriter/issues'
             projectSourceUrl         = 'https://github.com/phellams/phwriter'
