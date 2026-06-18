@@ -7,301 +7,222 @@
 
 ## Overview
 
-PHWriter(_**Powershell Help Writer**_) is a PowerShell module designed to generate beautifully formatted, colored help text for your PowerShell cmdlets, mimicking the style and readability of Linux man pages. It allows you to define your cmdlet's parameters and their descriptions in a structured way, providing a consistent and professional look for your command-line help.
-Features
+PHWriter (**PowerShell Help Writer**) is a professional PowerShell module designed to generate beautifully formatted, colored help text for cmdlets and CLI tools, mimicking the style, layout, and readability of modern Linux man pages. It supports modular command architectures (standard cmdlets and router functions), visual layout templates, and swappable color theme palettes.
 
- - **Customizable Layout**: Control indentation and spacing between parameter elements.
- - Colored Output: Enhance readability with distinct colors for different help sections and parameter components.
- - **ASCII Art Logo**: Includes a simple, elegant ASCII art banner for visual appeal, or you can provide your own ascii art.
- - **Inline/Newline Descriptions**: Choose whether parameter descriptions appear on the same line or a new line.
- - **Automatic Alignment**: Dynamically calculates padding to ensure perfect alignment of parameter types and descriptions.
- - **Production Ready**: Comes with a module manifest (.psd1) for proper PowerShell module management.
+---
+
+## High-Performance Architecture (phellams-aa Standards)
+
+PHWriter is built from the ground up using strict **phellams-aa** system automation guidelines:
+1. **Root Module Loader**: The main `phwriter.psm1` manages imports using high-performance .NET `[System.IO.Directory]` class bindings, dynamically dot-sourcing private helpers and public cmdlets while strictly controlling public exports via `Export-ModuleMember`.
+2. **File-Per-Cmdlet**: Every cmdlet resides in its own isolated `.ps1` script file under the `/Public` directory (e.g. `New-PHWriter.ps1`, `Write-PHAsciiLogo.ps1`).
+3. **Encapsulated Helpers**: Shared helper utilities reside under the `/Private` directory.
+4. **The .NET First Rule**: Replaces slow PowerShell cmdlets with direct cross-platform .NET library calls (e.g. `[System.Text.StringBuilder]` for string building and `[System.IO.File]` for loading help configs).
+5. **Color/Layout Exclusivity**: Utilizes a centralized ANSI 256-color parser that applies styling parameters *after* calculating layout padding to prevent character splitting and terminal output tearing.
+
+---
 
 ## Installation
 
-Phellams modules are available from [**PowerShell Gallery**](https://www.powershellgallery.com/packages/phwriter) and [**Chocolatey**](https://chocolatey.org/packages/phwriter). you can access the raw assets via [**Gitlab Generic Assets**](https://gitlab.com/phellams/phwriter/-/packages?orderBy=name&sort=desc&search[]=phwriter) or nuget repository via [**Gitlab Packages**](https://gitlab.com/phellams/phwriter/-/packages/?orderBy=name&sort=desc&search[]=phwriter&type=NuGet).
+### Installation via PowerShell Gallery
+```powershell
+Install-Module -Name PHWriter -Scope CurrentUser
+```
 
-|▓▓▓▓▒▒▒▒░░░|▓▓▓▓▒▒▒▒░░░|▓▓▓▓▒▒▒▒░░░|
-|-|-|-|
-|📦 PSGallery | <a href="https://www.powershellgallery.com/packages/phwriter"> <img src="https://img.shields.io/powershellgallery/v/phwriter?label=version&style=flat-square&logoColor=blue&labelColor=23CD5C5C&color=%231E3D59" alt="powershellgallery"></a> | <img src="https://img.shields.io/powershellgallery/dt/phwriter?style=flat-square&logoColor=blue&label=downloads&labelColor=23CD5C5C&color=%231E3D59" alt="powershellgallery-downloads"> |
-|📦 Chocolatey | <a href="https://community.chocolatey.org/packages/phwriter/"><img src="https://img.shields.io/chocolatey/v/phwriter?label=version&include_prereleases&style=flat-square&logoColor=blue&labelColor=23CD5C5C&color=%231E3D59" alt="chocolatey"/></a> | <img src="https://img.shields.io/chocolatey/dt/phwriter?style=flat-square&logoColor=blue&label=downloads&include_prereleases&labelColor=23CD5C5C&color=%231E3D59" alt="chocolatey-downloads"> |
-
-### Additinonal Installation Options:
- 
-|▓▓▓▓▒▒▒▒░░░|▓▓▓▓▒▒▒▒░░░|▓▓▓▓▒▒▒▒░░░|
-|-|-|-|
-|💼 Releases/Tags | <a href="https://gitlab.com/phellams/phwriter/-/releases"> <img src="https://img.shields.io/gitlab/v/release/phellams%2Fphwriter?include_prereleases&style=flat-square&logoColor=%2300B2A9&labelColor=%23CD5C5C&color=%231E3D59" alt="gitlab-release"></a> | <a href="https://gitlab.com/phellams/phwriter/-/tags"> <img src="https://img.shields.io/gitlab/v/tag/phellams%2Fphwriter?include_prereleases&style=flat-square&logoColor=%&labelColor=%23CD5C5C&color=%231E3D59" alt="gitlab tags"></a> |
-
-#### 📦 GitLab Packages
-
-Using `nuget`: See the [**packages**](https://gitlab.com/phellams/phwriter/-/packages?orderBy=name&sort=asc&search[]=phwriter&type=NuGet) page for installation instructions.
-
-> For instructions on adding `nuget` **sources** packages from *GitLab* see [**Releases**](https://github.com/sgkens/phwriter/releases) artifacts or via the [**Packages**](https://gitlab.com/phellams/phwriter/-/packages?orderBy=name&sort=asc&search[]=phwriter&type=NuGet) page.
-
-#### 🧺 Generic Asset
-
-The latest release artifacts can be downloaded from the [**Generic Assets Artifacts**](https://gitlab.com/phellams/phwriter/-/packages?orderBy=type&sort=desc&type=Generic) page.
-
-#### 💾 Git Clone
-
+### Manual Installation
 ```bash
 # Clone the repository
 git clone https://gitlab.com/phellams/phwriter.git
 cd phwriter
-import-module .\
+Import-Module .\phwriter.psm1
 ```
 
-## Quick Start
+---
+
+## Layout Templates
+
+PHWriter features **6 distinct ASCII/ANSI banner layouts** for rendering module headers:
+
+| Layout | Description | Visual Representation |
+|---|---|---|
+| `Box` | Renders the module name inside a sleek box with rounded corners. | `╭───...───╮` |
+| `Classic` | Renders a retro, double-lined border with text filled in by a custom theme block character. | `╔═══...═══╗` |
+| `Minimal` | Renders the spaced module name with a simple underlining bar. | `────...────` |
+| `Man` | Mimics standard Linux manual headers at the top of the command console. | `PHW(1)  User Commands  PHW(1)` |
+| `Terminal` | Renders a terminal prompt icon (`>_`) on the left, with details on the right. | `┌──┐ >_ Name` |
+| `Typewriter` | Displays a detailed ANSI typewriter graphic on the left, with details on the right. | Typewriter glyph |
+
+---
+
+## The 10 Default Themes
+
+PHWriter includes **10 built-in theme configurations** covering diverse visual aesthetics:
+
+1. **`default`** (Retro Modern): Neon Cyan header and Module name over Dark Green section indicators and Gray meta tags.
+2. **`matrix`** (Cyberpunk Green): High-contrast bright green on black. Perfect for dark terminal hacking setups.
+3. **`cyberpunk`** (Neon Synthwave): Hot Pink accents, Neon Yellow descriptions, and Cyan parameter types.
+4. **`dracula`** (Vampire Theme): Classic Dracula dark theme featuring Purple, Pink, Green, and Yellow highlights.
+5. **`nord`** (Nordic Frost): Clean and calm palette with icy blues, cyan accents, and white text.
+6. **Monokai** (`monokai`): Vibrant monokai theme utilizing pink, yellow, green, and orange text highlights.
+7. **`solarized`** (Solarized Dark): Muted cyan and green highlight structure with soft blue parameter names.
+8. **`sunset`** (Golden Hour): Warm reds, orange parameters, and golden yellow highlights.
+9. **`forest`** (Natural Autumn): Forest green, olive green parameters, and gold accents.
+10. **`classic`** (Old-School Man): Monochrome greyscale, mimicking traditional terminal man pages using only bold, underlines, and italics.
+
+---
+
+## Router Command Support
+
+PHWriter can document **router functions**—commands that wrap around multiple subcommands (like `git` or `docker` subcommands). Using the `-Subcommands` array parameter, PHWriter generates a `SUBCOMMANDS` help section detailing the sub-features, syntax, and description of each router endpoint.
+
+---
+
+## Usage Guide
+
+### Cmdlet Parameters
+
+#### 🏮 `New-PHWriter`
+Generates the help documentation layout:
+- **`JsonFile`** (`[string]`): File path to a JSON configuration containing help definitions.
+- **`Name`** (`[string]`): Name of the module/tool to display.
+- **`CommandInfo`** (`[hashtable]`): Contains `cmdlet`, `synopsis`, `description`, and `source` URL.
+- **`ParamTable`** (`[array]`): Array of hashtables representing cmdlet parameters (`name`, `param`, `type`, `required`, `description`, `inline`).
+- **`Subcommands`** (`[array]`): Array of hashtables representing router subcommands (`name`, `syntax`, `description`).
+- **`Examples`** (`[string[]]`): Array of example execution command blocks.
+- **`Version`** (`[string]`): Version string. Default: `1.0.0`.
+- **`Padding`** (`[int]`): Spaces between columns. Default: `3`.
+- **`Indent`** (`[int]`): Spaces of left indentation. Default: `1`.
+- **`Theme`** (`[string\|hashtable]`): Theme name (1 of the 10 defaults) or a custom theme hashtable. Default: `'default'`.
+- **`Layout`** (`[string]`): Banner layout (`Box`, `Classic`, `Minimal`, `Man`, `Terminal`, `Typewriter`). Default: `'Box'`.
+- **`CustomLogo`** (`[string]`): Custom ASCII logo art.
+
+#### 🏮 `Write-PHAsciiLogo`
+Outputs only the themed ASCII logo banner:
+- **`Name`** (`[string]`): Name of the tool.
+- **`Version`** (`[string]`): Tool version.
+- **`Theme`** (`[string\|hashtable]`): Theme configuration.
+- **`Layout`** (`[string]`): Layout name.
+
+---
+
+## Code Examples
+
+### Standard Cmdlet Documentation
 
 ```powershell
-# Import module from module directory
-Import-Module -name Phwriter
-```
-
-
-## Usage
-
-The primary cmdlet provided by this module is `New-PHWriter`. Generates formatted help text based on an array of hashtables defining your cmdlet's parameters.
-
-#### 🏮 New-PHWriter
-
-🔹 Output help text
-
-```powershell
-New-PHWriter -Help
-```
-🔹 Generate New Help
-```powershell
-New-PHWriter -Name <String> `
-             -CommandInfo <Hashtable> `
-             -ParamTable <HashTable[]> `
-             -Version <String> `
-             -Examples <String[]> `
-             -Padding <Int> `
-             -Indent <Int> `
-             -CustomLogo <String>
-             -Help <Switch>
-
-```
-
-### **Parameters List**
-
- - **Name**: The name of the module to display in the header. Default: "P H W R I T E R"
- - **CommandInfo**: A hashtable containing the name and description of the cmdlet to display version information. Default: Current command name props: 'ModuleName', 'Cmdlet', 'Description'
- - **ParamTable**: An array of hashtables defining the parameters and their descriptions. Default: Empty array
- - **Examples**: An array of examples for the cmdlet. Default: Empty array
- - **Version**: The version of the module to display in the header. Default: "1.0.0"
- - **Padding**: The number of spaces between the parameter alias/name, type, and description. Default: 4
- - **Indent**: The number of spaces to indent the help text. Default: 2
- - **CustomLogo**: The logo to display at the top of the help text. Default: "P H W R I T E R"
- - **Help**: Display help for the cmdlet
-
-#### 🏮 Write-PHAsciiLogo
-
-Outputs the header logo for the module
-
-```powershell
-Write-PHAsciiLogo -Name <String> # Has a Max char length
-```
-
-## **Examples:**
-
-You can call `New-PHWriter` to generate help text for your cmdlet with the following parameters either by using **params**, **params** via `hashtable`
-
-### 🟡 Option 1 By Variables
-```powershell
-# Define the parameters for your custom cmdlet's help
-[hashtable] $MyCommandDiscription = @{
-    cmdlet = "New-PHWriter";
-    synopsis = "New-PHWriter [-HelpTable <Hashtable[]>] [-Padding <Int>] [-Indent <Int>]";
-    description = "This cmdlet generates formatted help text for PowerShell cmdlets with custom layouts and coloring, mimicking the style of the 'help' command. It supports custom layouts, coloring, and inline/newline descriptions. "; 
-}
-
 $myCmdletParams = @(
     @{
         Name        = "SourcePath"
         Param       = "s|Source"
         Type        = "string"
-        required   = $true
-        Description = "Specifies the source path for the operation. Wildcards are supported."
-        Inline      = $false # Description on a new line
-    },
-    @{
-        Name        = "DestinationPath"
-        Param       = "d|Destination"
-        Type        = "string"
-        required   = $true
-        Description = "Specifies the destination path where files will be copied."
-        Inline      = $false  # Description on the same line
+        required    = $true
+        Description = "Specifies the source path for the files. Wildcards supported."
+        Inline      = $false
     },
     @{
         Name        = "Recurse"
         Param       = "r|Recurse"
         Type        = "switch"
-        required   = $false
-        Description = "Indicates that the operation should process subdirectories recursively."
-        Inline      = $false
+        required    = $false
+        Description = "Indicates that the operation should process recursively."
+        Inline      = $true
+    }
+)
+
+New-PHWriter -Name "MyModule" `
+             -CommandInfo @{
+                 cmdlet      = "Copy-Files"
+                 synopsis    = "Copy-Files -SourcePath <string> [-Recurse]"
+                 description = "Copies files from the source path to a predefined directory."
+                 source      = "https://github.com/myuser/mymodule"
+             } `
+             -ParamTable $myCmdletParams `
+             -Examples @(
+                 "Copy-Files -SourcePath 'C:\source' -Recurse"
+             ) `
+             -Version "1.4.2" `
+             -Theme "cyberpunk" `
+             -Layout "Terminal"
+```
+
+### Router CLI Command Documentation
+
+```powershell
+$subcommands = @(
+    @{
+        Name        = "init"
+        Syntax      = "init [-Force]"
+        Description = "Initialize local Git repository configuration."
     },
     @{
-        Name        = "Confirmation"
-        Param       = "c|Confirm"
-        Type        = "switch"
-        required   = $false
-        Description = "Prompts you for confirmation before running the cmdlet. (CommonParameter)"
-        Inline      = $false
+        Name        = "commit"
+        Syntax      = "commit -Message <string>"
+        Description = "Record changes to the repository."
     }
 )
 
-$myCmdletexamples = @(
-    "New-PHWriter -SourcePath 'C:\Source' -DestinationPath 'C:\Destination' -Recurse",
-    "New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Confirm",
-    "New-PHWriter -SourcePath 'C:\Source' -DestinationPath 'C:\Destination' -Recurse -Confirm",
-    "New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Recurse -Confirm"
-)
-```
-🟢 Call `PHWriter` with params
-
-```powershell
-
-New-PHWriter -Name "PHWRITER" `
-             -ParamTable $myCmdletParams `
-             -CommandInfo $MyCommandDiscription `
-             -Examples $myCmdletexamples `
-             -Version "1.2.1" `
-             -Padding 6 `
-             -Indent 2
+New-PHWriter -Name "GitHelper" `
+             -CommandInfo @{
+                 cmdlet      = "git-helper"
+                 synopsis    = "git-helper <command> [options]"
+                 description = "A command router function providing simplified Git integrations."
+                 source      = "https://gitlab.com/githelper"
+             } `
+             -Subcommands $subcommands `
+             -Version "0.9.1" `
+             -Theme "matrix" `
+             -Layout "Classic"
 ```
 
-### 🟡 Option 2 By Object Hashtable
+### Defining a Custom Theme
+
+You can pass a custom hashtable theme directly to `-Theme`:
 
 ```powershell
-$phwriter_object = @{
-    Name =  "PHWRITER"
-    Version =  "1.2.1"
-    Padding =  6
-    Indent =  2
-    CommandInfo = @{
-        cmdlet = "New-PHWriter";
-        synopsis = "New-PHWriter [-HelpTable <Hashtable[]>] [-Padding <Int>] [-Indent <Int>]";
-        description = "This cmdlet generates formatted help text for PowerShell cmdlets with custom layouts and coloring, mimicking the style of the 'help' command. It supports custom layouts, coloring, and inline/newline descriptions. "; 
-    }
-    ParamTable         = @(
-        @{
-            Name        = "SourcePath"
-            Param       = "s|Source"
-            Type        = "string"
-            required   = $true
-            Description = "Specifies the source path for the operation. Wildcards are supported."
-            Inline      = $false # Description on a new line
-        },
-        @{
-            Name        = "DestinationPath"
-            Param       = "d|Destination"
-            Type        = "string"
-            required   = $true
-            Description = "Specifies the destination path where files will be copied."
-            Inline      = $false  # Description on the same line
-        },
-        @{
-            Name        = "Recurse"
-            Param       = "r|Recurse"
-            Type        = "switch"
-            required   = $false
-            Description = "Indicates that the operation should process subdirectories recursively."
-            Inline      = $false
-        },
-        @{
-            Name        = "Confirmation"
-            Param       = "c|Confirm"
-            Type        = "switch"
-            required   = $false
-            Description = "Prompts you for confirmation before running the cmdlet. (CommonParameter)"
-            Inline      = $false
-        }
-    )
-    Examples           = @(
-        "New-PHWriter -SourcePath 'C:\Source' -DestinationPath 'C:\Destination' -Recurse",
-        "New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Confirm",
-        "New-PHWriter -SourcePath 'C:\Source' -DestinationPath 'C:\Destination' -Recurse -Confirm",
-        "New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Recurse -Confirm"
-    )
+$myCustomTheme = @{
+    AccentColor      = 'red'
+    AccentFormat     = 'bold,underline'
+    BorderColor      = 'yellow'
+    BorderFormat     = 'none'
+    HeaderBg         = 'black'
+    HeaderFg         = 'white'
+    ModuleBg         = 'black'
+    ModuleFg         = 'red'
+    VersionBg        = 'black'
+    VersionFg        = 'yellow'
+    SyntaxFg         = 'white'
+    SyntaxFormat     = 'none'
+    DescriptionFg    = 'white'
+    ParamNameFg      = 'red'
+    ParamNameFormat  = 'bold'
+    ParamTypeFg      = 'yellow'
+    ParamTypeFormat  = 'none'
+    ParamReqFg       = 'red'
+    ParamReqFormat   = 'bold'
+    ParamDescFg      = 'gray'
+    ExampleFg        = 'yellow'
+    DocsFg           = 'red'
+    DocsFormat       = 'underline'
+    SectionChar      = '🔥'
+    HeaderChar       = '➔'
+    BorderTop        = '🔥━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🔥'
+    BorderBottom     = '🔥━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🔥'
+    BorderMiddle     = '░'
 }
+
+New-PHWriter -Name "FireCLI" -Theme $myCustomTheme -CommandInfo $commandInfo -ParamTable $params
 ```
 
-🟢 Call `PHWriter` with hashtable params
-
-```powershell
-New-PHWriter @phwriter_objects
-```
-
-**Generate the formatted help output with custom padding and indent:**
-
-```powershell
-New-PHWriter -HelpTable $myCmdletParams -Padding 6 -Indent 2
-```
-
-**Output**
-
-```text
-╔═======════════════════════════════════════════════════════════======═╗
-╟░░░░░░░░░░░░░░░░░░░░░░░░░░░░P H W R I T E R░░░░░░░░░░░░░░░░░░░░░░░░░░░╢                                                               
-╚═======════════════════════════════════════════════════════════======═╝
-
-   MODULE  PHWRITER   CMDLET New-PHWriter      v1.2.1
-
-    CMDLET SYNOPSIS
-       New-PHWriter [-HelpTable <Hashtable[]>] [-Padding <Int>] [-Indent <Int>]
-
-    DESCRIPTION
-       This cmdlet generates formatted help text for PowerShell cmdlets with custom layouts and
-       coloring, mimicking the style of the 'help' command. It supports custom layouts, coloring, and
-       inline/newline descriptions.
-
-
-    PARAMETERS
-
-     -s|Source            [string]       (Req)  SourcePath
-                                          Specifies the source path for the operation. Wildcards are supported.
-     -d|Destination       [string]       (Req)  DestinationPath
-                                          Specifies the destination path where files will be copied.
-     -r|Recurse           [switch]        Recurse
-                                          Indicates that the operation should process subdirectories recursively.
-     -c|Confirm           [switch]        Confirmation
-                                          Prompts you for confirmation before running the cmdlet. (CommonParameter)
-   EXAMPLES
-
-     New-PHWriter -SourcePath 'C:\Source' -DestinationPath 'C:\Destination' -Recurse
-
-     New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Confirm
-
-     New-PHWriter -SourcePath 'C:\Source' -DestinationPath 'C:\Destination' -Recurse -Confirm
-
-     New-PHWriter -SourcePath 'C:\Source\*' -DestinationPath 'C:\Destination' -Recurse -Confirm
-```
-<!-- ROADMAP -->
-## Roadmap
-
-🟡 **Task List**
-
-- [ ] Add parameter validation as mandatory is not use, `modulename -help` needs to be called
-- [ ] Add Advance Parameter Section in output, make it *optional*
+---
 
 ## Contributing
 
-Feel free to contribute!  Fork the repo and submit a **merge request** with your improvements.  Or, open an **issue** with the `enhancement` tag to discuss your ideas.
+1. Fork the Project.
+2. Create your Feature Branch: `git switch -c feature/AmazingFeature`.
+3. Commit your changes.
+4. Push to the branch: `git push origin feature/AmazingFeature`.
+5. Open a **Merge Request**.
 
-1. Fork the Project from `git clone https://gitlab.com/phellams/phwriter.git`
-2. Create your Feature Branch check out the branch dev `git switch dev`.
-   1. `git switch -c feature/AmazingFeature`
-   2. or 
-   3. `git checkout -b feature/AmazingFeature`
-3. Commit your Changes `git commit -m 'Add some AmazingFeature'`
-4. Push to the Branch `git push origin feature/AmazingFeature`
-5. [Open a Merge Request](https://gitlab.com/phellams/phwriter/-/merge_requests/new)
-
-## 📑 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-
-[license-badge]: https://img.shields.io/badge/License-MIT-Blue?style=for-the-badge&labelColor=%232D2D34&color=%2317202a
