@@ -123,6 +123,14 @@ Describe "New-PHWriter" {
     It "Should render help with subcommands (router function) without throwing" {
         New-PHWriter @routerParams
     }
+
+    It "Should respect LineSpacing, SourceType, and Padding parameters" {
+        $customParams = $params.Clone()
+        $customParams['LineSpacing'] = 0
+        $customParams['SourceType'] = 'script'
+        $customParams['Padding'] = 1
+        New-PHWriter @customParams
+    }
 }
 
 Describe "New-AsciiColor" {
@@ -142,5 +150,105 @@ Describe "New-AsciiGradient" {
     It "Should generate foreground gradient successfully" {
         $grad = New-AsciiGradient -Type 'fg' -Steps @(196, 226) -String 'Rainbow'
         $grad | Should -BeLike '*R*'
+    }
+}
+
+Describe "Export-PHWriterMetadata" {
+    It "Should extract metadata from Write-PHAsciiLogo.ps1" {
+        $meta = Export-PHWriterMetadata -Path "$PSScriptRoot/../Public/Write-PHAsciiLogo.ps1" -FunctionName "Write-PHAsciiLogo"
+        $meta | Should -Not -BeNullOrEmpty
+        $meta.name | Should -Be 'phwriter'
+        $meta.version | Should -BeLike '*.*.*'
+        $meta.sourcetype | Should -Be 'module'
+        $meta.commandinfo.cmdlet | Should -Be 'Write-PHAsciiLogo'
+    }
+
+    It "Should respect FunctionName filter" {
+        $meta = Export-PHWriterMetadata -Path "$PSScriptRoot/../Public/Write-PHAsciiLogo.ps1" -FunctionName "Write-PHAsciiLogo"
+        $meta | Should -Not -BeNullOrEmpty
+        $meta.commandinfo.cmdlet | Should -Be 'Write-PHAsciiLogo'
+    }
+
+    It "Should output JSON file when requested" {
+        $tempJson = [System.IO.Path]::GetTempFileName() + ".json"
+        try {
+            $meta = Export-PHWriterMetadata -Path "$PSScriptRoot/../Public/Write-PHAsciiLogo.ps1" -FunctionName "Write-PHAsciiLogo" -OutputJson $tempJson
+            $meta | Should -Not -BeNullOrEmpty
+            [System.IO.File]::Exists($tempJson) | Should -Be $true
+            $loaded = Get-Content -Path $tempJson -Raw | ConvertFrom-Json
+            $loaded.name | Should -Be 'phwriter'
+        } finally {
+            if ([System.IO.File]::Exists($tempJson)) {
+                [System.IO.File]::Delete($tempJson)
+            }
+        }
+    }
+}
+
+Describe "New-PHRouter" {
+    It "Should dispatch exact match subcommand scriptblock" {
+        $state = @{ called = $false }
+        $routes = @{
+            'test' = { $state.called = $true }
+        }
+        New-PHRouter -Routes $routes -ArgumentList @('test')
+        $state.called | Should -Be $true
+    }
+
+    It "Should dispatch default route when no subcommand matches" {
+        $state = @{ called = $false }
+        $routes = @{
+            'test' = { }
+            'default' = { $state.called = $true }
+        }
+        New-PHRouter -Routes $routes -ArgumentList @()
+        $state.called | Should -Be $true
+    }
+
+    It "Should register native completer without throwing" {
+        New-PHRouter -Routes @{ 'a' = {} } -ArgumentList @() -ModuleName 'TestComplete' -RegisterCompleter
+    }
+
+    It "Should perform fuzzy suggestion on unknown subcommand" {
+        $routes = @{
+            'build' = { }
+            'test'  = { }
+        }
+        New-PHRouter -Routes $routes -ArgumentList @('buid') -ModuleName 'FuzzyTest'
+    }
+
+    It "Should dispatch exact match function name string route" {
+        function global:Invoke-TestRouterTarget { $script:routerState.called = $true }
+        $script:routerState = @{ called = $false }
+        try {
+            $routes = @{
+                'test' = 'Invoke-TestRouterTarget'
+            }
+            New-PHRouter -Routes $routes -ArgumentList @('test')
+            $script:routerState.called | Should -Be $true
+        } finally {
+            $script:routerState = $null
+            Remove-Item -Path "function:\Invoke-TestRouterTarget" -ErrorAction SilentlyContinue
+        }
+    }
+}
+
+Describe "Invoke-PHPager" {
+    It "Should render plain text content without throwing in test mode" {
+        $env:PHWRITER_TEST_MODE = 'true'
+        try {
+            "Line 1", "Line 2" | Invoke-PHPager -Title 'Test Pager' -NoColor
+        } finally {
+            $env:PHWRITER_TEST_MODE = $null
+        }
+    }
+
+    It "Should render ANSI colorized content in test mode" {
+        $env:PHWRITER_TEST_MODE = 'true'
+        try {
+            "Line 1 with `e[31mRed`e[0m text" | Invoke-PHPager -Title 'Test Color Pager'
+        } finally {
+            $env:PHWRITER_TEST_MODE = $null
+        }
     }
 }
