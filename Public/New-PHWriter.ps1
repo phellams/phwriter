@@ -20,9 +20,14 @@ function New-PHWriter {
     .PARAMETER Version
       The module version to display. Default is '1.0.0'.
     .PARAMETER Padding
-      Spaces of padding between columns. Default is 3.
+      Spaces of padding between columns. Default is 3. Increase for a more airy look, decrease for compact output.
     .PARAMETER Indent
       Spaces of left indentation for each line. Default is 1.
+    .PARAMETER LineSpacing
+      Number of blank lines between each parameter row. Default is 1. Set 0 for compact mode.
+    .PARAMETER SourceType
+      Header label identifying the documentation target type: 'module', 'script', 'tool', or 'plugin'. Default is 'module'.
+      Label type for the header line: 'module', 'script', 'tool', or 'plugin'. Default: 'module'.
     .PARAMETER Theme
       The name of a default theme ('default', 'matrix', 'cyberpunk', etc.) or a custom theme object.
     .PARAMETER Layout
@@ -56,11 +61,19 @@ function New-PHWriter {
         [Parameter(Mandatory = $false, HelpMessage = "Version of the command to display.")]
         [string]$Version,
 
-        [Parameter(HelpMessage = "Number of spaces for padding between columns.")]
+        [Parameter(HelpMessage = "Number of spaces for padding between columns. Default: 3.")]
         [int]$Padding = 3,
 
-        [Parameter(HelpMessage = "Number of spaces for left indentation of each line.")]
+        [Parameter(HelpMessage = "Number of spaces for left indentation of each line. Default: 1.")]
         [int]$Indent = 1,
+
+        [Parameter(HelpMessage = "Blank lines between parameter rows. 0=compact, 1=default, 2=spacious.")]
+        [ValidateRange(0, 4)]
+        [int]$LineSpacing = 1,
+
+        [Parameter(HelpMessage = "Header label type: module, script, tool, or plugin.")]
+        [ValidateSet('module', 'script', 'tool', 'plugin')]
+        [string]$SourceType = 'module',
 
         [Parameter(HelpMessage = "Theme name or custom theme object.")]
         $Theme = 'default',
@@ -85,13 +98,15 @@ function New-PHWriter {
                     param       = "j|JsonFile"
                     type        = "String"
                     description = "JSON file containing help configuration parameters to load."
+                    required    = $false
                     inline      = $false
                 },
                 @{
                     name        = "Name"
                     param       = "n|Name"
                     type        = "String"
-                    description = "The name of the module/tool."
+                    description = "The name of the module, script, or tool to display."
+                    required    = $false
                     inline      = $false
                 },
                 @{
@@ -99,42 +114,87 @@ function New-PHWriter {
                     param       = "c|CommandInfo"
                     type        = "Hashtable"
                     description = "Command details: cmdlet, synopsis, description, source."
+                    required    = $false
                     inline      = $false
                 },
                 @{
                     name        = "ParamTable"
                     param       = "p|ParamTable"
                     type        = "Hashtable[]"
-                    description = "An array of hashtables defining parameters."
+                    description = "Array of parameter hashtables: name, param, type, required, description, inline."
+                    required    = $false
                     inline      = $false
                 },
                 @{
                     name        = "Subcommands"
                     param       = "sub|Subcommands"
                     type        = "Hashtable[]"
-                    description = "An array of hashtables defining router subcommands (name, syntax, description)."
+                    description = "Array of router subcommand hashtables: name, syntax, description."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "Version"
+                    param       = "v|Version"
+                    type        = "String"
+                    description = "Version string to display in the header. Default: '1.0.0'."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "Padding"
+                    param       = "pad|Padding"
+                    type        = "Int"
+                    description = "Column padding in spaces. Default: 3. Lower for compact, higher for airy layout."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "Indent"
+                    param       = "i|Indent"
+                    type        = "Int"
+                    description = "Left indentation in spaces. Default: 1."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "LineSpacing"
+                    param       = "ls|LineSpacing"
+                    type        = "Int"
+                    description = "Blank lines between parameter rows. 0=compact, 1=default, 2=spacious."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "SourceType"
+                    param       = "st|SourceType"
+                    type        = "String"
+                    description = "Label type for the header line: 'module', 'script', 'tool', or 'plugin'. Default: 'module'."
+                    required    = $false
                     inline      = $false
                 },
                 @{
                     name        = "Theme"
                     param       = "t|Theme"
                     type        = "String|Hashtable"
-                    description = "The name of a default theme or a custom theme object."
+                    description = "Theme name (20 built-in) or a custom theme hashtable."
+                    required    = $false
                     inline      = $false
                 },
                 @{
                     name        = "Layout"
                     param       = "l|Layout"
                     type        = "String"
-                    description = "The ASCII banner layout style ('Box', 'Classic', 'Minimal', 'Man', 'Terminal', 'Typewriter')."
+                    description = "Banner layout: 'Box', 'Classic', 'Minimal', 'Man', 'Terminal', 'Typewriter'."
+                    required    = $false
                     inline      = $false
                 }
             )
             $phwriter_commandinfo = @{
-                cmdlet = "New-PHWriter"
-                synopsis = "New-PHWriter [-JsonFile <String>] [-Name <String>] [-CommandInfo <Hashtable>] [-ParamTable <Hashtable[]>] [-Subcommands <Hashtable[]>] [-Theme <String>] [-Layout <String>]"
-                description = "Generates beautifully formatted, colorized help text for cmdlets and router functions with 10 default themes and multiple layout styles."
-                source = "https://gitlab.com/phellams/phwriter/blob/main/README.md"
+                cmdlet      = "New-PHWriter"
+                synopsis    = "New-PHWriter [-Name <String>] [-CommandInfo <Hashtable>] [-ParamTable <Hashtable[]>] [-Theme <String>] [-Layout <String>] [-LineSpacing <Int>] [-SourceType <String>]"
+                description = "Generates beautifully formatted, colorized help text for cmdlets and router functions. Supports 20 built-in themes, 6 layouts, compact/spacious line spacing, and dynamic source-type header labeling."
+                source      = "https://gitlab.com/phellams/phwriter/blob/main/README.md"
             }
             $phwriter_examples = @(
                 'New-PHWriter -Help',
@@ -177,7 +237,8 @@ function New-PHWriter {
         # Fallbacks
         if (!$Name) { $Name = 'PHW' }
         if (!$Version) { $Version = '1.0.0' }
-        $indentString = " " * $Indent
+        $indentString  = " " * $Indent
+        $blankLine     = "`n" * $LineSpacing  # blank lines between param rows
 
         # Resolve Theme
         $themeObj = $null
@@ -198,9 +259,10 @@ function New-PHWriter {
         $styledHeadChar = if ($headerChar) { Format-ThemeText -String " $headerChar " -Theme $themeObj -Element 'Accent' } else { " " }
 
         # Display Version / Metadata Header
-        # Format: MODULE <Name> ▶ CMDLET <Cmdlet> ▶ VERSION <Version>
+        # Format: <SourceType> <Name> ▶ CMDLET <Cmdlet> ▶ VERSION <Version>
+        $typeLabel  = $SourceType.ToUpper()
         $headerParts = @()
-        $headerParts += "$(Format-ThemeText -String 'MODULE' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String $Name -Theme $themeObj -Element 'Header')"
+        $headerParts += "$(Format-ThemeText -String $typeLabel -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String $Name -Theme $themeObj -Element 'Header')"
         if ($CommandInfo.cmdlet) {
             $headerParts += "$(Format-ThemeText -String 'CMDLET' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String ($CommandInfo.cmdlet) -Theme $themeObj -Element 'Header')"
         }
@@ -306,7 +368,8 @@ function New-PHWriter {
                     $styledDesc = Format-ThemeText -String "   $paramDesc" -Theme $themeObj -Element 'ParamDesc'
                     [console]::WriteLine("${descIndent}${styledDesc}")
                 }
-                [console]::WriteLine()
+                # Emit $LineSpacing blank lines between param entries
+                for ($ls = 0; $ls -lt $LineSpacing; $ls++) { [console]::WriteLine() }
             }
         }
 

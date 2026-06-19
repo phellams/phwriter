@@ -1,18 +1,24 @@
 @{
-    ModuleVersion     = '0.4.3'
+    ModuleVersion     = '0.5.0'
     GUID              = '083f04e0-3fe0-42ec-a918-f799e1f1df39'
     Author            = 'Garvey K. Snow'
     CompanyName       = 'Phallems'
     Copyright         = '(c) 2025 Phallems. All rights reserved.'
-    Description       = 'A PowerShell module for generating custom, colored help text with a man-page-like layout.'
+    Description       = 'PHWriter: a PowerShell module for generating colored, themed help text, auto-extracting cmdlet metadata via AST, TUI paging, and zero-boilerplate CLI routing.'
     RootModule        = 'phwriter.psm1'
-    FunctionsToExport = @('New-PHWriter', 'Write-PHAsciiLogo')
+    FunctionsToExport = @(
+        'New-PHWriter',
+        'Write-PHAsciiLogo',
+        'Export-PHWriterMetadata',
+        'Invoke-PHPager',
+        'New-PHRouter'
+    )
     CmdletsToExport   = @()
     VariablesToExport = @()
-    AliasesToExport   = @()
+    AliasesToExport   = @('phextract', 'phpager', 'phroute')
     PrivateData       = @{
         PSData = @{
-            Tags         = @('Help', 'Formatting', 'CLI', 'PowerShell', 'Documentation')
+            Tags         = @('Help', 'Formatting', 'CLI', 'PowerShell', 'Documentation', 'AST', 'TUI', 'Router', 'Themes', 'Pager')
             ReleaseNotes = @()
             RequireLicenseAcceptance = $false
             IconUri                  = 'https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png'
@@ -41,7 +47,7 @@ Features
  - **Production Ready**: Comes with a module manifest (.psd1) for proper PowerShell module management.
 "@
             # CHOCOLATE ---------------------
-            Prerelease               = 'prerelease'
+            Prerelease               = ''
         }
     }
 }

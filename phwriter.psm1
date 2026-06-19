@@ -23,5 +23,10 @@ if ([System.IO.Directory]::Exists($publicPath)) {
     }
 }
 
-# Strictly control public exports
-Export-ModuleMember -Function New-PHWriter, Write-PHAsciiLogo
+# Strictly control public exports — list every public cmdlet explicitly
+Export-ModuleMember -Function `
+    New-PHWriter,
+    Write-PHAsciiLogo,
+    Export-PHWriterMetadata,
+    Invoke-PHPager,
+    New-PHRouter
