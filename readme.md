@@ -1,228 +1,657 @@
-# <img width="46" src="https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png" alt="Phellams Logo" /> **PHWriter**
+# <img width="46" src="https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png" alt="PHWriter Logo" /> PHWriter
 
-<a href="https://gitlab.com/phellams/phwriter/-/blob/main/readme.md"><img src="https://img.shields.io/badge/License-_mit-License?style=flat-square&labelColor=%23383838&color=%237A5ACF23CD5C5C" alt="MIT License" /></a>
+<a href="https://gitlab.com/phellams/phwriter/-/blob/main/readme.md"><img src="https://img.shields.io/badge/License-mit-License?style=flat-square&labelColor=%23383838&color=%237A5ACF23CD5C5C" alt="MIT License" /></a>
 <a href="https://gitlab.com/phellams/phwriter/-/pipelines"><img src="https://img.shields.io/gitlab/pipeline-status/phellams%2Fphwriter?style=flat-square&logo=Gitlab&logoColor=%233478BD&labelColor=%232D2D34" alt="Build Status"></a>
-<a href="https://codecov.io/gh/phellams/phwriter"><img src="https://img.shields.io/codecov/c/gitlab/phellams/phwriter?style=flat-square&logo=codecov&logoColor=%23E6746B&logoSize=auto&labelColor=%234A7A82" alt="Build Status"></a>
-<a href="https://gitlab.com/phellams/phwriter/-/issues"><img src="https://img.shields.io/gitlab/issues/open/phellams%2Fphwriter?style=flat-square&logo=gitlab&logoColor=red&labelColor=%23ffffff&color=%236B8D29" alt="gitlab issues"></a>
-
-## Overview
-
-PHWriter (**PowerShell Help Writer**) is a professional PowerShell module designed to generate beautifully formatted, colored help text for cmdlets and CLI tools, mimicking the style, layout, and readability of modern Linux man pages. It supports modular command architectures (standard cmdlets and router functions), visual layout templates, and swappable color theme palettes.
+<a href="https://codecov.io/gh/phellams/phwriter"><img src="https://img.shields.io/codecov/c/gitlab/phellams/phwriter?style=flat-square&logo=codecov&logoColor=%23E6746B&logoSize=auto&labelColor=%234A7A82" alt="Coverage"></a>
+<a href="https://gitlab.com/phellams/phwriter/-/issues"><img src="https://img.shields.io/gitlab/issues/open/phellams%2Fphwriter?style=flat-square&logo=gitlab&logoColor=red&labelColor=%23ffffff&color=%236B8D29" alt="Open Issues"></a>
 
 ---
 
-## High-Performance Architecture (phellams-aa Standards)
+## Overview
 
-PHWriter is built from the ground up using strict **phellams-aa** system automation guidelines:
-1. **Root Module Loader**: The main `phwriter.psm1` manages imports using high-performance .NET `[System.IO.Directory]` class bindings, dynamically dot-sourcing private helpers and public cmdlets while strictly controlling public exports via `Export-ModuleMember`.
-2. **File-Per-Cmdlet**: Every cmdlet resides in its own isolated `.ps1` script file under the `/Public` directory (e.g. `New-PHWriter.ps1`, `Write-PHAsciiLogo.ps1`).
-3. **Encapsulated Helpers**: Shared helper utilities reside under the `/Private` directory.
-4. **The .NET First Rule**: Replaces slow PowerShell cmdlets with direct cross-platform .NET library calls (e.g. `[System.Text.StringBuilder]` for string building and `[System.IO.File]` for loading help configs).
-5. **Color/Layout Exclusivity**: Utilizes a centralized ANSI 256-color parser that applies styling parameters *after* calculating layout padding to prevent character splitting and terminal output tearing.
+**PHWriter** (PowerShell Help Writer) is a professional PowerShell module for generating beautifully formatted, ANSI-coloured terminal help output. It reproduces the clarity and structure of Linux man pages with modern, themeable aesthetics and a zero-boilerplate API.
+
+Core capabilities:
+
+- **20 built-in themes** — 10 flat-colour themes + 10 new gradient-aware themes
+- **6 ASCII/ANSI banner layouts** — Box, Classic, Minimal, Man, Terminal, Typewriter
+- **AST-powered zero-touch metadata extraction** — Parse cmdlet source files automatically
+- **Interactive TUI pager** — Arrow-key navigation, alternate screen buffer, ANSI-aware
+- **CLI router scaffold** — Subcommand dispatch, tab-completion, Levenshtein fuzzy matching
+- **Module and script-file aware** — Detects `.psd1` manifests; adapts header label accordingly
+- **Adjustable spacing and padding** — Compact to spacious output, developer-controlled
+
+---
+
+## Architecture (phellams-aa Standards)
+
+PHWriter is structured to the [phellams-aa](https://gitlab.com/phellams/phwriter) engineering standard:
+
+| Principle | Implementation |
+|---|---|
+| Root Module Loader | `phwriter.psm1` dot-sources via `[System.IO.Directory]::GetFiles()` |
+| File-Per-Cmdlet | Each public cmdlet has its own `.ps1` in `/Public` |
+| Encapsulated Helpers | All shared helpers live in `/Private` |
+| .NET First | `[System.IO.*]`, `[System.Text.StringBuilder]`, `[System.Collections.Generic.List[T]]` throughout |
+| Padding Rule | All string lengths computed **before** ANSI encoding — no screen tearing |
 
 ---
 
 ## Installation
 
-### Installation via PowerShell Gallery
 ```powershell
+# PowerShell Gallery
 Install-Module -Name PHWriter -Scope CurrentUser
-```
 
-### Manual Installation
-```bash
-# Clone the repository
+# Manual
 git clone https://gitlab.com/phellams/phwriter.git
-cd phwriter
-Import-Module .\phwriter.psm1
+Import-Module ./phwriter.psm1
 ```
 
 ---
 
-## Layout Templates
+## Public Cmdlets
 
-PHWriter features **6 distinct ASCII/ANSI banner layouts** for rendering module headers:
-
-| Layout | Description | Visual Representation |
+| Cmdlet | Alias | Purpose |
 |---|---|---|
-| `Box` | Renders the module name inside a sleek box with rounded corners. | `╭───...───╮` |
-| `Classic` | Renders a retro, double-lined border with text filled in by a custom theme block character. | `╔═══...═══╗` |
-| `Minimal` | Renders the spaced module name with a simple underlining bar. | `────...────` |
-| `Man` | Mimics standard Linux manual headers at the top of the command console. | `PHW(1)  User Commands  PHW(1)` |
-| `Terminal` | Renders a terminal prompt icon (`>_`) on the left, with details on the right. | `┌──┐ >_ Name` |
-| `Typewriter` | Displays a detailed ANSI typewriter graphic on the left, with details on the right. | Typewriter glyph |
+| `New-PHWriter` | — | Render full help documentation |
+| `Write-PHAsciiLogo` | — | Render the themed ASCII banner only |
+| `Export-PHWriterMetadata` | `phextract` | Extract cmdlet metadata from source via AST |
+| `Invoke-PHPager` | `phpager` | Display content in an interactive TUI pager |
+| `New-PHRouter` | `phroute` | Dispatch CLI subcommands with tab-completion |
 
 ---
 
-## The 10 Default Themes
+## New-PHWriter
 
-PHWriter includes **10 built-in theme configurations** covering diverse visual aesthetics:
+### Parameters
 
-1. **`default`** (Retro Modern): Neon Cyan header and Module name over Dark Green section indicators and Gray meta tags.
-2. **`matrix`** (Cyberpunk Green): High-contrast bright green on black. Perfect for dark terminal hacking setups.
-3. **`cyberpunk`** (Neon Synthwave): Hot Pink accents, Neon Yellow descriptions, and Cyan parameter types.
-4. **`dracula`** (Vampire Theme): Classic Dracula dark theme featuring Purple, Pink, Green, and Yellow highlights.
-5. **`nord`** (Nordic Frost): Clean and calm palette with icy blues, cyan accents, and white text.
-6. **Monokai** (`monokai`): Vibrant monokai theme utilizing pink, yellow, green, and orange text highlights.
-7. **`solarized`** (Solarized Dark): Muted cyan and green highlight structure with soft blue parameter names.
-8. **`sunset`** (Golden Hour): Warm reds, orange parameters, and golden yellow highlights.
-9. **`forest`** (Natural Autumn): Forest green, olive green parameters, and gold accents.
-10. **`classic`** (Old-School Man): Monochrome greyscale, mimicking traditional terminal man pages using only bold, underlines, and italics.
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `-Name` | String | `'PHW'` | Module, script, or tool name displayed in the banner |
+| `-CommandInfo` | Hashtable | — | `cmdlet`, `synopsis`, `description`, `source` keys |
+| `-ParamTable` | Hashtable[] | — | Parameter definitions (see format below) |
+| `-Subcommands` | Hashtable[] | — | Router subcommand definitions |
+| `-Examples` | String[] | — | Usage example strings |
+| `-Version` | String | `'1.0.0'` | Version string |
+| `-Padding` | Int | `3` | Column padding in spaces |
+| `-Indent` | Int | `1` | Left indentation in spaces |
+| `-LineSpacing` | Int | `1` | Blank lines between parameter rows (`0`=compact, `1`=default, `2`=spacious) |
+| `-SourceType` | String | `'module'` | Header label — `module`, `script`, `tool`, or `plugin` |
+| `-Theme` | String\|Hashtable | `'default'` | Theme name or custom theme hashtable |
+| `-Layout` | String | `'Box'` | Banner layout style |
+| `-CustomLogo` | String | — | Override banner with a custom ASCII string |
+| `-JsonFile` | String | — | Load all parameters from a JSON file |
+| `-Help` | Switch | — | Display PHWriter's own help output |
 
----
+### ParamTable Row Format
 
-## Router Command Support
-
-PHWriter can document **router functions**—commands that wrap around multiple subcommands (like `git` or `docker` subcommands). Using the `-Subcommands` array parameter, PHWriter generates a `SUBCOMMANDS` help section detailing the sub-features, syntax, and description of each router endpoint.
-
----
-
-## Usage Guide
-
-### Cmdlet Parameters
-
-#### 🏮 `New-PHWriter`
-Generates the help documentation layout:
-- **`JsonFile`** (`[string]`): File path to a JSON configuration containing help definitions.
-- **`Name`** (`[string]`): Name of the module/tool to display.
-- **`CommandInfo`** (`[hashtable]`): Contains `cmdlet`, `synopsis`, `description`, and `source` URL.
-- **`ParamTable`** (`[array]`): Array of hashtables representing cmdlet parameters (`name`, `param`, `type`, `required`, `description`, `inline`).
-- **`Subcommands`** (`[array]`): Array of hashtables representing router subcommands (`name`, `syntax`, `description`).
-- **`Examples`** (`[string[]]`): Array of example execution command blocks.
-- **`Version`** (`[string]`): Version string. Default: `1.0.0`.
-- **`Padding`** (`[int]`): Spaces between columns. Default: `3`.
-- **`Indent`** (`[int]`): Spaces of left indentation. Default: `1`.
-- **`Theme`** (`[string\|hashtable]`): Theme name (1 of the 10 defaults) or a custom theme hashtable. Default: `'default'`.
-- **`Layout`** (`[string]`): Banner layout (`Box`, `Classic`, `Minimal`, `Man`, `Terminal`, `Typewriter`). Default: `'Box'`.
-- **`CustomLogo`** (`[string]`): Custom ASCII logo art.
-
-#### 🏮 `Write-PHAsciiLogo`
-Outputs only the themed ASCII logo banner:
-- **`Name`** (`[string]`): Name of the tool.
-- **`Version`** (`[string]`): Tool version.
-- **`Theme`** (`[string\|hashtable]`): Theme configuration.
-- **`Layout`** (`[string]`): Layout name.
-
----
-
-## Code Examples
-
-### Standard Cmdlet Documentation
+Each entry in `-ParamTable` is a hashtable with the following keys:
 
 ```powershell
-$myCmdletParams = @(
+@{
+    name        = 'SourcePath'    # Parameter name (display only)
+    param       = 's|SourcePath'  # Alias|FullName format — pipe-separated
+    type        = 'String'        # Type string to display
+    required    = $true           # Boolean — shows (Req) label when true
+    description = 'The source path for input files.'
+    inline      = $false          # $true = description on same line as name
+                                  # $false = description on next line (default)
+}
+```
+
+### Subcommands Row Format
+
+```powershell
+@{
+    name        = 'build'
+    syntax      = 'build [-Release] [-Target <String>]'
+    description = 'Compile the project.'
+}
+```
+
+### Examples
+
+#### Standard cmdlet documentation
+
+```powershell
+$params = @(
     @{
-        Name        = "SourcePath"
-        Param       = "s|Source"
-        Type        = "string"
+        name        = 'SourcePath'
+        param       = 's|SourcePath'
+        type        = 'String'
         required    = $true
-        Description = "Specifies the source path for the files. Wildcards supported."
-        Inline      = $false
+        description = 'Path to the source directory.'
+        inline      = $false
     },
     @{
-        Name        = "Recurse"
-        Param       = "r|Recurse"
-        Type        = "switch"
+        name        = 'Recurse'
+        param       = 'r|Recurse'
+        type        = 'Switch'
         required    = $false
-        Description = "Indicates that the operation should process recursively."
-        Inline      = $true
+        description = 'Process subdirectories recursively.'
+        inline      = $true
     }
 )
 
-New-PHWriter -Name "MyModule" `
-             -CommandInfo @{
-                 cmdlet      = "Copy-Files"
-                 synopsis    = "Copy-Files -SourcePath <string> [-Recurse]"
-                 description = "Copies files from the source path to a predefined directory."
-                 source      = "https://github.com/myuser/mymodule"
-             } `
-             -ParamTable $myCmdletParams `
-             -Examples @(
-                 "Copy-Files -SourcePath 'C:\source' -Recurse"
-             ) `
-             -Version "1.4.2" `
-             -Theme "cyberpunk" `
-             -Layout "Terminal"
+New-PHWriter `
+    -Name        'MyModule' `
+    -Version     '2.1.0' `
+    -Theme       'cyberpunk' `
+    -Layout      'Terminal' `
+    -LineSpacing 0 `
+    -CommandInfo @{
+        cmdlet      = 'Copy-Files'
+        synopsis    = 'Copy-Files -SourcePath <String> [-Recurse]'
+        description = 'Copies files from a source path to a predefined output directory.'
+        source      = 'https://github.com/myuser/mymodule'
+    } `
+    -ParamTable  $params `
+    -Examples    @('Copy-Files -SourcePath C:\src -Recurse')
 ```
 
-### Router CLI Command Documentation
+#### Script-file documentation (not a module)
+
+```powershell
+New-PHWriter `
+    -Name       'deploy.ps1' `
+    -SourceType 'script' `
+    -Version    '0.3.0' `
+    -Theme      'nord' `
+    -CommandInfo @{
+        cmdlet      = 'Invoke-Deploy'
+        synopsis    = 'Invoke-Deploy -Environment <String>'
+        description = 'Deploys the application to a target environment.'
+        source      = ''
+    } `
+    -ParamTable $params
+```
+
+#### Router function documentation
 
 ```powershell
 $subcommands = @(
-    @{
-        Name        = "init"
-        Syntax      = "init [-Force]"
-        Description = "Initialize local Git repository configuration."
-    },
-    @{
-        Name        = "commit"
-        Syntax      = "commit -Message <string>"
-        Description = "Record changes to the repository."
-    }
+    @{ name='init';   syntax='init [-Force]';              description='Initialise the project.' },
+    @{ name='build';  syntax='build [-Release]';           description='Compile the project.' },
+    @{ name='test';   syntax='test [-Coverage] [-Filter]'; description='Run the test suite.' }
 )
 
-New-PHWriter -Name "GitHelper" `
-             -CommandInfo @{
-                 cmdlet      = "git-helper"
-                 synopsis    = "git-helper <command> [options]"
-                 description = "A command router function providing simplified Git integrations."
-                 source      = "https://gitlab.com/githelper"
-             } `
-             -Subcommands $subcommands `
-             -Version "0.9.1" `
-             -Theme "matrix" `
-             -Layout "Classic"
+New-PHWriter `
+    -Name        'mycli' `
+    -Version     '1.0.0' `
+    -Theme       'matrix' `
+    -Layout      'Classic' `
+    -Subcommands $subcommands `
+    -CommandInfo @{
+        cmdlet      = 'mycli'
+        synopsis    = 'mycli <command> [options]'
+        description = 'CLI entrypoint for the MyProject tool.'
+        source      = 'https://gitlab.com/myuser/myproject'
+    }
 ```
 
-### Defining a Custom Theme
-
-You can pass a custom hashtable theme directly to `-Theme`:
+#### Compact layout (developer preference)
 
 ```powershell
-$myCustomTheme = @{
-    AccentColor      = 'red'
-    AccentFormat     = 'bold,underline'
-    BorderColor      = 'yellow'
-    BorderFormat     = 'none'
-    HeaderBg         = 'black'
-    HeaderFg         = 'white'
-    ModuleBg         = 'black'
-    ModuleFg         = 'red'
-    VersionBg        = 'black'
-    VersionFg        = 'yellow'
-    SyntaxFg         = 'white'
-    SyntaxFormat     = 'none'
-    DescriptionFg    = 'white'
-    ParamNameFg      = 'red'
-    ParamNameFormat  = 'bold'
-    ParamTypeFg      = 'yellow'
-    ParamTypeFormat  = 'none'
-    ParamReqFg       = 'red'
-    ParamReqFormat   = 'bold'
-    ParamDescFg      = 'gray'
-    ExampleFg        = 'yellow'
-    DocsFg           = 'red'
-    DocsFormat       = 'underline'
-    SectionChar      = '🔥'
-    HeaderChar       = '➔'
-    BorderTop        = '🔥━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🔥'
-    BorderBottom     = '🔥━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━🔥'
-    BorderMiddle     = '░'
+# LineSpacing 0 = no blank lines between params — tight, compact output
+New-PHWriter @meta -Theme 'steel' -Layout 'Minimal' -LineSpacing 0 -Padding 2
+```
+
+#### Spacious layout
+
+```powershell
+# LineSpacing 2 = two blank lines between params — airy, readable output
+New-PHWriter @meta -Theme 'aurora' -Layout 'Box' -LineSpacing 2 -Padding 5
+```
+
+---
+
+## Themes
+
+### Base Themes (10)
+
+| Theme | Character | Style |
+|---|---|---|
+| `default` | `◉` | Retro Modern — neon cyan/dark green |
+| `matrix` | `$` | Cyberpunk Green — high-contrast bright green |
+| `cyberpunk` | `▲` | Neon Synthwave — hot pink, yellow, cyan |
+| `dracula` | `🧛` | Dracula Dark — purple, pink, green, yellow |
+| `nord` | `❄` | Nordic Frost — icy blues and white |
+| `monokai` | `❖` | Monokai — pink, yellow, green, orange |
+| `solarized` | `☼` | Solarized Dark — muted cyan/green on dark |
+| `sunset` | `🌅` | Golden Hour — reds, oranges, gold |
+| `forest` | `🌲` | Natural Autumn — greens and gold |
+| `classic` | ` ` | Old-School Man — monochrome, bold/underline |
+
+### Gradient Themes (10)
+
+These themes declare `GradientSteps` and `GradientType` keys. Use `New-AsciiGradient` to apply the gradient to text elements.
+
+| Theme | Palette | Gradient Direction |
+|---|---|---|
+| `aurora` | Cyan → Purple → Magenta | `[51,93,129,201]` |
+| `neon-noir` | Magenta → Deep Pink | `[201,198,196,200]` |
+| `lava` | Red → Orange → Yellow | `[196,202,214,220]` |
+| `ocean` | Dark Blue → Cyan | `[17,20,27,39,51]` |
+| `toxic` | Acid Greens | `[46,82,118,154]` |
+| `midnight` | Deep Indigo → Violet | `[17,54,91,128,165]` |
+| `gold` | Dark Gold → Yellow | `[136,172,214,220,226]` |
+| `rose` | Deep Pink → Light Pink | `[161,197,199,207,213]` |
+| `steel` | Dark Grey → Light Grey | `[233,238,243,248,253]` |
+| `phwriter` | Classic PHWriter retro | flat (no gradient) |
+
+`phman` is an alias for `phwriter`.
+
+### Applying a Gradient Theme
+
+```powershell
+$theme = Get-PHTheme -Name 'aurora'
+
+# Apply the theme's declared gradient to a string
+$gradientTitle = New-AsciiGradient `
+    -Type   $theme.GradientType `
+    -Steps  $theme.GradientSteps `
+    -String 'AURORA MODULE' `
+    -Format @('bold')
+
+# Then use the theme for the rest of the layout
+New-PHWriter @meta -Theme $theme
+```
+
+### Custom Theme
+
+Any hashtable with the required keys is a valid theme:
+
+```powershell
+$myTheme = @{
+    AccentColor     = 'red'
+    AccentFormat    = 'bold,underline'
+    BorderColor     = 'yellow'
+    BorderFormat    = 'none'
+    HeaderBg        = 'black'
+    HeaderFg        = 'white'
+    ModuleBg        = 'black'
+    ModuleFg        = 'red'
+    VersionBg       = 'black'
+    VersionFg       = 'yellow'
+    SyntaxFg        = 'white'
+    SyntaxFormat    = 'none'
+    DescriptionFg   = 'white'
+    ParamNameFg     = 'red'
+    ParamNameFormat = 'bold'
+    ParamTypeFg     = 'yellow'
+    ParamTypeFormat = 'none'
+    ParamReqFg      = 'red'
+    ParamReqFormat  = 'bold'
+    ParamDescFg     = 'gray'
+    ExampleFg       = 'yellow'
+    DocsFg          = 'red'
+    DocsFormat      = 'underline'
+    SectionChar     = '>'
+    HeaderChar      = ':'
+    BorderTop       = '==================='
+    BorderBottom    = '==================='
+    BorderMiddle    = ' '
 }
 
-New-PHWriter -Name "FireCLI" -Theme $myCustomTheme -CommandInfo $commandInfo -ParamTable $params
+New-PHWriter -Theme $myTheme @rest
+```
+
+---
+
+## Banner Layouts
+
+| Layout | Description |
+|---|---|
+| `Box` | Rounded-corner box: `╭──...──╮` |
+| `Classic` | Theme-defined border strings from `BorderTop`/`BorderBottom` |
+| `Minimal` | Spaced name + underline bar |
+| `Man` | Linux man-page header: `NAME(1)   User Commands   NAME(1)` |
+| `Terminal` | Terminal icon glyph `>_` on left, name/version on right |
+| `Typewriter` | Retro typewriter glyph on left, name/version on right |
+
+---
+
+## Export-PHWriterMetadata (phextract)
+
+Zero-touch AST parser. Point at any `.ps1` or `.psm1` file — it returns a ready-to-use metadata hashtable consumable directly by `New-PHWriter`.
+
+### Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `-Path` | String (Mandatory) | Source `.ps1` or `.psm1` file. Accepts pipeline from `Get-ChildItem` |
+| `-FunctionName` | String | Filter to a specific function name. Supports wildcards (`Get-*`) |
+| `-OutputJson` | String | Serialize extracted metadata to a `.json` file |
+| `-ModuleName` | String | Override module name in the output |
+| `-Version` | String | Override version string. Default: `1.0.0` |
+| `-Source` | String | Documentation URL to embed |
+
+### Module vs Script Detection
+
+`Export-PHWriterMetadata` automatically detects whether the source file is part of a module by walking up directory levels looking for a `.psd1` manifest (max 3 levels).
+
+- **Module detected** — `ModuleName` and `ModuleVersion` are read from the manifest. The `sourcetype` key in the returned hashtable is set to `'module'`.
+- **No manifest found** — The file basename is used as the name, and `sourcetype` is set to `'script'`.
+
+Use the returned `sourcetype` value directly with `New-PHWriter -SourceType`:
+
+```powershell
+$meta = Export-PHWriterMetadata -Path './Public/Invoke-Deploy.ps1'
+New-PHWriter @meta -SourceType $meta.sourcetype -Theme 'nord'
+```
+
+### What It Extracts
+
+From comment-based help (`.SYNOPSIS`, `.DESCRIPTION`, `.PARAMETER`, `.EXAMPLE`) and the AST parameter block:
+
+- Function name → `commandinfo.cmdlet`
+- Parameter name, type, mandatory flag, aliases → `paramtable`
+- `HelpMessage` attribute as description fallback
+- `.EXAMPLE` code blocks → `examples`
+- Module name and version from `.psd1` manifest
+
+### CBH Format Requirements
+
+For best extraction results, each function must have complete comment-based help **immediately before the `param()` block**, inside the function body:
+
+```powershell
+function Get-SystemData {
+    <#
+    .SYNOPSIS
+      Returns system diagnostic data.
+    .DESCRIPTION
+      Collects CPU, memory, and disk statistics from the local machine.
+    .PARAMETER ComputerName
+      Target computer name or IP. Default: localhost.
+    .PARAMETER IncludeDisk
+      When specified, includes disk usage data.
+    .EXAMPLE
+      Get-SystemData -ComputerName SERVER01
+    .EXAMPLE
+      Get-SystemData -IncludeDisk
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $false, HelpMessage = 'Target computer.')]
+        [string]$ComputerName = 'localhost',
+
+        [Parameter(Mandatory = $false)]
+        [switch]$IncludeDisk
+    )
+    ...
+}
+```
+
+**Critical rules:**
+
+1. `.SYNOPSIS` must be a single concise line — it is used as display text, not the syntax line (the syntax line is auto-generated from the AST).
+2. `.PARAMETER <Name>` blocks are matched case-insensitively to parameter variable names.
+3. If `.PARAMETER` is missing for a param, `HelpMessage` attribute value is used as the description fallback.
+4. `.EXAMPLE` blocks: only the code portion is extracted (the line immediately after `.EXAMPLE`).
+5. The `[CmdletBinding()]` attribute must be present for `GetHelpContent()` to resolve correctly.
+
+### Multi-Cmdlet File Awareness
+
+If a `.ps1` file contains multiple functions, use `-FunctionName` to target a specific one:
+
+```powershell
+# File contains: Get-Data, Set-Data, Remove-Data
+$meta = Export-PHWriterMetadata -Path './Data.ps1' -FunctionName 'Get-Data'
+
+# Wildcard — extract all Get-* functions
+$metas = Export-PHWriterMetadata -Path './Data.ps1' -FunctionName 'Get-*'
+
+# No filter — returns array of metadata for every function found
+$all = Export-PHWriterMetadata -Path './Data.ps1'
+```
+
+### Batch Extraction
+
+```powershell
+# Extract all Public cmdlets and cache as JSON
+Get-ChildItem -Path ./Public/*.ps1 | ForEach-Object {
+    Export-PHWriterMetadata `
+        -Path       $_.FullName `
+        -OutputJson "./docs/metadata/$($_.BaseName).json" `
+        -Source     'https://gitlab.com/myuser/mymodule'
+}
+
+# Load from JSON and render
+New-PHWriter -JsonFile './docs/metadata/Get-SystemData.json' -Theme 'matrix'
+```
+
+---
+
+## Invoke-PHPager (phpager)
+
+An interactive TUI pager using the terminal's alternate screen buffer. Enters cleanly; exits cleanly without leaving output in the scroll buffer.
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `-Content` | String[] | — | Content to display. Pipeline-compatible |
+| `-Title` | String | `'PHWriter Pager'` | Top bar title text |
+| `-PageSize` | Int | auto | Override page height in lines |
+| `-NoColor` | Switch | — | Strip ANSI codes before display |
+
+### Keyboard Controls
+
+| Key | Action |
+|---|---|
+| `↑` / `↓` | Scroll one line |
+| `PgUp` / `PgDn` | Jump one page |
+| `Home` / `End` | Jump to start / end |
+| `Q` / `ESC` | Quit pager |
+
+### Usage
+
+```powershell
+# Pipe Get-Help output into the pager
+Get-Help Get-Process -Full | Out-String | Invoke-PHPager -Title 'Get-Process'
+
+# Pipe New-PHWriter output into the pager
+New-PHWriter @meta -Theme 'dracula' | Out-String | phpager -Title 'MyModule Docs'
+
+# Plain text mode
+Get-Content ./CHANGELOG.md | phpager -Title 'CHANGELOG' -NoColor
+```
+
+---
+
+## New-PHRouter (phroute)
+
+Zero-boilerplate CLI subcommand dispatcher with tab-completion registration and Levenshtein fuzzy "Did you mean?" on unknown subcommands.
+
+### Parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `-Routes` | Hashtable (Mandatory) | Subcommand name → `[scriptblock]` or function name string |
+| `-ArgumentList` | String[] | Raw argument array (typically `$args`) |
+| `-ModuleName` | String | CLI name for error messages. Default: `'PHRouter'` |
+| `-RegisterCompleter` | Switch | Auto-register `Register-ArgumentCompleter` for tab completion |
+| `-Metadata` | Hashtable | PHWriter metadata for route validation |
+
+### Route Map Format
+
+```powershell
+$routes = @{
+    'build'   = { param($rest) Invoke-Build @rest }   # scriptblock
+    'test'    = 'Invoke-PesterTests'                   # function name string
+    'docs'    = {
+        $meta = phextract ./Public/Invoke-MyCLI.ps1
+        New-PHWriter @meta -Theme 'nord' | Out-String | phpager
+    }
+    'default' = { Write-Host "Usage: mycli <build|test|docs>" }
+}
+```
+
+The `'default'` key is invoked when no subcommand is provided.
+
+### Full CLI Entrypoint Example
+
+```powershell
+function Invoke-MyCLI {
+    [CmdletBinding()]
+    param(
+        [Parameter(ValueFromRemainingArguments)]
+        [string[]]$args
+    )
+
+    $routes = @{
+        'build'   = { param($rest) Invoke-Build @rest }
+        'test'    = 'Invoke-PesterTests'
+        'release' = { param($rest) Publish-Module @rest }
+        'help'    = {
+            $meta = phextract ./Public/Invoke-MyCLI.ps1
+            New-PHWriter @meta -Theme 'default' | Out-String | phpager -Title 'MyCLI Help'
+        }
+        'default' = { Write-Host "Run: mycli help" }
+    }
+
+    New-PHRouter `
+        -Routes            $routes `
+        -ArgumentList      $args `
+        -ModuleName        'mycli' `
+        -RegisterCompleter
+}
+```
+
+### Unknown Subcommand Output
+
+```
+Unknown subcommand: 'buid'
+
+Did you mean?
+  build
+
+Available subcommands for mycli:
+  build
+  help
+  release
+  test
+```
+
+---
+
+## Color and Gradient Helpers
+
+These private helpers are used internally but can be accessed inside module scope.
+
+### New-AsciiColor
+
+Applies ANSI 256-color foreground/background and format codes to a string.
+
+```powershell
+# By name (16-color system)
+New-AsciiColor -String 'Hello' -Color 'cyan' -Format 'bold'
+
+# By 256-color index
+New-AsciiColor -String 'Hello' -Color '51' -BgColor '235' -Format @('bold','underline')
+```
+
+**Available format values:** `bold`, `dim`, `italic`, `underline`, `blink`, `reverse`, `hidden`, `strikethrough`
+
+### New-AsciiGradient
+
+Applies an interpolated 256-color gradient across the characters of a string.
+
+```powershell
+# Cyan → Purple → Magenta gradient on foreground
+New-AsciiGradient -Type fg -Steps @(51, 93, 129, 201) -String 'AURORA' -Format @('bold')
+
+# Background gradient
+New-AsciiGradient -Type bg -Steps @(196, 214, 226) -String 'LAVA'
+```
+
+---
+
+## JSON Configuration
+
+All `New-PHWriter` parameters can be loaded from a JSON file. Useful for storing help definitions alongside source files.
+
+```json
+{
+    "name": "MyModule",
+    "version": "2.0.0",
+    "theme": "cyberpunk",
+    "layout": "Terminal",
+    "linespacing": 1,
+    "sourcetype": "module",
+    "commandinfo": {
+        "cmdlet": "Invoke-MyCommand",
+        "synopsis": "Invoke-MyCommand -Target <String> [-Verbose]",
+        "description": "Executes the primary workflow for MyModule.",
+        "source": "https://gitlab.com/myuser/mymodule"
+    },
+    "paramtable": [
+        {
+            "name": "Target",
+            "param": "t|Target",
+            "type": "String",
+            "required": true,
+            "description": "Target resource identifier.",
+            "inline": false
+        }
+    ],
+    "examples": [
+        "Invoke-MyCommand -Target 'production'",
+        "Invoke-MyCommand -Target 'staging' -Verbose"
+    ]
+}
+```
+
+Load with:
+
+```powershell
+New-PHWriter -JsonFile './docs/metadata/mymodule.json'
+```
+
+---
+
+## Integration with Build Pipeline
+
+PHWriter is a first-class citizen in the phellams `automator-devops` build system. The `Phwriter` flag in `build_config.json` triggers automatic help generation during the build stage.
+
+```json
+{
+    "Phwriter": true
+}
+```
+
+The local build script (`automator-devops/localbuild.ps1`) handles module loading, metadata extraction, and help rendering automatically.
+
+---
+
+## Development Workflow
+
+```
+develop → feature/<name> → PR → develop → main (release)
+```
+
+Commit convention: [Conventional Commits](https://www.conventionalcommits.org/)
+
+```bash
+git switch -c feature/my-feature
+# ... implement ...
+git add Public/My-Feature.ps1
+git commit -m "feat(phwriter): add My-Feature cmdlet"
+git push origin feature/my-feature
 ```
 
 ---
 
 ## Contributing
 
-1. Fork the Project.
-2. Create your Feature Branch: `git switch -c feature/AmazingFeature`.
-3. Commit your changes.
-4. Push to the branch: `git push origin feature/AmazingFeature`.
-5. Open a **Merge Request**.
+1. Fork the repository.
+2. Create a feature branch: `git switch -c feature/my-change`
+3. Implement changes. Ensure Pester tests pass (`pester -Coverage 90%+`).
+4. Open a Merge Request against `develop`.
+
+---
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT — see [LICENSE](./LICENSE) for details.
