@@ -109,39 +109,43 @@ function Write-PHAsciiLogo {
                 $top    = "╭" + ("─" * ($width - 2)) + "╮"
                 $bottom = "╰" + ("─" * ($width - 2)) + "╯"
 
-                # $width includes the two │ chars; inner usable columns = $width - 2.
-                # We reserve 1 space minimum on each side, so available padding = inner - nameWidth - 2.
-                $innerWidth   = $width - 2
-                $paddingTotal = $innerWidth - $nameVisualWidth - 2
-                $padLeft  = [Math]::Max(1, [Math]::Floor($paddingTotal / 2))
-                $padRight = [Math]::Max(1, $paddingTotal - $padLeft)
+                # Calculate the inner row text width (total width minus borders)
+                $innerWidth = $width - 2
+                
+                # Center the spaced name inside the borders with plain space characters
+                # before applying any ANSI color styling.
+                $innerPadded = Pad-AnsiString -Text $spacedName -Width $innerWidth -Align 'Center' -PadChar ' '
 
-                $middle = "│" + (" " * $padLeft) + $spacedName + (" " * $padRight) + "│"
+                # Combine formatted borders and header contents
+                $borderChar = Format-ThemeText -String "│" -Theme $themeObj -Element 'Border'
+                $middle = $borderChar + (Format-ThemeText -String $innerPadded -Theme $themeObj -Element 'Header') + $borderChar
 
                 [console]::WriteLine($(Format-ThemeText -String $top    -Theme $themeObj -Element 'Border'))
-                [console]::WriteLine($(Format-ThemeText -String $middle -Theme $themeObj -Element 'Header'))
+                [console]::WriteLine($middle)
                 [console]::WriteLine($(Format-ThemeText -String $bottom -Theme $themeObj -Element 'Border'))
             }
             'Classic' {
-                # Renders the original classic double-line banner styled by the theme parameters
                 $borderTop    = $themeObj['BorderTop']
                 $borderBottom = $themeObj['BorderBottom']
                 $borderMiddle = $themeObj['BorderMiddle']
 
-                # Compute padding based on visual width of BorderTop (handles emoji/wide chars)
+                # Compute padding based on visual width of BorderTop
                 $totalWidth = if ($borderTop) { _Measure-VisualWidth $borderTop } else { 70 }
-
-                $paddingTotal = $totalWidth - $nameVisualWidth - 4
-                $padLeft  = [Math]::Max(0, [Math]::Floor($paddingTotal / 2))
-                $padRight = [Math]::Max(0, $paddingTotal - $padLeft)
+                $innerWidth = $totalWidth - 2
 
                 $middleChar = if ($borderMiddle) { $borderMiddle } else { "░" }
                 $nameVisualWidth = _Measure-VisualWidth $spacedName
-                $middle = "╟" + ($middleChar * $padLeft) + $spacedName + ($middleChar * $padRight) + "╢"
+
+                # Center spaced name using the theme's middle character prior to ANSI coloring
+                $innerPadded = Pad-AnsiString -Text $spacedName -Width $innerWidth -Align 'Center' -PadChar $middleChar
+
+                $borderLeft  = Format-ThemeText -String "╟" -Theme $themeObj -Element 'Border'
+                $borderRight = Format-ThemeText -String "╢" -Theme $themeObj -Element 'Border'
+                $middle = $borderLeft + (Format-ThemeText -String $innerPadded -Theme $themeObj -Element 'Header') + $borderRight
 
                 [console]::WriteLine($(Format-ThemeText -String $borderTop    -Theme $themeObj -Element 'Border'))
-                [console]::WriteLine($(Format-ThemeText -String $middle        -Theme $themeObj -Element 'Header'))
-                [console]::WriteLine($(Format-ThemeText -String $borderBottom  -Theme $themeObj -Element 'Border'))
+                [console]::WriteLine($middle)
+                [console]::WriteLine($(Format-ThemeText -String $borderBottom -Theme $themeObj -Element 'Border'))
             }
             'Minimal' {
                 $nameVisualWidth = _Measure-VisualWidth $spacedName
@@ -157,8 +161,12 @@ function Write-PHAsciiLogo {
                 $centerText = "User Commands"
                 $rightText  = "$($Name.ToUpper())(1)"
 
-                $padSize    = [Math]::Max(2, [Math]::Floor(($width - $leftText.Length - $centerText.Length - $rightText.Length) / 2))
-                $headerLine = $leftText + (" " * $padSize) + $centerText + (" " * $padSize) + $rightText
+                # Concatenate with correct cell widths and alignments using Clap
+                $headerLine = Clap -Cells @(
+                    @{ Text = $leftText;   Width = 25; Align = 'Left' }
+                    @{ Text = $centerText; Width = 20; Align = 'Center' }
+                    @{ Text = $rightText;  Width = 25; Align = 'Right' }
+                )
 
                 [console]::WriteLine($(Format-ThemeText -String $headerLine -Theme $themeObj -Element 'Header'))
                 [console]::WriteLine($(Format-ThemeText -String ("─" * $width) -Theme $themeObj -Element 'Border'))
