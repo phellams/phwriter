@@ -99,6 +99,49 @@ Describe "Get-PHTheme" {
     }
 }
 
+Describe "Show-PHTheme" {
+    It "Should render a single theme in minimal mode" {
+        Show-PHTheme -Name 'default' -Minimal
+    }
+
+    It "Should render a single theme in full mode" {
+        Show-PHTheme -Name 'cyberpunk'
+    }
+
+    It "Should render custom-rgb theme without throwing" {
+        Show-PHTheme -Name 'custom-rgb' -Minimal
+    }
+}
+
+Describe "Get-TerminalPalette" {
+    It "Should return a palette object with functioning Apply and GetStaticColor" {
+        $pal = Get-TerminalPalette -ColorPalette @{ 'Fill' = 'red'; 'Accent' = 'green' }
+        $pal | Should -Not -BeNullOrEmpty
+        
+        $static = $pal.GetStaticColor.Invoke('Accent')
+        $static | Should -BeLike '*green*'
+
+        $applied = $pal.Apply.Invoke('text', '31') # Red foreground code
+        $applied | Should -BeLike '*text*'
+    }
+
+    It "Should support Gradient mode GetFillColor" {
+        $pal = Get-TerminalPalette -ColorMode 'Gradient' -GradientStart @(255, 0, 0) -GradientEnd @(0, 0, 255)
+        $code = $pal.GetFillColor.Invoke(0, 10)
+        $code | Should -BeLike '38;2;255;0;0'
+    }
+
+    It "Should support Conditional threshold mode" {
+        $thresholds = @{
+            50  = 'yellow'
+            100 = 'red'
+        }
+        $pal = Get-TerminalPalette -ColorMode 'Conditional' -ColorThresholds $thresholds -CurrentValue 30
+        $code = $pal.GetFillColor.Invoke(0, 0)
+        $code | Should -BeLike '*yellow*'
+    }
+}
+
 Describe "Write-PHAsciiLogo" {
     It "Should render logo with Box layout" {
         Write-PHAsciiLogo -Name 'TestMod' -Version '1.2.3' -Layout 'Box'

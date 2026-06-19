@@ -242,6 +242,52 @@ These themes declare `GradientSteps` and `GradientType` keys. Use `New-AsciiGrad
 
 `phman` is an alias for `phwriter`.
 
+### Extended Themes (20)
+
+These 20 additional themes utilize advanced ASCII characters and unique color steps:
+
+| Theme | Description | Symbol (Section/Header) | Gradient Stops |
+|---|---|---|---|
+| `glitch` | Cyberpunk Glitchy | `▚` / `▞` | `[196,201,45,51]` |
+| `cosmic` | Space & Starry Night | `☄` / `★` | `[17,21,57,93,129]` |
+| `forest-mist` | Moss Green / Earthy | `🍀` / `🌿` | `[22,28,64,106,244]` |
+| `blood-moon` | Dark Vampire Red | `🥀` / `🩸` | `[232,52,88,124,160]` |
+| `retro-arcade` | 80s Synthwave | `🕹` / `👾` | `[196,201,93,39]` |
+| `abyss` | Deep Ocean Trench | `⦿` / `⁘` | `[232,17,18,19,21]` |
+| `zen` | Minimalist Zen | `⛩` / `☯` | `[245,248,252,255]` |
+| `blaze` | Intense Fire | `☄` / `🔥` | `[196,202,208,214,220]` |
+| `rust` | Industrial Decay | `⚙` / `⚒` | `[52,94,130,166]` |
+| `matrix-neon` | Vibrant Code Stream | `⁙` / `⁚` | `[22,28,34,40,46]` |
+| `quantum` | Subatomic Scientific | `⬢` / `⬟` | `[57,93,129,81]` |
+| `radioactive` | Toxic Nuclear Fallout | `☣` / `☢` | `[232,190,226,190]` |
+| `vaporwave` | 80s Pink/Teal Palm | `🌴` / `🐬` | `[201,165,129,81,51]` |
+| `nebula` | Deep Space Star Dust | `✹` / `✸` | `[129,135,163,199,201]` |
+| `crystal` | Diamond & Glacier Ice | `❖` / `✧` | `[159,195,231,255]` |
+| `copper` | Copper Pipeline / Orange | `╞` / `╡` | `[130,136,172,214]` |
+| `royal` | Gold on Royal Blue | `⚜` / `✦` | `[17,20,21,220,226]` |
+| `desert-heat` | Warm Sands & Sun | `☀` / `🏜` | `[130,166,202,214,220]` |
+| `sheriff` | Western Brown / Leather | `✶` / `↱` | `[52,94,137,180]` |
+| `frost` | Arctic Blizzard | `❄` / `❆` | `[240,244,248,117,159]` |
+
+---
+
+### Previewing Themes (DX)
+
+PHWriter provides a built-in Developer Experience (DX) previewing tool `Show-PHTheme` to render themes directly in your terminal:
+
+```powershell
+# Preview a single theme in full layout mode
+Show-PHTheme -Name 'cyberpunk'
+
+# Preview all 41 themes in minimal banner mode
+Show-PHTheme -All -Minimal -Layout 'Terminal'
+
+# Preview a dynamic custom RGB theme
+Show-PHTheme -Name 'custom-rgb' -Layout 'Classic'
+```
+
+---
+
 ### Applying a Gradient Theme
 
 ```powershell
@@ -564,6 +610,26 @@ New-AsciiGradient -Type fg -Steps @(51, 93, 129, 201) -String 'AURORA' -Format @
 
 # Background gradient
 New-AsciiGradient -Type bg -Steps @(196, 214, 226) -String 'LAVA'
+```
+
+### Get-TerminalPalette (Alias: terpal, Get-TerminalPallete)
+
+Generates a dynamic terminal palette object supporting Solid, Conditional, or Gradient color modes with RGB, 256-color, or named color formats.
+
+```powershell
+# Create a dynamic RGB gradient palette
+$gradientPal = Get-TerminalPalette `
+    -ColorMode 'Gradient' `
+    -GradientStart @(255, 0, 0) `
+    -GradientEnd @(0, 0, 255)
+
+# Apply dynamic colors to string characters
+$testString = "Beautiful custom gradient!"
+$chars = $testString.ToCharArray()
+for ($i = 0; $i -lt $chars.Count; $i++) {
+    $code = $gradientPal.GetFillColor.Invoke($i, $chars.Count)
+    Write-Host -NoNewline ($gradientPal.Apply.Invoke($chars[$i], $code))
+}
 ```
 
 ---

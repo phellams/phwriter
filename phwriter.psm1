@@ -23,10 +23,12 @@ if ([System.IO.Directory]::Exists($publicPath)) {
     }
 }
 
-# Strictly control public exports — list every public cmdlet explicitly
 Export-ModuleMember -Function `
     New-PHWriter,
     Write-PHAsciiLogo,
     Export-PHWriterMetadata,
     Invoke-PHPager,
-    New-PHRouter
+    New-PHRouter,
+    Show-PHTheme,
+    Get-TerminalPalette `
+    -Alias phextract, phpager, phroute, terpal

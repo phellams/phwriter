@@ -4,10 +4,25 @@ function Get-TerminalPalette {
       Returns a dynamically generated terminal palette object.
     .DESCRIPTION
       Returns a hashtable-like custom object containing Apply, GetFillColor, and GetStaticColor scriptblocks.
-    .ALIAS terpal
+      Handles RGB arrays, names, and 256-color indices.
+    .PARAMETER ColorPalette
+      A hashtable defining the static colors.
+    .PARAMETER ColorMode
+      Color mode: 'Solid', 'Conditional', or 'Gradient'.
+    .PARAMETER ColorThresholds
+      A hashtable of thresholds for conditional mode.
+    .PARAMETER GradientStart
+      RGB array [r, g, b] for gradient start.
+    .PARAMETER GradientEnd
+      RGB array [r, g, b] for gradient end.
+    .PARAMETER CurrentValue
+      Current value for conditional threshold check.
+    .PARAMETER MaxValue
+      Maximum value. Default is 100.
+    .ALIAS terpal, Get-TerminalPallete
     #>
     [CmdletBinding()]
-    [Alias('terpal')]
+    [Alias('terpal', 'Get-TerminalPallete')]
     param (
         [hashtable]$ColorPalette,
         [string]$ColorMode,

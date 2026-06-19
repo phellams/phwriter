@@ -18,7 +18,7 @@
       - Cells mode:   array of hashtables, one per column, for table-row building
  
 .EXPORTS
-    Clap                    Main entry point (alias: New-ClapString)
+    Clap                     Main entry point (alias: New-ClapString)
     Pad-AnsiString           Single-string ANSI-aware pad/truncate
     Get-ClapVisibleLength    Visible (non-escape) character count
     Set-ClapAnsiPattern      Override the escape-sequence regex if needed

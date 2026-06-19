@@ -11,11 +11,13 @@
         'Write-PHAsciiLogo',
         'Export-PHWriterMetadata',
         'Invoke-PHPager',
-        'New-PHRouter'
+        'New-PHRouter',
+        'Show-PHTheme',
+        'Get-TerminalPalette'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()
-    AliasesToExport   = @('phextract', 'phpager', 'phroute')
+    AliasesToExport   = @('phextract', 'phpager', 'phroute', 'terpal')
     PrivateData       = @{
         PSData = @{
             Tags         = @('Help', 'Formatting', 'CLI', 'PowerShell', 'Documentation', 'AST', 'TUI', 'Router', 'Themes', 'Pager')
