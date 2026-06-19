@@ -59,6 +59,8 @@ Import-Module ./phwriter.psm1
 | `Export-PHWriterMetadata` | `phextract` | Extract cmdlet metadata from source via AST |
 | `Invoke-PHPager` | `phpager` | Display content in an interactive TUI pager |
 | `New-PHRouter` | `phroute` | Dispatch CLI subcommands with tab-completion |
+| `Show-PHTheme` | — | Preview built-in and custom themes |
+| `Get-TerminalPalette` | `terpal` | Generate dynamic solid, conditional, or gradient palette objects |
 
 ---
 
@@ -715,6 +717,30 @@ git push origin feature/my-feature
 2. Create a feature branch: `git switch -c feature/my-change`
 3. Implement changes. Ensure Pester tests pass (`pester -Coverage 90%+`).
 4. Open a Merge Request against `develop`.
+
+---
+
+## Caveats and Known Issues
+
+> [!IMPORTANT]
+> **Non-Interactive Environments (CI/CD Pager Caveat)**
+> The TUI Pager (`Invoke-PHPager`) requires an interactive terminal host (`stdout` connected to a TTY). Attempting to run the pager inside background jobs or non-interactive CI/CD runner pipelines (such as GitLab CI/CD or GitHub Actions) will fail or hang indefinitely.
+> - **Solution**: For automated tests or scripts running in CI environments, set the environment variable `$env:PHWRITER_TEST_MODE = 'true'` to bypass keyboard input processing and write content directly to the standard output.
+
+> [!WARNING]
+> **AST Parser Scope Constraints**
+> `Export-PHWriterMetadata` retrieves parameter metadata statically from the Abstract Syntax Tree.
+> - It only extracts parameters declared in the primary `param(...)` block. Parameters declared dynamically in `dynamicparam` blocks are not evaluated.
+> - Comment-based help (CBH) blocks **must** be placed immediately preceding the `param()` block inside the function body for the parser to align parameters with their descriptions.
+
+> [!NOTE]
+> **Unicode Emoji & East Asian Wide Characters**
+> PHWriter uses a visual width helper to strip ANSI formatting before padding calculations to prevent console layout tearing.
+> - While common emojis and CJK wide characters are correctly visual-width-measured as 2 columns, some terminal console hosts might still render wide glyphs differently depending on their font settings, causing minor spacing gaps.
+
+> [!CAUTION]
+> **Terminal TrueColor Support**
+> Running custom RGB color themes requires a terminal emulator that supports 24-bit TrueColor sequences (e.g. Windows Terminal, VS Code Terminal, modern xterm). On older console hosts (like standard `conhost.exe` on Windows 10/Server before virtual terminal processing is enabled), RGB escape sequences might display as plain text or cause visual layout glitches.
 
 ---
 
