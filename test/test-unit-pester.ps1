@@ -82,16 +82,21 @@ Describe "Get-PHTheme" {
         $theme.AccentColor | Should -Be 'darkgreen'
     }
 
-    It "Should load default theme" { (Get-PHTheme 'default') | Should -Not -BeNullOrEmpty }
-    It "Should load matrix theme" { (Get-PHTheme 'matrix') | Should -Not -BeNullOrEmpty }
-    It "Should load cyberpunk theme" { (Get-PHTheme 'cyberpunk') | Should -Not -BeNullOrEmpty }
-    It "Should load dracula theme" { (Get-PHTheme 'dracula') | Should -Not -BeNullOrEmpty }
-    It "Should load nord theme" { (Get-PHTheme 'nord') | Should -Not -BeNullOrEmpty }
-    It "Should load monokai theme" { (Get-PHTheme 'monokai') | Should -Not -BeNullOrEmpty }
-    It "Should load solarized theme" { (Get-PHTheme 'solarized') | Should -Not -BeNullOrEmpty }
-    It "Should load sunset theme" { (Get-PHTheme 'sunset') | Should -Not -BeNullOrEmpty }
-    It "Should load forest theme" { (Get-PHTheme 'forest') | Should -Not -BeNullOrEmpty }
-    It "Should load classic theme" { (Get-PHTheme 'classic') | Should -Not -BeNullOrEmpty }
+    It "Should load all predefined themes without throwing" {
+        $names = @(
+            'default', 'matrix', 'cyberpunk', 'dracula', 'nord', 'monokai', 'solarized', 
+            'sunset', 'forest', 'classic', 'aurora', 'neon-noir', 'lava', 'ocean', 'toxic', 
+            'midnight', 'gold', 'rose', 'steel', 'phwriter', 'phman', 'glitch', 'cosmic', 
+            'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust', 
+            'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal', 
+            'copper', 'royal', 'desert-heat', 'sheriff', 'frost'
+        )
+        foreach ($name in $names) {
+            $theme = Get-PHTheme -Name $name
+            $theme | Should -Not -BeNullOrEmpty
+            $theme.ContainsKey('SectionChar') | Should -Be $true
+        }
+    }
 }
 
 Describe "Write-PHAsciiLogo" {
