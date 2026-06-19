@@ -1,7 +1,7 @@
 #---------------------------------------------
 # Default values for all jobs unless overridden
 default:
-  image: docker.io/sgkens/phellams-automator:2.5.1
+  image: docker.io/sgkens/phellams-automator:{$AUTOMATOR_VERSION}
   tags:
     - docker
   artifacts:
