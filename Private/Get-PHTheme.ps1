@@ -4,6 +4,8 @@ function Get-PHTheme {
       Retrieve a predefined theme configuration by name.
     .DESCRIPTION
       Returns a hashtable defining terminal colors, styles, borders and layouts.
+      Gradient themes additionally expose GradientSteps (int[]) and GradientType ('fg'|'bg')
+      keys that callers can pass directly to New-AsciiGradient.
     .PARAMETER Name
       Name of the theme. Default is 'default'.
     #>
@@ -13,6 +15,7 @@ function Get-PHTheme {
         [string]$Name = 'default'
     )
 
+    # ── Original 10 themes ────────────────────────────────────────────────────
     $Themes = @{
         'default' = @{
             AccentColor      = 'darkgreen'
@@ -316,6 +319,354 @@ function Get-PHTheme {
         }
     }
 
+    # ── 10 new gradient-capable themes ────────────────────────────────────────
+    # Each theme includes:
+    #   GradientSteps  – int[] of 256-color palette stops for New-AsciiGradient
+    #   GradientType   – 'fg' (foreground gradient)
+    # All standard color keys are present for fallback with New-AsciiColor.
+
+    # 1. aurora — Northern lights: cyan → purple → magenta
+    $Themes['aurora'] = @{
+        AccentColor      = 'cyan'
+        AccentFormat     = 'bold'
+        BorderColor      = 'magenta'
+        BorderFormat     = 'bold'
+        HeaderBg         = 'black'
+        HeaderFg         = 'cyan'
+        ModuleBg         = 'black'
+        ModuleFg         = 'cyan'
+        VersionBg        = 'black'
+        VersionFg        = 'magenta'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'cyan'
+        ParamNameFg      = 'magenta'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = 'cyan'
+        ParamTypeFormat  = 'italic'
+        ParamReqFg       = 'red'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = 'cyan'
+        DocsFg           = 'magenta'
+        DocsFormat       = 'underline'
+        SectionChar      = '✦'
+        HeaderChar       = '◈'
+        BorderTop        = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+        BorderBottom     = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+        BorderMiddle     = '·'
+        GradientSteps    = [int[]]@(51, 93, 129, 201)
+        GradientType     = 'fg'
+    }
+
+    # 2. neon-noir — Dark pink/purple neon: magenta → deep pink
+    $Themes['neon-noir'] = @{
+        AccentColor      = 'magenta'
+        AccentFormat     = 'bold'
+        BorderColor      = 'magenta'
+        BorderFormat     = 'bold'
+        HeaderBg         = 'black'
+        HeaderFg         = 'magenta'
+        ModuleBg         = 'black'
+        ModuleFg         = 'magenta'
+        VersionBg        = 'black'
+        VersionFg        = 'red'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'magenta'
+        ParamNameFg      = 'magenta'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = 'red'
+        ParamTypeFormat  = 'italic'
+        ParamReqFg       = 'red'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = 'magenta'
+        DocsFg           = 'red'
+        DocsFormat       = 'underline'
+        SectionChar      = '◆'
+        HeaderChar       = '⟩'
+        BorderTop        = '◆══════════════════════════════════════════════════════════◆'
+        BorderBottom     = '◆══════════════════════════════════════════════════════════◆'
+        BorderMiddle     = '░'
+        GradientSteps    = [int[]]@(201, 198, 196, 200)
+        GradientType     = 'fg'
+    }
+
+    # 3. lava — Hot reds/oranges: red → orange → yellow
+    $Themes['lava'] = @{
+        AccentColor      = 'red'
+        AccentFormat     = 'bold'
+        BorderColor      = 'yellow'
+        BorderFormat     = 'bold'
+        HeaderBg         = 'black'
+        HeaderFg         = 'red'
+        ModuleBg         = 'black'
+        ModuleFg         = 'yellow'
+        VersionBg        = 'black'
+        VersionFg        = 'yellow'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'yellow'
+        ParamNameFg      = 'red'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = 'yellow'
+        ParamTypeFormat  = 'none'
+        ParamReqFg       = 'red'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = 'yellow'
+        DocsFg           = 'red'
+        DocsFormat       = 'underline'
+        SectionChar      = '🔥'
+        HeaderChar       = '▶'
+        BorderTop        = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+        BorderBottom     = '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+        BorderMiddle     = '▒'
+        GradientSteps    = [int[]]@(196, 202, 214, 220)
+        GradientType     = 'fg'
+    }
+
+    # 4. ocean — Deep sea: dark blue → cyan
+    $Themes['ocean'] = @{
+        AccentColor      = 'darkblue'
+        AccentFormat     = 'bold'
+        BorderColor      = 'cyan'
+        BorderFormat     = 'none'
+        HeaderBg         = 'black'
+        HeaderFg         = 'cyan'
+        ModuleBg         = 'black'
+        ModuleFg         = 'cyan'
+        VersionBg        = 'black'
+        VersionFg        = 'blue'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'cyan'
+        ParamNameFg      = 'blue'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = 'cyan'
+        ParamTypeFormat  = 'italic'
+        ParamReqFg       = 'red'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = 'cyan'
+        DocsFg           = 'blue'
+        DocsFormat       = 'underline'
+        SectionChar      = '≈'
+        HeaderChar       = '◦'
+        BorderTop        = '≈────────────────────────────────────────────────────────≈'
+        BorderBottom     = '≈────────────────────────────────────────────────────────≈'
+        BorderMiddle     = '·'
+        GradientSteps    = [int[]]@(17, 20, 27, 39, 51)
+        GradientType     = 'fg'
+    }
+
+    # 5. toxic — Acid green: bright greens
+    $Themes['toxic'] = @{
+        AccentColor      = 'green'
+        AccentFormat     = 'bold'
+        BorderColor      = 'green'
+        BorderFormat     = 'bold'
+        HeaderBg         = 'black'
+        HeaderFg         = 'green'
+        ModuleBg         = 'black'
+        ModuleFg         = 'green'
+        VersionBg        = 'black'
+        VersionFg        = 'green'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'green'
+        ParamNameFg      = 'green'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = 'green'
+        ParamTypeFormat  = 'italic'
+        ParamReqFg       = 'red'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = 'green'
+        DocsFg           = 'green'
+        DocsFormat       = 'underline'
+        SectionChar      = '⚗'
+        HeaderChar       = '⊲'
+        BorderTop        = '────────────────────────────────────────────────────────────'
+        BorderBottom     = '────────────────────────────────────────────────────────────'
+        BorderMiddle     = '·'
+        GradientSteps    = [int[]]@(46, 82, 118, 154)
+        GradientType     = 'fg'
+    }
+
+    # 6. midnight — Deep indigo/purple: deep blue → violet
+    $Themes['midnight'] = @{
+        AccentColor      = 'darkblue'
+        AccentFormat     = 'bold'
+        BorderColor      = 'darkmagenta'
+        BorderFormat     = 'none'
+        HeaderBg         = 'black'
+        HeaderFg         = 'blue'
+        ModuleBg         = 'black'
+        ModuleFg         = 'magenta'
+        VersionBg        = 'black'
+        VersionFg        = 'magenta'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'blue'
+        ParamNameFg      = 'magenta'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = 'blue'
+        ParamTypeFormat  = 'italic'
+        ParamReqFg       = 'red'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = 'blue'
+        DocsFg           = 'magenta'
+        DocsFormat       = 'underline'
+        SectionChar      = '★'
+        HeaderChar       = '◇'
+        BorderTop        = '············································································'
+        BorderBottom     = '············································································'
+        BorderMiddle     = '·'
+        GradientSteps    = [int[]]@(17, 54, 91, 128, 165)
+        GradientType     = 'fg'
+    }
+
+    # 7. gold — Gold/copper: dark gold → yellow
+    $Themes['gold'] = @{
+        AccentColor      = 'yellow'
+        AccentFormat     = 'bold'
+        BorderColor      = 'yellow'
+        BorderFormat     = 'bold'
+        HeaderBg         = 'black'
+        HeaderFg         = 'yellow'
+        ModuleBg         = 'black'
+        ModuleFg         = 'yellow'
+        VersionBg        = 'black'
+        VersionFg        = 'yellow'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'yellow'
+        ParamNameFg      = 'yellow'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = 'yellow'
+        ParamTypeFormat  = 'italic'
+        ParamReqFg       = 'red'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = 'yellow'
+        DocsFg           = 'yellow'
+        DocsFormat       = 'underline'
+        SectionChar      = '◈'
+        HeaderChar       = '►'
+        BorderTop        = '◈────────────────────────────────────────────────────────◈'
+        BorderBottom     = '◈────────────────────────────────────────────────────────◈'
+        BorderMiddle     = '·'
+        GradientSteps    = [int[]]@(136, 172, 214, 220, 226)
+        GradientType     = 'fg'
+    }
+
+    # 8. rose — Pink/rose: deep pink → light pink
+    $Themes['rose'] = @{
+        AccentColor      = 'magenta'
+        AccentFormat     = 'bold'
+        BorderColor      = 'magenta'
+        BorderFormat     = 'none'
+        HeaderBg         = 'black'
+        HeaderFg         = 'magenta'
+        ModuleBg         = 'black'
+        ModuleFg         = 'magenta'
+        VersionBg        = 'black'
+        VersionFg        = 'magenta'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'magenta'
+        ParamNameFg      = 'magenta'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = 'magenta'
+        ParamTypeFormat  = 'italic'
+        ParamReqFg       = 'red'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = 'magenta'
+        DocsFg           = 'magenta'
+        DocsFormat       = 'underline'
+        SectionChar      = '✿'
+        HeaderChar       = '›'
+        BorderTop        = '✿────────────────────────────────────────────────────────✿'
+        BorderBottom     = '✿────────────────────────────────────────────────────────✿'
+        BorderMiddle     = '·'
+        GradientSteps    = [int[]]@(161, 197, 199, 207, 213)
+        GradientType     = 'fg'
+    }
+
+    # 9. steel — Greyscale metallic: dark → light grey
+    $Themes['steel'] = @{
+        AccentColor      = 'gray'
+        AccentFormat     = 'bold'
+        BorderColor      = 'gray'
+        BorderFormat     = 'none'
+        HeaderBg         = 'black'
+        HeaderFg         = 'white'
+        ModuleBg         = 'black'
+        ModuleFg         = 'gray'
+        VersionBg        = 'black'
+        VersionFg        = 'white'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'gray'
+        ParamNameFg      = 'white'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = 'gray'
+        ParamTypeFormat  = 'italic'
+        ParamReqFg       = 'red'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = 'gray'
+        DocsFg           = 'white'
+        DocsFormat       = 'underline'
+        SectionChar      = '▪'
+        HeaderChar       = '▸'
+        BorderTop        = '────────────────────────────────────────────────────────────'
+        BorderBottom     = '────────────────────────────────────────────────────────────'
+        BorderMiddle     = '·'
+        GradientSteps    = [int[]]@(233, 238, 243, 248, 253)
+        GradientType     = 'fg'
+    }
+
+    # 10. phwriter — The original PHWriter retro theme (restored as a named theme)
+    $Themes['phwriter'] = @{
+        AccentColor      = 'darkcyan'
+        AccentFormat     = 'bold'
+        BorderColor      = 'darkgreen'
+        BorderFormat     = 'bold'
+        HeaderBg         = ''
+        HeaderFg         = 'cyan'
+        ModuleBg         = ''
+        ModuleFg         = 'cyan'
+        VersionBg        = ''
+        VersionFg        = 'cyan'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'white'
+        ParamNameFg      = 'green'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = 'darkcyan'
+        ParamTypeFormat  = 'none'
+        ParamReqFg       = 'red'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = 'yellow'
+        DocsFg           = 'darkcyan'
+        DocsFormat       = 'bold,underline'
+        SectionChar      = '◉'
+        HeaderChar       = '▶'
+        BorderTop        = '══════════════════════════════════════════════════════════════'
+        BorderBottom     = '══════════════════════════════════════════════════════════════'
+        BorderMiddle     = '░'
+    }
+
+    # phman is an alias for the phwriter theme
+    $Themes['phman'] = $Themes['phwriter']
+
+    # ── Lookup and return ─────────────────────────────────────────────────────
     $selected = $Name.ToLower()
     if ($Themes.ContainsKey($selected)) {
         return $Themes[$selected]
@@ -330,29 +681,29 @@ function Format-ThemeText {
         [string]$Element
     )
     if ([string]::IsNullOrEmpty($String)) { return '' }
-    
-    $colorKey = "${Element}Fg"
-    $bgKey = "${Element}Bg"
+
+    $colorKey  = "${Element}Fg"
+    $bgKey     = "${Element}Bg"
     $formatKey = "${Element}Format"
-    
-    $color = if ($Theme.ContainsKey($colorKey)) { $Theme[$colorKey] } else { '' }
-    $bgColor = if ($Theme.ContainsKey($bgKey)) { $Theme[$bgKey] } else { '' }
-    
-    $rawFormat = if ($Theme.ContainsKey($formatKey)) { 
-        if ($Theme[$formatKey] -is [array]) { $Theme[$formatKey] } 
+
+    $color   = if ($Theme.ContainsKey($colorKey))  { $Theme[$colorKey]  } else { '' }
+    $bgColor = if ($Theme.ContainsKey($bgKey))      { $Theme[$bgKey]     } else { '' }
+
+    $rawFormat = if ($Theme.ContainsKey($formatKey)) {
+        if ($Theme[$formatKey] -is [array]) { $Theme[$formatKey] }
         else { $Theme[$formatKey] -split ',' }
     } else { @() }
-    
+
     $format = @($rawFormat) | Where-Object { $_ -and $_ -ne 'none' }
 
     $params = @{
-        String = $String
-        Color  = $color
+        String  = $String
+        Color   = $color
         BgColor = $bgColor
     }
     if ($format -and $format.Count -gt 0) {
         $params['Format'] = $format
     }
-    
+
     return New-AsciiColor @params
 }
