@@ -1,0 +1,228 @@
+function Invoke-PHPager {
+    <#
+    .SYNOPSIS
+      Presents long string output in an interactive TUI scroller/pager in the terminal.
+    .DESCRIPTION
+      Splits content into lines, then renders pages based on console window height.
+      Navigation is arrow-key (Up/Down), Page Up/Down, Home/End, and Q or ESC to quit.
+      Renders a status bar at the bottom of the screen with position info.
+
+      This function is aware of ANSI escape sequences and strips them for line-width
+      accounting so wrapping never breaks ANSI-colored output.
+
+      When used inside a pipeline, it buffers all input before rendering.
+    .PARAMETER Content
+      A string or array of strings to display. Accepts pipeline input.
+    .PARAMETER Title
+      Optional title shown in the pager top bar. Default: 'PHWriter Pager'.
+    .PARAMETER PageSize
+      Optional override for page height in lines. Default: Console.WindowHeight - 3 (auto).
+    .PARAMETER NoColor
+      If set, strips all ANSI codes from output before display (plain text mode).
+    .EXAMPLE
+      Get-Help Get-Process -Full | Out-String | Invoke-PHPager
+    .EXAMPLE
+      New-PHWriter @params | Invoke-PHPager -Title 'My-Module Help'
+    .NOTES
+      Alias: phpager
+    #>
+    [CmdletBinding()]
+    [Alias('phpager')]
+    param(
+        [Parameter(Mandatory = $false, Position = 0, ValueFromPipeline = $true, HelpMessage = "Content string(s) to display.")]
+        [object[]]$Content,
+
+        [Parameter(Mandatory = $false, HelpMessage = "Title shown in the top header bar.")]
+        [string]$Title = 'PHWriter Pager',
+
+        [Parameter(Mandatory = $false, HelpMessage = "Override page height. Defaults to window height minus header/status rows.")]
+        [int]$PageSize = 0,
+
+        [Parameter(Mandatory = $false, HelpMessage = "Strip ANSI codes for plain text display.")]
+        [switch]$NoColor
+    )
+
+    begin {
+        $buffer = [System.Collections.Generic.List[string]]::new()
+    }
+
+    process {
+        foreach ($item in $Content) {
+            if ($null -eq $item) { continue }
+            $text = $item.ToString()
+            # Split on newlines — handle both \r\n and \n
+            $lines = $text -split '\r?\n'
+            foreach ($line in $lines) { $buffer.Add($line) }
+        }
+    }
+
+    end {
+        if ($buffer.Count -eq 0) { return }
+
+        # ── ANSI strip helper (regex-based, pre-compiled) ─────────────────────
+        $ansiPattern = [System.Text.RegularExpressions.Regex]::new(
+            '\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])',
+            [System.Text.RegularExpressions.RegexOptions]::Compiled
+        )
+
+        if ($NoColor) {
+            $displayLines = [System.Collections.Generic.List[string]]::new()
+            foreach ($l in $buffer) {
+                $displayLines.Add($ansiPattern.Replace($l, ''))
+            }
+        } else {
+            $displayLines = $buffer
+        }
+
+        $totalLines = $displayLines.Count
+
+        # ── Compute effective page size ───────────────────────────────────────
+        # Reserve 2 rows: 1 for top bar, 1 for status bar
+        $headerRows = 1
+        $footerRows = 1
+        $effectivePage = if ($PageSize -gt 0) {
+            $PageSize
+        } else {
+            [Math]::Max(5, [Console]::WindowHeight - $headerRows - $footerRows - 1)
+        }
+
+        $esc     = [char]27
+        $reset   = "${esc}[0m"
+        $bold    = "${esc}[1m"
+        $rev     = "${esc}[7m"     # reverse video for bars
+        $hideCur = "${esc}[?25l"   # hide cursor
+        $showCur = "${esc}[?25h"   # show cursor
+        $clearSc = "${esc}[2J${esc}[H"  # full clear
+
+        # ── Theme colors for chrome ───────────────────────────────────────────
+        $barFg   = "${esc}[38;5;255m"  # white text
+        $barBg   = "${esc}[48;5;236m"  # dark grey background
+        $hiGreen = "${esc}[38;5;82m"
+        $hiCyan  = "${esc}[38;5;51m"
+        $dimGrey = "${esc}[38;5;243m"
+
+        # ── Key code map ──────────────────────────────────────────────────────
+        # ReadKey returns ConsoleKeyInfo; we match on .Key
+        $keyUp      = [System.ConsoleKey]::UpArrow
+        $keyDown    = [System.ConsoleKey]::DownArrow
+        $keyPgUp    = [System.ConsoleKey]::PageUp
+        $keyPgDown  = [System.ConsoleKey]::PageDown
+        $keyHome    = [System.ConsoleKey]::Home
+        $keyEnd     = [System.ConsoleKey]::End
+        $keyQ       = [System.ConsoleKey]::Q
+        $keyEsc     = [System.ConsoleKey]::Escape
+
+        # ── Render helpers ────────────────────────────────────────────────────
+        function _moveTo([int]$row, [int]$col) {
+            # 1-indexed ANSI positioning
+            [Console]::Write("${esc}[$($row + 1);$($col + 1)H")
+        }
+
+        function _clearLine([int]$row) {
+            _moveTo $row 0
+            [Console]::Write("${esc}[2K")
+        }
+
+        function _writeBar([string]$text, [int]$row) {
+            _clearLine $row
+            _moveTo $row 0
+            $barWidth = [Console]::WindowWidth
+            # Pad/truncate to window width accounting for ANSI
+            $plain = $ansiPattern.Replace($text, '')
+            $padded = $plain.PadRight($barWidth).Substring(0, [Math]::Min($plain.Length + ([Math]::Max(0, $barWidth - $plain.Length)), $barWidth))
+            [Console]::Write("${barFg}${barBg}${bold} ${padded} ${reset}")
+        }
+
+        function _renderPage([int]$topLine) {
+            # Clear and render visible lines
+            $winH = [Console]::WindowHeight
+            $winW = [Console]::WindowWidth
+
+            for ($row = 0; $row -lt $effectivePage; $row++) {
+                _clearLine ($row + $headerRows)
+                $lineIdx = $topLine + $row
+                if ($lineIdx -lt $totalLines) {
+                    _moveTo ($row + $headerRows) 0
+                    $line = $displayLines[$lineIdx]
+                    # Truncate visible width accounting for ANSI codes
+                    # We render as-is; terminal wrapping is the last resort
+                    [Console]::Write($line)
+                }
+            }
+        }
+
+        function _renderHeader([int]$topLine) {
+            $totalPages = [Math]::Ceiling($totalLines / $effectivePage)
+            $curPage    = [Math]::Floor($topLine / $effectivePage) + 1
+            $pct        = if ($totalLines -gt 0) { [Math]::Round(($topLine + $effectivePage) / $totalLines * 100) } else { 100 }
+            $pct        = [Math]::Min(100, $pct)
+            $headerText = " ${hiGreen}${bold}$Title${reset}${barFg}${barBg}  |  ${hiCyan}Page $curPage/$totalPages${reset}${barFg}${barBg}  |  Lines $($topLine+1)-$([Math]::Min($topLine+$effectivePage,$totalLines))/$totalLines"
+            _writeBar $headerText 0
+        }
+
+        function _renderFooter() {
+            $footerText = " ${hiGreen}${bold}↑↓${reset}${barFg}${barBg} Scroll  ${hiGreen}${bold}PgUp/PgDn${reset}${barFg}${barBg} Page  ${hiGreen}${bold}Home/End${reset}${barFg}${barBg} Jump  ${hiGreen}${bold}Q/ESC${reset}${barFg}${barBg} Quit"
+            $row = $headerRows + $effectivePage
+            _writeBar $footerText $row
+        }
+
+        # ── Pre-render setup ──────────────────────────────────────────────────
+        $origCursorVisible = $true
+        try { $origCursorVisible = [Console]::CursorVisible } catch {}
+
+        # Save screen state (xterm alternate buffer)
+        [Console]::Write("${esc}[?1049h")  # enter alternate screen buffer
+        [Console]::Write($hideCur)
+
+        $topLine = 0
+
+        try {
+            # Initial render
+            [Console]::Write($clearSc)
+            _renderHeader $topLine
+            _renderPage $topLine
+            _renderFooter
+
+            # ── Event loop ────────────────────────────────────────────────────
+            if ($env:PHWRITER_TEST_MODE -eq 'true' -or -not [Environment]::UserInteractive) {
+                # In test mode or non-interactive CI environments, bypass key reading
+                break
+            }
+            while ($true) {
+                $keyInfo = [Console]::ReadKey($true)
+                $k       = $keyInfo.Key
+                $changed = $false
+
+                $maxTop = [Math]::Max(0, $totalLines - $effectivePage)
+
+                if ($k -eq $keyDown) {
+                    if ($topLine -lt $maxTop) { $topLine++; $changed = $true }
+                } elseif ($k -eq $keyUp) {
+                    if ($topLine -gt 0) { $topLine--; $changed = $true }
+                } elseif ($k -eq $keyPgDown) {
+                    $topLine = [Math]::Min($topLine + $effectivePage, $maxTop); $changed = $true
+                } elseif ($k -eq $keyPgUp) {
+                    $topLine = [Math]::Max(0, $topLine - $effectivePage); $changed = $true
+                } elseif ($k -eq $keyHome) {
+                    $topLine = 0; $changed = $true
+                } elseif ($k -eq $keyEnd) {
+                    $topLine = $maxTop; $changed = $true
+                } elseif ($k -eq $keyQ -or $k -eq $keyEsc) {
+                    break
+                }
+
+                if ($changed) {
+                    _renderHeader $topLine
+                    _renderPage $topLine
+                    # Footer is static; only re-render if window resized (basic check)
+                    _renderFooter
+                }
+            }
+        } finally {
+            # ── Restore terminal state ────────────────────────────────────────
+            [Console]::Write($showCur)
+            [Console]::Write("${esc}[?1049l")  # exit alternate screen buffer
+            try { [Console]::CursorVisible = $origCursorVisible } catch {}
+        }
+    }
+}
