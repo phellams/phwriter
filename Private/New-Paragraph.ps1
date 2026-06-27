@@ -1,38 +1,3 @@
-# Add C# Indenter type if not already loaded
-if (-not ([System.Management.Automation.PSTypeName]'Indenter').Type) {
-    Add-Type -TypeDefinition @"
-using System;
-using System.Text;
-
-public class Indenter
-{
-    public static string NewIndent(int position, int indent, string str)
-    {
-        var StringBuilder = new StringBuilder();
-        var words = str.Split(' ');
-
-        int currentLineLength = 0;
-        StringBuilder.Append(' ', indent);
-        foreach (var word in words)
-        {
-            if (currentLineLength + word.Length > position)
-            {
-                StringBuilder.AppendLine();
-                StringBuilder.Append(' ', indent);
-                currentLineLength = 0;
-            }
-
-            StringBuilder.Append(word);
-            StringBuilder.Append(' ');
-            currentLineLength += word.Length + 1;
-        }
-
-        return StringBuilder.ToString();
-    }
-}
-"@
-}
-
 function New-Paragraph {
     <#
     .SYNOPSIS
@@ -59,5 +24,22 @@ function New-Paragraph {
         [string]$string
     )
 
-    return [Indenter]::NewIndent($position, $indent, $string)
+    $sb = [System.Text.StringBuilder]::new()
+    $words = $string.Split(' ')
+    $currentLineLength = 0
+    [void]$sb.Append([char]' ', $indent)
+
+    foreach ($word in $words) {
+        if ($currentLineLength + $word.Length -gt $position) {
+            [void]$sb.AppendLine()
+            [void]$sb.Append([char]' ', $indent)
+            $currentLineLength = 0
+        }
+
+        [void]$sb.Append($word)
+        [void]$sb.Append([char]' ')
+        $currentLineLength += $word.Length + 1
+    }
+
+    return $sb.ToString()
 }

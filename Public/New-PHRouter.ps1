@@ -60,7 +60,7 @@ function New-PHRouter {
     [CmdletBinding()]
     [Alias('phroute')]
     param(
-        [Parameter(Mandatory = $true, Position = 0, HelpMessage = "Subcommand route map.")]
+        [Parameter(Mandatory = $false, Position = 0, HelpMessage = "Subcommand route map.")]
         [hashtable]$Routes,
 
         [Parameter(Mandatory = $false, Position = 1, ValueFromRemainingArguments = $false, HelpMessage = "Raw argument array.")]
@@ -73,8 +73,84 @@ function New-PHRouter {
         [switch]$RegisterCompleter,
 
         [Parameter(Mandatory = $false, HelpMessage = "PHWriter metadata for validation.")]
-        [object]$Metadata
+        [object]$Metadata,
+
+        [Parameter(Mandatory = $false, HelpMessage = "Theme name or custom theme object.")]
+        [object]$Theme = 'default',
+
+        [Parameter(HelpMessage = "Display Help for New-PHRouter.")]
+        [switch]$Help
     )
+
+    # ── Help support ──────────────────────────────────────────────────────────
+    if ($Help) {
+        $phrouter_ParamTable = @(
+            @{
+                name        = "Routes"
+                param       = "r|Routes"
+                type        = "Hashtable"
+                description = "Subcommand route map (subcommand -> scriptblock/string)."
+                required    = $true
+                inline      = $false
+            },
+            @{
+                name        = "ArgumentList"
+                param       = "args|ArgumentList"
+                type        = "String[]"
+                description = "Raw argument array to dispatch."
+                required    = $false
+                inline      = $false
+            },
+            @{
+                name        = "ModuleName"
+                param       = "m|ModuleName"
+                type        = "String"
+                description = "Module/CLI name for messaging. Default: 'PHRouter'."
+                required    = $false
+                inline      = $false
+            },
+            @{
+                name        = "RegisterCompleter"
+                param       = "rc|RegisterCompleter"
+                type        = "Switch"
+                description = "Auto-register tab-completion for subcommand keys."
+                required    = $false
+                inline      = $true
+            },
+            @{
+                name        = "Metadata"
+                param       = "meta|Metadata"
+                type        = "Object"
+                description = "PHWriter metadata for route validation."
+                required    = $false
+                inline      = $false
+            },
+            @{
+                name        = "Theme"
+                param       = "th|Theme"
+                type        = "String|Hashtable"
+                description = "Theme name or custom theme object."
+                required    = $false
+                inline      = $false
+            }
+        )
+        $phrouter_commandinfo = @{
+            cmdlet      = "New-PHRouter"
+            synopsis    = "New-PHRouter -Routes <Hashtable> [-ArgumentList <String[]>] [-ModuleName <String>] [-RegisterCompleter] [-Metadata <Object>] [-Theme <Object>]"
+            description = "Scaffolds and dispatches a standardized subcommand router for PowerShell CLI modules."
+            source      = "https://gitlab.com/phellams/phwriter"
+        }
+        $phrouter_examples = @(
+            "New-PHRouter -Routes \$routes -ArgumentList \$args -ModuleName 'mycli' -RegisterCompleter",
+            "New-PHRouter -Routes \$routes -ArgumentList \$args -Theme 'steel-plate'"
+        )
+        New-PHWriter -Name 'PHWRITER' -CommandInfo $phrouter_commandinfo -ParamTable $phrouter_ParamTable -Padding 4 -Indent 2 -Theme $Theme -Version '1.0.0' -Examples $phrouter_examples
+        return
+    }
+
+    if ($null -eq $Routes) {
+        throw [System.ArgumentException]::new("Routes parameter is mandatory when -Help is not specified.")
+    }
 
     # ── Auto-register tab completer ───────────────────────────────────────────
     if ($RegisterCompleter) {
@@ -112,7 +188,7 @@ function New-PHRouter {
             $target = $Routes['default']
             _PHRouter_Invoke $target $restArgs
         } else {
-            _PHRouter_NoRoute $ModuleName $Routes $null
+            _PHRouter_NoRoute $ModuleName $Routes $null $Theme
         }
         return
     }
@@ -133,7 +209,7 @@ function New-PHRouter {
     }
 
     # ── Fuzzy "Did you mean?" fallback ────────────────────────────────────────
-    _PHRouter_NoRoute $ModuleName $Routes $subcommand
+    _PHRouter_NoRoute $ModuleName $Routes $subcommand $Theme
 }
 
 # ── Private: Invoke a route (scriptblock or function name string) ─────────────
@@ -160,21 +236,23 @@ function _PHRouter_NoRoute {
     param(
         [string]$ModuleName,
         [hashtable]$Routes,
-        [string]$Subcommand
+        [string]$Subcommand,
+        [object]$Theme = 'default'
     )
 
-    $esc    = [char]27
-    $reset  = "${esc}[0m"
-    $red    = "${esc}[38;5;196m"
-    $yellow = "${esc}[38;5;226m"
-    $cyan   = "${esc}[38;5;51m"
-    $dim    = "${esc}[38;5;243m"
-    $bold   = "${esc}[1m"
+    $themeObj = $null
+    if ($Theme -is [hashtable]) {
+        $themeObj = $Theme
+    } else {
+        $themeObj = Get-PHTheme -Name $Theme
+    }
 
     $routeKeys = @($Routes.Keys | Where-Object { $_ -ne 'default' } | Sort-Object)
 
     if ($Subcommand) {
-        Write-Host "${red}${bold}Unknown subcommand:${reset} ${yellow}'$Subcommand'${reset}"
+        $unknownText = Format-ThemeText -String "Unknown subcommand:" -Theme $themeObj -Element 'ParamReq'
+        $subtext = Format-ThemeText -String "'$Subcommand'" -Theme $themeObj -Element 'ParamName'
+        Write-Host "${unknownText} ${subtext}"
 
         # Levenshtein distance for fuzzy suggest
         $suggestions = foreach ($key in $routeKeys) {
@@ -183,17 +261,23 @@ function _PHRouter_NoRoute {
         $best = $suggestions | Sort-Object dist | Select-Object -First 3 | Where-Object { $_.dist -le 4 }
         if ($best) {
             Write-Host ""
-            Write-Host "${dim}Did you mean?${reset}"
+            $didYouMeanText = Format-ThemeText -String "Did you mean?" -Theme $themeObj -Element 'ParamDesc'
+            Write-Host $didYouMeanText
             foreach ($b in $best) {
-                Write-Host "  ${cyan}${bold}$($b.key)${reset}"
+                $bkeyText = Format-ThemeText -String "  $($b.key)" -Theme $themeObj -Element 'ParamName'
+                Write-Host $bkeyText
             }
         }
     }
 
+    $availStart = Format-ThemeText -String "Available subcommands for " -Theme $themeObj -Element 'ParamDesc'
+    $modNameText = Format-ThemeText -String $ModuleName -Theme $themeObj -Element 'Header'
+    $availEnd = Format-ThemeText -String ":" -Theme $themeObj -Element 'ParamDesc'
     Write-Host ""
-    Write-Host "${dim}Available subcommands for ${yellow}${bold}$ModuleName${reset}${dim}:${reset}"
+    Write-Host "${availStart}${modNameText}${availEnd}"
     foreach ($key in $routeKeys) {
-        Write-Host "  ${cyan}${bold}$key${reset}"
+        $keyText = Format-ThemeText -String "  $key" -Theme $themeObj -Element 'ParamName'
+        Write-Host $keyText
     }
     Write-Host ""
 }

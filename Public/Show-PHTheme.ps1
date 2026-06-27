@@ -41,7 +41,10 @@ function Show-PHTheme {
         [switch]$All,
 
         [Parameter()]
-        [switch]$Minimal
+        [switch]$Minimal,
+
+        [Parameter(HelpMessage = "Display Help for Show-PHTheme.")]
+        [switch]$Help
     )
 
     begin {
@@ -78,6 +81,55 @@ function Show-PHTheme {
     }
 
     process {
+        if ($Help) {
+            $showtheme_ParamTable = @(
+                @{
+                    name        = "Name"
+                    param       = "n|Name"
+                    type        = "String"
+                    description = "Name of the theme to preview, or 'all', or 'custom-rgb'."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "Layout"
+                    param       = "l|Layout"
+                    type        = "String"
+                    description = "The ASCII banner layout style: 'Box', 'Classic', etc."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "All"
+                    param       = "a|All"
+                    type        = "Switch"
+                    description = "Preview all themes."
+                    required    = $false
+                    inline      = $true
+                },
+                @{
+                    name        = "Minimal"
+                    param       = "m|Minimal"
+                    type        = "Switch"
+                    description = "Render only the ASCII banner logo and version header."
+                    required    = $false
+                    inline      = $true
+                }
+            )
+            $showtheme_commandinfo = @{
+                cmdlet      = "Show-PHTheme"
+                synopsis    = "Show-PHTheme [-Name <String>] [-Layout <String>] [-All] [-Minimal]"
+                description = "Displays a visual preview of one or all PHWriter themes."
+                source      = "https://gitlab.com/phellams/phwriter"
+            }
+            $showtheme_examples = @(
+                "Show-PHTheme -Name 'cyberpunk'",
+                "Show-PHTheme -All -Layout 'Terminal' -Minimal"
+            )
+            New-PHWriter -Name 'PHWRITER' -CommandInfo $showtheme_commandinfo -ParamTable $showtheme_ParamTable -Padding 4 -Indent 2 -Theme 'default' -Version '1.0.0' -Examples $showtheme_examples
+            return
+        }
+
         # Determine which themes to show
         $themesToShow = @()
         $isCustomRgb = $false

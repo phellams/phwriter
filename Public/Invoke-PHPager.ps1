@@ -39,7 +39,13 @@ function Invoke-PHPager {
         [int]$PageSize = 0,
 
         [Parameter(Mandatory = $false, HelpMessage = "Strip ANSI codes for plain text display.")]
-        [switch]$NoColor
+        [switch]$NoColor,
+
+        [Parameter(Mandatory = $false, HelpMessage = "Theme name or custom theme object.")]
+        [object]$Theme = 'default',
+
+        [Parameter(HelpMessage = "Display Help for Invoke-PHPager.")]
+        [switch]$Help
     )
 
     begin {
@@ -47,6 +53,63 @@ function Invoke-PHPager {
     }
 
     process {
+        if ($Help) {
+            $phpager_ParamTable = @(
+                @{
+                    name        = "Content"
+                    param       = "c|Content"
+                    type        = "Object[]"
+                    description = "Content string(s) to display. Accepts pipeline input."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "Title"
+                    param       = "t|Title"
+                    type        = "String"
+                    description = "Title shown in the top header bar. Default: 'PHWriter Pager'."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "PageSize"
+                    param       = "ps|PageSize"
+                    type        = "Int"
+                    description = "Override page height. Defaults to window height minus header/status rows."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "NoColor"
+                    param       = "nc|NoColor"
+                    type        = "Switch"
+                    description = "Strip ANSI codes for plain text display."
+                    required    = $false
+                    inline      = $true
+                },
+                @{
+                    name        = "Theme"
+                    param       = "th|Theme"
+                    type        = "String|Hashtable"
+                    description = "Theme name or custom theme object."
+                    required    = $false
+                    inline      = $false
+                }
+            )
+            $phpager_commandinfo = @{
+                cmdlet      = "Invoke-PHPager"
+                synopsis    = "Invoke-PHPager [-Content <Object[]>] [-Title <String>] [-PageSize <Int>] [-NoColor] [-Theme <Object>]"
+                description = "Presents long string output in an interactive TUI scroller/pager in the terminal. Handles ANSI escape sequences and strips them for line-width accounting."
+                source      = "https://gitlab.com/phellams/phwriter"
+            }
+            $phpager_examples = @(
+                "Get-Help Get-Process -Full | Out-String | Invoke-PHPager",
+                "New-PHWriter @params | Invoke-PHPager -Title 'My-Module Help' -Theme 'drift-blue-orange'"
+            )
+            New-PHWriter -Name 'PHWRITER' -CommandInfo $phpager_commandinfo -ParamTable $phpager_ParamTable -Padding 4 -Indent 2 -Theme $Theme -Version '1.0.0' -Examples $phpager_examples
+            return
+        }
+
         foreach ($item in $Content) {
             if ($null -eq $item) { continue }
             $text = $item.ToString()
@@ -95,11 +158,29 @@ function Invoke-PHPager {
         $clearSc = "${esc}[2J${esc}[H"  # full clear
 
         # ── Theme colors for chrome ───────────────────────────────────────────
-        $barFg   = "${esc}[38;5;255m"  # white text
-        $barBg   = "${esc}[48;5;236m"  # dark grey background
-        $hiGreen = "${esc}[38;5;82m"
-        $hiCyan  = "${esc}[38;5;51m"
-        $dimGrey = "${esc}[38;5;243m"
+        $themeObj = $null
+        if ($Theme -is [hashtable]) {
+            $themeObj = $Theme
+        } else {
+            $themeObj = Get-PHTheme -Name $Theme
+        }
+
+        $hFg = if ($themeObj.ContainsKey('HeaderFg')) { $themeObj['HeaderFg'] } else { 'white' }
+        $hBg = if ($themeObj.ContainsKey('HeaderBg')) { $themeObj['HeaderBg'] } else { '' }
+        $barStyleRaw = New-AsciiColor -String "X" -Color $hFg -BgColor $hBg
+        $barStyle = if ($barStyleRaw.EndsWith("[0m")) { $barStyleRaw.Substring(0, $barStyleRaw.Length - 5) } else { "" }
+
+        $accCol = if ($themeObj.ContainsKey('AccentColor')) { $themeObj['AccentColor'] } else { 'green' }
+        $hiGreenRaw = New-AsciiColor -String "X" -Color $accCol -Format 'bold'
+        $hiGreen = if ($hiGreenRaw.EndsWith("[0m")) { $hiGreenRaw.Substring(0, $hiGreenRaw.Length - 5) } else { "" }
+
+        $borCol = if ($themeObj.ContainsKey('BorderColor')) { $themeObj['BorderColor'] } else { 'cyan' }
+        $hiCyanRaw = New-AsciiColor -String "X" -Color $borCol
+        $hiCyan = if ($hiCyanRaw.EndsWith("[0m")) { $hiCyanRaw.Substring(0, $hiCyanRaw.Length - 5) } else { "" }
+
+        $descCol = if ($themeObj.ContainsKey('ParamDescFg')) { $themeObj['ParamDescFg'] } else { 'gray' }
+        $dimGreyRaw = New-AsciiColor -String "X" -Color $descCol
+        $dimGrey = if ($dimGreyRaw.EndsWith("[0m")) { $dimGreyRaw.Substring(0, $dimGreyRaw.Length - 5) } else { "" }
 
         # ── Key code map ──────────────────────────────────────────────────────
         # ReadKey returns ConsoleKeyInfo; we match on .Key
@@ -130,7 +211,7 @@ function Invoke-PHPager {
             # Pad/truncate to window width accounting for ANSI
             $plain = $ansiPattern.Replace($text, '')
             $padded = $plain.PadRight($barWidth).Substring(0, [Math]::Min($plain.Length + ([Math]::Max(0, $barWidth - $plain.Length)), $barWidth))
-            [Console]::Write("${barFg}${barBg}${bold} ${padded} ${reset}")
+            [Console]::Write("${barStyle}${bold} ${padded} ${reset}")
         }
 
         function _renderPage([int]$topLine) {
@@ -156,12 +237,12 @@ function Invoke-PHPager {
             $curPage    = [Math]::Floor($topLine / $effectivePage) + 1
             $pct        = if ($totalLines -gt 0) { [Math]::Round(($topLine + $effectivePage) / $totalLines * 100) } else { 100 }
             $pct        = [Math]::Min(100, $pct)
-            $headerText = " ${hiGreen}${bold}$Title${reset}${barFg}${barBg}  |  ${hiCyan}Page $curPage/$totalPages${reset}${barFg}${barBg}  |  Lines $($topLine+1)-$([Math]::Min($topLine+$effectivePage,$totalLines))/$totalLines"
+            $headerText = " ${hiGreen}${bold}$Title${reset}${barStyle}  |  ${hiCyan}Page $curPage/$totalPages${reset}${barStyle}  |  Lines $($topLine+1)-$([Math]::Min($topLine+$effectivePage,$totalLines))/$totalLines"
             _writeBar $headerText 0
         }
 
         function _renderFooter() {
-            $footerText = " ${hiGreen}${bold}↑↓${reset}${barFg}${barBg} Scroll  ${hiGreen}${bold}PgUp/PgDn${reset}${barFg}${barBg} Page  ${hiGreen}${bold}Home/End${reset}${barFg}${barBg} Jump  ${hiGreen}${bold}Q/ESC${reset}${barFg}${barBg} Quit"
+            $footerText = " ${hiGreen}${bold}↑↓${reset}${barStyle} Scroll  ${hiGreen}${bold}PgUp/PgDn${reset}${barStyle} Page  ${hiGreen}${bold}Home/End${reset}${barStyle} Jump  ${hiGreen}${bold}Q/ESC${reset}${barStyle} Quit"
             $row = $headerRows + $effectivePage
             _writeBar $footerText $row
         }

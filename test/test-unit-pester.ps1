@@ -89,7 +89,9 @@ Describe "Get-PHTheme" {
             'midnight', 'gold', 'rose', 'steel', 'phwriter', 'phman', 'glitch', 'cosmic', 
             'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust', 
             'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal', 
-            'copper', 'royal', 'desert-heat', 'sheriff', 'frost'
+            'copper', 'royal', 'desert-heat', 'sheriff', 'frost',
+            'drift-blue-orange', 'steel-plate', 'cyber-grid', 'retro-blocks', 'gothic-crypt',
+            'acid-shards', 'aurora-borealis', 'solar-flare', 'subspace', 'neon-horizon'
         )
         foreach ($name in $names) {
             $theme = Get-PHTheme -Name $name
@@ -298,5 +300,31 @@ Describe "Invoke-PHPager" {
         } finally {
             $env:PHWRITER_TEST_MODE = $null
         }
+    }
+}
+
+Describe "Cmdlet-Help-Switches" {
+    It "Should render help for New-PHWriter without throwing" {
+        New-PHWriter -Help
+    }
+
+    It "Should render help for Export-PHWriterMetadata without throwing" {
+        Export-PHWriterMetadata -Help
+    }
+
+    It "Should render help for Show-PHTheme without throwing" {
+        Show-PHTheme -Help
+    }
+
+    It "Should render help for New-PHRouter without throwing" {
+        New-PHRouter -Help
+    }
+
+    It "Should render help for Invoke-PHPager without throwing" {
+        Invoke-PHPager -Help
+    }
+
+    It "Should render help for Write-PHAsciiLogo without throwing" {
+        Write-PHAsciiLogo -Help
     }
 }

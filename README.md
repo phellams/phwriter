@@ -9,7 +9,7 @@
 
 ## Overview
 
-**PHWriter** (PowerShell Help Writer) is a professional PowerShell module for generating beautifully formatted, ANSI-coloured terminal help output. It reproduces the clarity and structure of Linux man pages with modern, themeable aesthetics and a zero-boilerplate API.
+**PHWriter** (PowerShell Help Writer) is a module for generating beautifully formatted, ANSI-coloured terminal help output. It reproduces the clarity and structure of Linux man pages with modern, themeable aesthetics and a zero-boilerplate API.
 
 Core capabilities:
 
@@ -23,9 +23,7 @@ Core capabilities:
 
 ---
 
-## Architecture (phellams-aa Standards)
-
-PHWriter is structured to the [phellams-aa](https://gitlab.com/phellams/phwriter) engineering standard:
+## Architecture
 
 | Principle | Implementation |
 |---|---|

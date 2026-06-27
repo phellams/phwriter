@@ -62,7 +62,7 @@ function Write-PHAsciiLogo {
     #>
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory = $true, Position = 0)]
+        [Parameter(Mandatory = $false, Position = 0)]
         [string]$Name,
 
         [Parameter(Position = 1)]
@@ -76,10 +76,73 @@ function Write-PHAsciiLogo {
         [string]$Layout = 'Box',
 
         [Parameter()]
-        [string]$CustomLogo = $null
+        [string]$CustomLogo = $null,
+
+        [Parameter(HelpMessage = "Display Help for Write-PHAsciiLogo.")]
+        [switch]$Help
     )
 
     process {
+        if ($Help) {
+            $asciilogo_ParamTable = @(
+                @{
+                    name        = "Name"
+                    param       = "n|Name"
+                    type        = "String"
+                    description = "The name of the module/tool to display."
+                    required    = $true
+                    inline      = $false
+                },
+                @{
+                    name        = "Version"
+                    param       = "v|Version"
+                    type        = "String"
+                    description = "Optional version string of the module."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "Theme"
+                    param       = "th|Theme"
+                    type        = "String|Hashtable"
+                    description = "Theme name or custom theme object."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "Layout"
+                    param       = "l|Layout"
+                    type        = "String"
+                    description = "The layout style to use: 'Box', 'Classic', 'Minimal', etc."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "CustomLogo"
+                    param       = "cl|CustomLogo"
+                    type        = "String"
+                    description = "An optional custom ASCII art string that overrides the default layouts."
+                    required    = $false
+                    inline      = $false
+                }
+            )
+            $asciilogo_commandinfo = @{
+                cmdlet      = "Write-PHAsciiLogo"
+                synopsis    = "Write-PHAsciiLogo [-Name <String>] [-Version <String>] [-Theme <Object>] [-Layout <String>] [-CustomLogo <String>]"
+                description = "Renders the ASCII logo banner for a module with dynamic theme and layout options."
+                source      = "https://gitlab.com/phellams/phwriter"
+            }
+            $asciilogo_examples = @(
+                "Write-PHAsciiLogo -Name 'SAMPLE' -Version '1.2.3' -Theme 'drift-blue-orange'"
+            )
+            New-PHWriter -Name 'PHWRITER' -CommandInfo $asciilogo_commandinfo -ParamTable $asciilogo_ParamTable -Padding 4 -Indent 2 -Theme $Theme -Version '1.0.0' -Examples $asciilogo_examples
+            return
+        }
+
+        if ([string]::IsNullOrEmpty($Name)) {
+            throw [System.ArgumentException]::new("Name parameter is mandatory when -Help is not specified.")
+        }
+
         # Resolve Theme
         $themeObj = $null
         if ($Theme -is [hashtable]) {

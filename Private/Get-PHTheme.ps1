@@ -1346,6 +1346,330 @@ function Get-PHTheme {
     # phman is an alias for the phwriter theme
     $Themes['phman'] = $Themes['phwriter']
 
+    # ── 10 New Hard-Bordered Themes using ASCII shapes ───────────────────────────
+
+    # 1. drift-blue-orange — Reserved themed with double border and blue/orange colors
+    $Themes['drift-blue-orange'] = @{
+        AccentColor      = '39'          # Sky blue
+        AccentFormat     = 'bold'
+        BorderColor      = '208'         # Bright orange
+        BorderFormat     = 'bold'
+        HeaderBg         = ''
+        HeaderFg         = '39'
+        ModuleBg         = ''
+        ModuleFg         = '39'
+        VersionBg        = ''
+        VersionFg        = '208'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'white'
+        ParamNameFg      = '39'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = '208'
+        ParamTypeFormat  = 'none'
+        ParamReqFg       = 'red'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = '39'
+        DocsFg           = '208'
+        DocsFormat       = 'bold,underline'
+        SectionChar      = '◆'
+        HeaderChar       = '▶'
+        BorderTop        = '╔══════════════════════════════════════════════════════════════╗'
+        BorderBottom     = '╚══════════════════════════════════════════════════════════════╝'
+        BorderMiddle     = '║'
+    }
+
+    # 2. steel-plate — Heavy industrial single line box borders with steel gray palette
+    $Themes['steel-plate'] = @{
+        AccentColor      = 'white'
+        AccentFormat     = 'bold'
+        BorderColor      = '245'         # Steel gray
+        BorderFormat     = 'bold'
+        HeaderBg         = ''
+        HeaderFg         = 'white'
+        ModuleBg         = ''
+        ModuleFg         = 'white'
+        VersionBg        = ''
+        VersionFg        = '245'
+        SyntaxFg         = '250'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = '252'
+        ParamNameFg      = 'white'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = '245'
+        ParamTypeFormat  = 'italic'
+        ParamReqFg       = '203'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = '244'
+        ExampleFg        = 'white'
+        DocsFg           = '245'
+        DocsFormat       = 'underline'
+        SectionChar      = '█'
+        HeaderChar       = '▌'
+        BorderTop        = '▛▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▜'
+        BorderBottom     = '▙▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▟'
+        BorderMiddle     = '▌'
+    }
+
+    # 3. cyber-grid — Grid block patterned borders with cyber magenta/yellow colors
+    $Themes['cyber-grid'] = @{
+        AccentColor      = '226'         # Yellow
+        AccentFormat     = 'bold'
+        BorderColor      = '201'         # Cyber pink/magenta
+        BorderFormat     = 'bold'
+        HeaderBg         = ''
+        HeaderFg         = '226'
+        ModuleBg         = ''
+        ModuleFg         = '201'
+        VersionBg        = ''
+        VersionFg        = '226'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = '226'
+        ParamNameFg      = '201'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = '51'          # Cyan
+        ParamTypeFormat  = 'none'
+        ParamReqFg       = '196'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = '226'
+        DocsFg           = '51'
+        DocsFormat       = 'underline'
+        SectionChar      = '▩'
+        HeaderChar       = '▨'
+        BorderTop        = '▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩'
+        BorderBottom     = '▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩▩'
+        BorderMiddle     = '▩'
+    }
+
+    # 4. retro-blocks — Classic solid blocks and squares border style
+    $Themes['retro-blocks'] = @{
+        AccentColor      = '81'          # Retro light blue
+        AccentFormat     = 'bold'
+        BorderColor      = '15'          # White
+        BorderFormat     = 'none'
+        HeaderBg         = ''
+        HeaderFg         = '81'
+        ModuleBg         = ''
+        ModuleFg         = '15'
+        VersionBg        = ''
+        VersionFg        = '81'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = '250'
+        ParamNameFg      = '81'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = '15'
+        ParamTypeFormat  = 'none'
+        ParamReqFg       = '196'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = '81'
+        DocsFg           = '15'
+        DocsFormat       = 'underline'
+        SectionChar      = '■'
+        HeaderChar       = '▪'
+        BorderTop        = '■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□'
+        BorderBottom     = '■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□■□'
+        BorderMiddle     = '▪'
+    }
+
+    # 5. gothic-crypt — Dark red and gothic cross shape styling
+    $Themes['gothic-crypt'] = @{
+        AccentColor      = '196'         # Crimson
+        AccentFormat     = 'bold'
+        BorderColor      = '88'          # Dark red
+        BorderFormat     = 'bold'
+        HeaderBg         = ''
+        HeaderFg         = '196'
+        ModuleBg         = ''
+        ModuleFg         = '88'
+        VersionBg        = ''
+        VersionFg        = '196'
+        SyntaxFg         = '250'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'gray'
+        ParamNameFg      = '196'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = '88'
+        ParamTypeFormat  = 'italic'
+        ParamReqFg       = '196'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = '196'
+        DocsFg           = '88'
+        DocsFormat       = 'underline'
+        SectionChar      = '☩'
+        HeaderChar       = '♰'
+        BorderTop        = '☩━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━☩'
+        BorderBottom     = '☩━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━☩'
+        BorderMiddle     = '│'
+    }
+
+    # 6. acid-shards — Triangles and shards with toxic yellow/green tones
+    $Themes['acid-shards'] = @{
+        AccentColor      = '190'         # Lime yellow
+        AccentFormat     = 'bold'
+        BorderColor      = '112'         # Toxic green
+        BorderFormat     = 'bold'
+        HeaderBg         = ''
+        HeaderFg         = '190'
+        ModuleBg         = ''
+        ModuleFg         = '112'
+        VersionBg        = ''
+        VersionFg        = '190'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = '190'
+        ParamNameFg      = '112'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = '190'
+        ParamTypeFormat  = 'none'
+        ParamReqFg       = '196'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = '190'
+        DocsFg           = '112'
+        DocsFormat       = 'underline'
+        SectionChar      = '▼'
+        HeaderChar       = '▲'
+        BorderTop        = '▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△▼△'
+        BorderBottom     = '▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽▲▽'
+        BorderMiddle     = '▲'
+    }
+
+    # 7. aurora-borealis — Rounded single box corners with blue/green gradient
+    $Themes['aurora-borealis'] = @{
+        AccentColor      = '51'          # Bright Cyan
+        AccentFormat     = 'bold'
+        BorderColor      = '33'          # Royal Blue
+        BorderFormat     = 'none'
+        HeaderBg         = ''
+        HeaderFg         = '51'
+        ModuleBg         = ''
+        ModuleFg         = '33'
+        VersionBg        = ''
+        VersionFg        = '201'         # Aurora purple accent
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'white'
+        ParamNameFg      = '51'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = '201'
+        ParamTypeFormat  = 'italic'
+        ParamReqFg       = '196'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = '51'
+        DocsFg           = '201'
+        DocsFormat       = 'underline'
+        SectionChar      = '❄'
+        HeaderChar       = '│'
+        BorderTop        = '╭────────────────────────────────────────────────────────────╮'
+        BorderBottom     = '╰────────────────────────────────────────────────────────────╯'
+        BorderMiddle     = '│'
+        GradientSteps    = [int[]]@(51, 45, 129, 201, 207)
+        GradientType     = 'fg'
+    }
+
+    # 8. solar-flare — Diamonds border shapes with burning orange/gold colors
+    $Themes['solar-flare'] = @{
+        AccentColor      = '220'         # Bright Gold
+        AccentFormat     = 'bold'
+        BorderColor      = '202'         # Fire Orange
+        BorderFormat     = 'bold'
+        HeaderBg         = ''
+        HeaderFg         = '220'
+        ModuleBg         = ''
+        ModuleFg         = '202'
+        VersionBg        = ''
+        VersionFg        = '220'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = '220'
+        ParamNameFg      = '202'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = '220'
+        ParamTypeFormat  = 'none'
+        ParamReqFg       = '196'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = '220'
+        DocsFg           = '202'
+        DocsFormat       = 'underline'
+        SectionChar      = '◆'
+        HeaderChar       = '◈'
+        BorderTop        = '◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇'
+        BorderBottom     = '◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇◆◇'
+        BorderMiddle     = '◈'
+    }
+
+    # 9. subspace — Double heavy arrowheads and deep space teal colors
+    $Themes['subspace'] = @{
+        AccentColor      = '39'          # Teal
+        AccentFormat     = 'bold'
+        BorderColor      = '24'          # Dark Blue
+        BorderFormat     = 'bold'
+        HeaderBg         = ''
+        HeaderFg         = '39'
+        ModuleBg         = ''
+        ModuleFg         = '24'
+        VersionBg        = ''
+        VersionFg        = '39'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'gray'
+        ParamNameFg      = '39'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = '24'
+        ParamTypeFormat  = 'italic'
+        ParamReqFg       = '196'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = '39'
+        DocsFg           = '24'
+        DocsFormat       = 'underline'
+        SectionChar      = '⇛'
+        HeaderChar       = '┃'
+        BorderTop        = '⇛━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⇚'
+        BorderBottom     = '⇛━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━⇚'
+        BorderMiddle     = '┃'
+    }
+
+    # 10. neon-horizon — Blocks and shades with hot pink/cyan horizon styling
+    $Themes['neon-horizon'] = @{
+        AccentColor      = '201'         # Hot Pink
+        AccentFormat     = 'bold'
+        BorderColor      = '51'          # Neon Cyan
+        BorderFormat     = 'bold'
+        HeaderBg         = ''
+        HeaderFg         = '201'
+        ModuleBg         = ''
+        ModuleFg         = '51'
+        VersionBg        = ''
+        VersionFg        = '201'
+        SyntaxFg         = 'white'
+        SyntaxFormat     = 'none'
+        DescriptionFg    = 'white'
+        ParamNameFg      = '51'
+        ParamNameFormat  = 'bold'
+        ParamTypeFg      = '201'
+        ParamTypeFormat  = 'none'
+        ParamReqFg       = '196'
+        ParamReqFormat   = 'bold'
+        ParamDescFg      = 'gray'
+        ExampleFg        = '201'
+        DocsFg           = '51'
+        DocsFormat       = 'underline'
+        SectionChar      = '█'
+        HeaderChar       = '░'
+        BorderTop        = '░▒▓█▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀█▓▒░'
+        BorderBottom     = '░▒▓█▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄█▓▒░'
+        BorderMiddle     = '█'
+    }
+
     # ── Lookup and return ─────────────────────────────────────────────────────
     $selected = $Name.ToLower()
     if ($Themes.ContainsKey($selected)) {

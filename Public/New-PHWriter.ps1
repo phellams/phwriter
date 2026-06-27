@@ -341,31 +341,68 @@ function New-PHWriter {
                     continue
                 }
 
-                $paramAlias = "-$($paramInfo.param)"
                 $paramType = "[$($paramInfo.type)]"
                 $paramName = $paramInfo.name
                 $paramDesc = $paramInfo.description
                 $required = $paramInfo.required -or $false
                 $inline = [bool]$paramInfo.inline
 
-                $reqText = if ($required) { Format-ThemeText -String "(Req) " -Theme $themeObj -Element 'ParamReq' } else { "" }
+                # Swap (req) to the end of param name, styled.
+                $reqText = if ($required) { " " + (Format-ThemeText -String "(Req)" -Theme $themeObj -Element 'ParamReq') } else { "" }
 
-                $formattedAlias = $paramAlias.PadRight($maxParamLength + $Padding)
+                # Format alias with pipe coloring if present
+                if ($paramInfo.param -like '*|*') {
+                    $parts = $paramInfo.param -split '\|', 2
+                    $shorthandRaw = "-$($parts[0])"
+                    $pipeRaw = "|"
+                    $targetLongNameLength = ($maxParamLength + $Padding) - ($shorthandRaw.Length + 1)
+                    $longNameRaw = $parts[1].PadRight($targetLongNameLength)
+
+                    $styledShorthand = Format-ThemeText -String $shorthandRaw -Theme $themeObj -Element 'ParamName'
+                    $styledPipe = Format-ThemeText -String $pipeRaw -Theme $themeObj -Element 'Border'
+                    $styledLongName = Format-ThemeText -String $longNameRaw -Theme $themeObj -Element 'ParamName'
+                    $styledAlias = $styledShorthand + $styledPipe + $styledLongName
+                } else {
+                    $paramAlias = "-$($paramInfo.param)"
+                    $formattedAlias = $paramAlias.PadRight($maxParamLength + $Padding)
+                    $styledAlias = Format-ThemeText -String $formattedAlias -Theme $themeObj -Element 'ParamName'
+                }
+
                 $formattedType = $paramType.PadRight($maxTypeLength + $Padding)
-
-                $styledAlias = Format-ThemeText -String $formattedAlias -Theme $themeObj -Element 'ParamName'
                 $styledType = Format-ThemeText -String $formattedType -Theme $themeObj -Element 'ParamType'
                 $styledName = Format-ThemeText -String $paramName -Theme $themeObj -Element 'Header'
 
-                [console]::Write("${indentString}   ${styledAlias}${styledType}${reqText}${styledName}")
+                [console]::Write("${indentString}   ${styledAlias}${styledType}${styledName}${reqText}")
 
-                if ($inline) {
-                    $styledDesc = Format-ThemeText -String "  $paramDesc" -Theme $themeObj -Element 'ParamDesc'
+                # Format single quotes inside $paramDesc
+                $descParts = $paramDesc -split "'"
+                $resultParts = [System.Collections.Generic.List[string]]::new()
+                for ($i = 0; $i -lt $descParts.Count; $i++) {
+                    if ($i % 2 -eq 1) {
+                        $quotedText = "'$($descParts[$i])'"
+                        $colorValue = if ($themeObj.ContainsKey('AccentColor')) { $themeObj['AccentColor'] } else { 'cyan' }
+                        $styledQuoted = New-AsciiColor -String $quotedText -Color $colorValue -Format @('bold', 'italic')
+                        $resultParts.Add($styledQuoted)
+                    } else {
+                        if ($descParts[$i].Length -gt 0) {
+                            $styledOutside = Format-ThemeText -String $descParts[$i] -Theme $themeObj -Element 'ParamDesc'
+                            $resultParts.Add($styledOutside)
+                        }
+                    }
+                }
+                $styledDescText = $resultParts -join ""
+
+                # Determine if description should be inline (only indent if too long)
+                $startLength = $Indent + 3 + ($maxParamLength + $Padding) + ($maxTypeLength + $Padding) + $paramName.Length + ($(if ($required) { 6 } else { 0 }))
+                $shouldInline = $inline -or (($startLength + 2 + $paramDesc.Length) -le 80)
+
+                if ($shouldInline) {
+                    $styledDesc = "  " + $styledDescText
                     [console]::WriteLine($styledDesc)
                 } else {
                     [console]::WriteLine()
                     $descIndent = $indentString + (" " * ($maxParamLength + $maxTypeLength + (2 * $Padding) + 1))
-                    $styledDesc = Format-ThemeText -String "   $paramDesc" -Theme $themeObj -Element 'ParamDesc'
+                    $styledDesc = "   " + $styledDescText
                     [console]::WriteLine("${descIndent}${styledDesc}")
                 }
                 # Emit $LineSpacing blank lines between param entries
@@ -378,10 +415,71 @@ function New-PHWriter {
             $exTitle = Format-ThemeText -String "EXAMPLES" -Theme $themeObj -Element 'Accent'
             [console]::WriteLine("${indentString}${styledSecChar}${exTitle}`n")
 
+            $getHighlightedExample = {
+                param(
+                    [string]$ExText,
+                    $Theme
+                )
+                $cmdletFormat = if ($Theme.AccentFormat) { @($Theme.AccentFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
+                $cParams = @{ String = "X"; Color = $Theme.AccentColor }
+                $cFormatList = [System.Collections.Generic.List[string]]::new()
+                foreach ($f in $cmdletFormat) { [void]$cFormatList.Add($f) }
+                if (-not $cFormatList.Contains('bold')) { [void]$cFormatList.Add('bold') }
+                $cParams['Format'] = $cFormatList.ToArray()
+                $cmdletColor = New-AsciiColor @cParams
+                $cmdletSeq = if ($cmdletColor.EndsWith("[0m")) { $cmdletColor.Substring(0, $cmdletColor.Length - 5) } else { "" }
+
+                $pFormat = if ($Theme.ParamNameFormat) { @($Theme.ParamNameFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
+                $pParams = @{ String = "X"; Color = $Theme.ParamNameFg }
+                if ($pFormat -and $pFormat.Count -gt 0) { $pParams['Format'] = $pFormat }
+                $pEsc = New-AsciiColor @pParams
+                $paramSeq = if ($pEsc.EndsWith("[0m")) { $pEsc.Substring(0, $pEsc.Length - 5) } else { "" }
+
+                $sFormat = if ($Theme.ParamTypeFormat) { @($Theme.ParamTypeFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
+                $sParams = @{ String = "X"; Color = $Theme.ParamTypeFg }
+                if ($sFormat -and $sFormat.Count -gt 0) { $sParams['Format'] = $sFormat }
+                $sEsc = New-AsciiColor @sParams
+                $stringSeq = if ($sEsc.EndsWith("[0m")) { $sEsc.Substring(0, $sEsc.Length - 5) } else { "" }
+
+                $reset = [char]27 + "[0m"
+
+                $pattern = '(?<string>\''[^\'']*\''|"[^"]*")|(?<param>-\w+(\|\w+)?)|(?<cmdlet>\b[A-Za-z]+-[A-Za-z]+\w*\b)|(?<word>\S+)|(?<space>\s+)'
+                $matches = [System.Text.RegularExpressions.Regex]::Matches($ExText, $pattern)
+                $sb = [System.Text.StringBuilder]::new()
+                $seenFirstWord = $false
+
+                foreach ($m in $matches) {
+                    if ($m.Groups['string'].Success) {
+                        [void]$sb.Append("${stringSeq}$($m.Value)${reset}")
+                    } elseif ($m.Groups['param'].Success) {
+                        if ($m.Value -like '*|*') {
+                            $parts = $m.Value -split '\|', 2
+                            $pipeEsc = New-AsciiColor -String "|" -Color $Theme.BorderColor
+                            [void]$sb.Append("${paramSeq}$($parts[0])${reset}${pipeEsc}${paramSeq}$($parts[1])${reset}")
+                        } else {
+                            [void]$sb.Append("${paramSeq}$($m.Value)${reset}")
+                        }
+                    } elseif ($m.Groups['cmdlet'].Success) {
+                        $seenFirstWord = $true
+                        [void]$sb.Append("${cmdletSeq}$($m.Value)${reset}")
+                    } elseif ($m.Groups['word'].Success) {
+                        if (-not $seenFirstWord) {
+                            $seenFirstWord = $true
+                            [void]$sb.Append("${cmdletSeq}$($m.Value)${reset}")
+                        } else {
+                            [void]$sb.Append($m.Value)
+                        }
+                    } else {
+                        [void]$sb.Append($m.Value)
+                    }
+                }
+                return $sb.ToString()
+            }
+
             foreach ($example in $Examples) {
                 $cleanedExample = $example.Replace("//", "/")
-                $styledEx = Format-ThemeText -String $cleanedExample -Theme $themeObj -Element 'Example'
-                [console]::WriteLine("${indentString}   ${styledEx}`n")
+                $styledEx = & $getHighlightedExample $cleanedExample $themeObj
+                [console]::WriteLine("${indentString}    ${styledEx}`n")
             }
         }
 

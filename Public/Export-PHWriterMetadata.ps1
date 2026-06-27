@@ -86,7 +86,7 @@ function Export-PHWriterMetadata {
     [Alias('phextract')]
     [OutputType([hashtable])]
     param(
-        [Parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, HelpMessage = "Path to the source .ps1 or .psm1 script file.")]
+        [Parameter(Mandatory = $false, Position = 0, ValueFromPipeline = $true, ValueFromPipelineByPropertyName = $true, HelpMessage = "Path to the source .ps1 or .psm1 script file.")]
         [Alias('FullName')]
         [string]$Path,
 
@@ -103,7 +103,10 @@ function Export-PHWriterMetadata {
         [string]$Version = '1.0.0',
 
         [Parameter(Mandatory = $false, HelpMessage = "Override documentation source URL.")]
-        [string]$Source = ''
+        [string]$Source = '',
+
+        [Parameter(HelpMessage = "Display Help for Export-PHWriterMetadata.")]
+        [switch]$Help
     )
 
     begin {
@@ -112,6 +115,75 @@ function Export-PHWriterMetadata {
     }
 
     process {
+        if ($Help) {
+            $phextract_ParamTable = @(
+                @{
+                    name        = "Path"
+                    param       = "p|Path"
+                    type        = "String"
+                    description = "Path to the source .ps1 or .psm1 script file to parse."
+                    required    = $true
+                    inline      = $false
+                },
+                @{
+                    name        = "FunctionName"
+                    param       = "f|FunctionName"
+                    type        = "String"
+                    description = "Extract only the named function. Supports wildcards."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "OutputJson"
+                    param       = "o|OutputJson"
+                    type        = "String"
+                    description = "Optional path to serialize the extracted metadata into a JSON file."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "ModuleName"
+                    param       = "m|ModuleName"
+                    type        = "String"
+                    description = "Override the module name field in the output metadata."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "Version"
+                    param       = "v|Version"
+                    type        = "String"
+                    description = "Override the version field in the output metadata."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "Source"
+                    param       = "s|Source"
+                    type        = "String"
+                    description = "Override the documentation source URL."
+                    required    = $false
+                    inline      = $false
+                }
+            )
+            $phextract_commandinfo = @{
+                cmdlet      = "Export-PHWriterMetadata"
+                synopsis    = "Export-PHWriterMetadata -Path <String> [-FunctionName <String>] [-OutputJson <String>] [-ModuleName <String>] [-Version <String>] [-Source <String>]"
+                description = "Extracts PHWriter help metadata automatically from a PowerShell script file using AST parsing."
+                source      = "https://gitlab.com/phellams/phwriter"
+            }
+            $phextract_examples = @(
+                "Export-PHWriterMetadata -Path './Public/Get-SystemData.ps1'",
+                "Export-PHWriterMetadata -Path './Public/My-Cmdlet.ps1' -FunctionName 'My-Cmdlet'"
+            )
+            New-PHWriter -Name 'PHWRITER' -CommandInfo $phextract_commandinfo -ParamTable $phextract_ParamTable -Padding 4 -Indent 2 -Theme 'default' -Version '1.0.0' -Examples $phextract_examples
+            return
+        }
+
+        if ([string]::IsNullOrEmpty($Path)) {
+            throw [System.ArgumentException]::new("Path parameter is mandatory when -Help is not specified.")
+        }
+
         # ── Validate and Load Source File ─────────────────────────────────────
         $absolutePath = [System.IO.Path]::GetFullPath($Path)
 
