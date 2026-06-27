@@ -31,6 +31,14 @@ function Show-PHTheme {
     [CmdletBinding()]
     param(
         [Parameter(Position = 0, ValueFromPipeline = $true)]
+        [ValidateSet(
+                'default', 'matrix', 'cyberpunk', 'dracula', 'nord', 'monokai', 'solarized', 
+                'sunset', 'forest', 'classic', 'aurora', 'neon-noir', 'lava', 'ocean', 'toxic', 
+                'midnight', 'gold', 'rose', 'steel', 'phwriter', 'glitch', 'cosmic', 
+                'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust', 
+                'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal', 
+                'copper', 'royal', 'desert-heat', 'sheriff', 'frost'
+        )]
         [string]$Name = 'default',
 
         [Parameter()]
