@@ -78,6 +78,13 @@ function Write-PHAsciiLogo {
         [Parameter()]
         [string]$CustomLogo = $null,
 
+        [Parameter()]
+        [switch]$Gradient,
+
+        [Parameter()]
+        [Alias('CustomGradnet')]
+        [int[]]$CustomGradient,
+
         [Parameter(HelpMessage = "Display Help for Write-PHAsciiLogo.")]
         [switch]$Help
     )
@@ -151,6 +158,17 @@ function Write-PHAsciiLogo {
             $themeObj = Get-PHTheme -Name $Theme
         }
 
+        $useGradient = $Gradient -or ($null -ne $CustomGradient)
+        if ($useGradient) {
+            $steps = if ($null -ne $CustomGradient) {
+                $CustomGradient
+            } elseif ($themeObj.ContainsKey('GradientSteps')) {
+                $themeObj['GradientSteps']
+            } else {
+                [int[]]@(51, 93, 129, 201)
+            }
+        }
+
         # If custom logo is provided, print it directly (with border styling applied to each line if wanted)
         if ($CustomLogo) {
             $lines = $CustomLogo -split "`n" | ForEach-Object { $_.TrimEnd() }
@@ -181,7 +199,12 @@ function Write-PHAsciiLogo {
 
                 # Combine formatted borders and header contents
                 $borderChar = Format-ThemeText -String "│" -Theme $themeObj -Element 'Border'
-                $middle = $borderChar + (Format-ThemeText -String $innerPadded -Theme $themeObj -Element 'Header') + $borderChar
+                $styledHeader = if ($useGradient) {
+                    New-AsciiGradient -Type 'fg' -Steps $steps -String $innerPadded
+                } else {
+                    Format-ThemeText -String $innerPadded -Theme $themeObj -Element 'Header'
+                }
+                $middle = $borderChar + $styledHeader + $borderChar
 
                 [console]::WriteLine($(Format-ThemeText -String $top    -Theme $themeObj -Element 'Border'))
                 [console]::WriteLine($middle)
@@ -204,7 +227,12 @@ function Write-PHAsciiLogo {
 
                 $borderLeft  = Format-ThemeText -String "╟" -Theme $themeObj -Element 'Border'
                 $borderRight = Format-ThemeText -String "╢" -Theme $themeObj -Element 'Border'
-                $middle = $borderLeft + (Format-ThemeText -String $innerPadded -Theme $themeObj -Element 'Header') + $borderRight
+                $styledHeader = if ($useGradient) {
+                    New-AsciiGradient -Type 'fg' -Steps $steps -String $innerPadded
+                } else {
+                    Format-ThemeText -String $innerPadded -Theme $themeObj -Element 'Header'
+                }
+                $middle = $borderLeft + $styledHeader + $borderRight
 
                 [console]::WriteLine($(Format-ThemeText -String $borderTop    -Theme $themeObj -Element 'Border'))
                 [console]::WriteLine($middle)
@@ -214,7 +242,12 @@ function Write-PHAsciiLogo {
                 $nameVisualWidth = _Measure-VisualWidth $spacedName
                 $width = [Math]::Max(60, $nameVisualWidth + 4)
                 $line  = "─" * $width
-                [console]::WriteLine($(Format-ThemeText -String ("  " + $spacedName) -Theme $themeObj -Element 'Header'))
+                $styledHeader = if ($useGradient) {
+                    New-AsciiGradient -Type 'fg' -Steps $steps -String ("  " + $spacedName)
+                } else {
+                    Format-ThemeText -String ("  " + $spacedName) -Theme $themeObj -Element 'Header'
+                }
+                [console]::WriteLine($styledHeader)
                 [console]::WriteLine($(Format-ThemeText -String $line -Theme $themeObj -Element 'Border'))
             }
             'Man' {
@@ -231,7 +264,12 @@ function Write-PHAsciiLogo {
                     @{ Text = $rightText;  Width = 25; Align = 'Right' }
                 )
 
-                [console]::WriteLine($(Format-ThemeText -String $headerLine -Theme $themeObj -Element 'Header'))
+                $styledHeader = if ($useGradient) {
+                    New-AsciiGradient -Type 'fg' -Steps $steps -String $headerLine
+                } else {
+                    Format-ThemeText -String $headerLine -Theme $themeObj -Element 'Header'
+                }
+                [console]::WriteLine($styledHeader)
                 [console]::WriteLine($(Format-ThemeText -String ("─" * $width) -Theme $themeObj -Element 'Border'))
             }
             'Terminal' {
@@ -246,7 +284,11 @@ function Write-PHAsciiLogo {
                 foreach ($line in $terminalArt) {
                     $rendered = $line
                     if ($rendered -match '\{Name\}') {
-                        $styledName = Format-ThemeText -String $spacedName -Theme $themeObj -Element 'Header'
+                        $styledName = if ($useGradient) {
+                            New-AsciiGradient -Type 'fg' -Steps $steps -String $spacedName
+                        } else {
+                            Format-ThemeText -String $spacedName -Theme $themeObj -Element 'Header'
+                        }
                         $rendered   = $rendered -replace '\{Name\}', $styledName
                     }
                     if ($rendered -match '\{Version\}') {
@@ -277,7 +319,11 @@ function Write-PHAsciiLogo {
                 foreach ($line in $typewriterArt) {
                     $rendered = $line
                     if ($rendered -match '\{Name\}') {
-                        $styledName = Format-ThemeText -String $spacedName -Theme $themeObj -Element 'Header'
+                        $styledName = if ($useGradient) {
+                            New-AsciiGradient -Type 'fg' -Steps $steps -String $spacedName
+                        } else {
+                            Format-ThemeText -String $spacedName -Theme $themeObj -Element 'Header'
+                        }
                         $rendered   = $rendered -replace '\{Name\}', $styledName
                     }
                     if ($rendered -match '\{Version\}') {

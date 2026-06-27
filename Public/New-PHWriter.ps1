@@ -85,6 +85,23 @@ function New-PHWriter {
         [Parameter(HelpMessage = "Custom logo banner string.")]
         [string]$CustomLogo = $null,
 
+        [Parameter(HelpMessage = "Enable gradient color for the header.")]
+        [switch]$Gradient,
+
+        [Parameter(HelpMessage = "Custom gradient color steps.")]
+        [Alias('CustomGradnet')]
+        [int[]]$CustomGradient,
+
+        [Parameter(HelpMessage = "Wrap the entire help output in a border.")]
+        [switch]$OuterBorder,
+
+        [Parameter(HelpMessage = "Enable gradient color for the outer border.")]
+        [switch]$BorderGradient,
+
+        [Parameter(HelpMessage = "Custom gradient color steps for the outer border.")]
+        [Alias('BorderCustomGradnet')]
+        [int[]]$BorderCustomGradient,
+
         [Parameter(HelpMessage = "Display Help for New-PHWriter.")]
         [switch]$Help
     )
@@ -206,6 +223,20 @@ function New-PHWriter {
             return
         }
 
+        # Resolve Theme
+        $themeObj = $null
+        if ($Theme -is [hashtable]) {
+            $themeObj = $Theme
+        } else {
+            $themeObj = Get-PHTheme -Name $Theme
+        }
+
+        if ($OuterBorder) {
+            $originalOut = [System.Console]::Out
+            $stringWriter = [System.IO.StringWriter]::new()
+            [System.Console]::SetOut($stringWriter)
+        }
+
         # Load JSON data if a JsonFile is provided
         if ($JsonFile) {
             $jsonFile_FullPath = Get-ChildItem -Path $JsonFile | Select-Object -First 1
@@ -224,6 +255,13 @@ function New-PHWriter {
                     if ($jsonData.theme) { $Theme = $jsonData.theme }
                     if ($jsonData.layout) { $Layout = $jsonData.layout }
                     if ($jsonData.customlogo) { $CustomLogo = $jsonData.customlogo }
+                    if ($jsonData.ContainsKey('gradient')) { $Gradient = [bool]$jsonData.gradient }
+                    if ($jsonData.ContainsKey('customgradient')) { $CustomGradient = [int[]]$jsonData.customgradient }
+                    elseif ($jsonData.ContainsKey('customgradnet')) { $CustomGradient = [int[]]$jsonData.customgradnet }
+                    if ($jsonData.ContainsKey('outerborder')) { $OuterBorder = [bool]$jsonData.outerborder }
+                    if ($jsonData.ContainsKey('bordergradient')) { $BorderGradient = [bool]$jsonData.bordergradient }
+                    if ($jsonData.ContainsKey('bordercustomgradient')) { $BorderCustomGradient = [int[]]$jsonData.bordercustomgradient }
+                    elseif ($jsonData.ContainsKey('bordercustomgradnet')) { $BorderCustomGradient = [int[]]$jsonData.bordercustomgradnet }
                 } catch {
                     Write-Warning "Failed to parse JSON file: $_"
                     return
@@ -240,16 +278,10 @@ function New-PHWriter {
         $indentString  = " " * $Indent
         $blankLine     = "`n" * $LineSpacing  # blank lines between param rows
 
-        # Resolve Theme
-        $themeObj = $null
-        if ($Theme -is [hashtable]) {
-            $themeObj = $Theme
-        } else {
-            $themeObj = Get-PHTheme -Name $Theme
-        }
+        # Resolve Theme (already resolved at the beginning)
 
         # Output Logo
-        Write-PHAsciiLogo -Name $Name -Version $Version -Theme $themeObj -Layout $Layout -CustomLogo $CustomLogo
+        Write-PHAsciiLogo -Name $Name -Version $Version -Theme $themeObj -Layout $Layout -CustomLogo $CustomLogo -Gradient:$Gradient -CustomGradient $CustomGradient
 
         # Sections config
         $sectionChar = if ($themeObj.ContainsKey('SectionChar')) { $themeObj['SectionChar'] } else { '◉' }
@@ -392,19 +424,9 @@ function New-PHWriter {
                 }
                 $styledDescText = $resultParts -join ""
 
-                # Determine if description should be inline (only indent if too long)
-                $startLength = $Indent + 3 + ($maxParamLength + $Padding) + ($maxTypeLength + $Padding) + $paramName.Length + ($(if ($required) { 6 } else { 0 }))
-                $shouldInline = $inline -or (($startLength + 2 + $paramDesc.Length) -le 80)
-
-                if ($shouldInline) {
-                    $styledDesc = "  " + $styledDescText
-                    [console]::WriteLine($styledDesc)
-                } else {
-                    [console]::WriteLine()
-                    $descIndent = $indentString + (" " * ($maxParamLength + $maxTypeLength + (2 * $Padding) + 1))
-                    $styledDesc = "   " + $styledDescText
-                    [console]::WriteLine("${descIndent}${styledDesc}")
-                }
+                # Description is always printed on the same line as the parameter name
+                $styledDesc = "  " + $styledDescText
+                [console]::WriteLine($styledDesc)
                 # Emit $LineSpacing blank lines between param entries
                 for ($ls = 0; $ls -lt $LineSpacing; $ls++) { [console]::WriteLine() }
             }
@@ -489,6 +511,88 @@ function New-PHWriter {
             $docsLink = Format-ThemeText -String ($CommandInfo.source) -Theme $themeObj -Element 'Docs'
             [console]::WriteLine("${indentString} ${docsTitle} ${docsLink} for more info")
             [console]::WriteLine()
+        }
+
+        if ($OuterBorder) {
+            [System.Console]::SetOut($originalOut)
+            $capturedText = $stringWriter.ToString()
+
+            # Now parse, pad, and format the captured lines
+            $lines = $capturedText -split '\r?\n'
+            if ($lines.Count -gt 0 -and [string]::IsNullOrEmpty($lines[-1])) {
+                $lines = $lines[0..($lines.Count - 2)]
+            }
+
+            # Measure visual widths
+            $MeasureWidth = {
+                param([string]$Text)
+                $plain = [System.Text.RegularExpressions.Regex]::Replace($Text, '\x1b\[[0-?]*[ -/]*[@-~]', '')
+                $width = 0
+                $chars = $plain.ToCharArray()
+                $i = 0
+                while ($i -lt $chars.Length) {
+                    $ch = $chars[$i]
+                    if ([char]::IsHighSurrogate($ch) -and ($i + 1) -lt $chars.Length -and [char]::IsLowSurrogate($chars[$i + 1])) {
+                        $cp = [char]::ConvertToUtf32($ch, $chars[$i + 1])
+                        $width += 2
+                        $i += 2
+                        continue
+                    }
+                    $cp = [int]$ch
+                    if (($cp -ge 0x1F300 -and $cp -le 0x1FAFF) -or
+                        ($cp -ge 0x2600  -and $cp -le 0x27BF)  -or
+                        ($cp -ge 0xFE30  -and $cp -le 0xFE4F)  -or
+                        ($cp -ge 0x4E00  -and $cp -le 0x9FFF)) {
+                        $width += 2
+                    } else {
+                        $width += 1
+                    }
+                    $i++
+                }
+                return $width
+            }
+
+            $maxW = 0
+            foreach ($line in $lines) {
+                $w = & $MeasureWidth $line
+                if ($w -gt $maxW) { $maxW = $w }
+            }
+
+            # Define border characters
+            $borderLeft   = "│"
+            $borderRight  = "│"
+            $topBorder    = "╭" + ("─" * ($maxW + 2)) + "╮"
+            $bottomBorder = "╰" + ("─" * ($maxW + 2)) + "╯"
+
+            # Color borders
+            $useBorderGrad = $BorderGradient -or ($null -ne $BorderCustomGradient)
+            if ($useBorderGrad) {
+                $bSteps = if ($null -ne $BorderCustomGradient) {
+                    $BorderCustomGradient
+                } elseif ($themeObj.ContainsKey('GradientSteps')) {
+                    $themeObj['GradientSteps']
+                } else {
+                    [int[]]@(51, 93, 129, 201)
+                }
+                $styledTop    = New-AsciiGradient -Type 'fg' -Steps $bSteps -String $topBorder
+                $styledBottom = New-AsciiGradient -Type 'fg' -Steps $bSteps -String $bottomBorder
+                $styledLeft   = New-AsciiGradient -Type 'fg' -Steps $bSteps -String $borderLeft
+                $lastStep     = $bSteps[-1]
+                $styledRight  = New-AsciiGradient -Type 'fg' -Steps @($lastStep, $lastStep) -String $borderRight
+            } else {
+                $styledTop    = Format-ThemeText -String $topBorder    -Theme $themeObj -Element 'Border'
+                $styledBottom = Format-ThemeText -String $bottomBorder -Theme $themeObj -Element 'Border'
+                $styledLeft   = Format-ThemeText -String $borderLeft   -Theme $themeObj -Element 'Border'
+                $styledRight  = Format-ThemeText -String $borderRight  -Theme $themeObj -Element 'Border'
+            }
+
+            # Print bordered output
+            [console]::WriteLine($styledTop)
+            foreach ($line in $lines) {
+                $padded = Pad-AnsiString -Text $line -Width $maxW -Align 'Left' -PadChar ' '
+                [console]::WriteLine("${styledLeft} ${padded} ${styledRight}")
+            }
+            [console]::WriteLine($styledBottom)
         }
     }
 }

@@ -6,6 +6,7 @@ BeforeAll {
     . ./Private/New-AsciiColor.ps1
     . ./Private/New-AsciiGradient.ps1
     . ./Private/Get-PHTheme.ps1
+    . ./Private/clap.ps1
 
     $params = @{
         Name        = 'TestModule'
@@ -326,5 +327,28 @@ Describe "Cmdlet-Help-Switches" {
 
     It "Should render help for Write-PHAsciiLogo without throwing" {
         Write-PHAsciiLogo -Help
+    }
+}
+
+Describe "PHWriter-Priority-1-Features" {
+    It "Should support Pad-AnsiString with multi-character/emoji PadChar" {
+        $padded = Pad-AnsiString -Text "A" -Width 6 -Align 'Center' -PadChar "🔥"
+        $padded | Should -BeLike "*🔥A🔥*"
+    }
+
+    It "Should support Clap-SliceAnsi to slice styled text preserving colors" {
+        $text = "abc`e[31mdef`e[0mghi"
+        $sliced = Clap-SliceAnsi -Text $text -Start 3 -Width 3
+        $sliced | Should -BeLike "*def*"
+        $sliced | Should -Not -BeLike "*abc*"
+        $sliced | Should -Not -BeLike "*ghi*"
+    }
+
+    It "Should render New-PHWriter with Gradient and OuterBorder without throwing" {
+        New-PHWriter @params -Gradient -OuterBorder -BorderGradient
+    }
+
+    It "Should render New-PHWriter with CustomGradient steps without throwing" {
+        New-PHWriter @params -CustomGradient @(196, 202, 226) -OuterBorder -BorderCustomGradient @(17, 21)
     }
 }

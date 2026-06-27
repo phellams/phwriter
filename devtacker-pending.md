@@ -1,5 +1,20 @@
 # Developer Tracker - Pending Tasks
 
+## Pirority 1 - High-Priority Tasks
+- [x] **My Goal** - a cross platform helper writer that can be use with all of my modules and tools, and other tools if they want to use powershell for that perpose. i want to dev to have full control to output how they want theme how they want and have the ability to customize the theme to their liking.
+- [x] **READ** - extended-tui-knowleadge.md - some elements are to avioided for tear for tui
+  - [x] **FIX** - remove all problematic glyphs from the theme and only use safe glyphs
+- [x] **FIX** blaze theme error
+- [x] **Customize-extend** - allow header to be gradient perhaps have a switch for -gradient and -customgradnet where user can specify.
+- [x] for all themes i want to be able to optional put a border around the entire help output and have the border be a gradient, with custom gradient if spcified
+- [x] the parm name and description should be on the same line, for descriptions that are too long we can use the pager to scroll through the description unsure of the best way to allow the user to specify action.
+
+Pad-AnsiString: 
+Line |
+4749 |  … t $spacedName -Width $innerWidth -Align 'Center' -PadChar $middleChar
+     |                                                              ~~~~~~~~~~~
+     | Cannot process argument transformation on parameter 'PadChar'. Cannot convert value "🔥" to type "System.Char". Error: "String must be exactly one character long."
+
 ## Performance & Optimization
 
 - [x] Identify root causes of slow module import (~1.4s overhead)

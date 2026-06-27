@@ -121,6 +121,62 @@ function Clap-TruncateAnsi {
  
     $sb.ToString()
 }
+
+function Clap-SliceAnsi {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Text,
+        [Parameter(Mandatory)]
+        [int]$Start,
+        [Parameter(Mandatory)]
+        [int]$Width
+    )
+
+    if ($Width -le 0) { return '' }
+    if ($Start -le 0) { return Clap-TruncateAnsi -Text $Text -MaxVisible $Width }
+
+    $sb = [System.Text.StringBuilder]::new()
+    $activeEscapes = [System.Collections.Generic.List[string]]::new()
+    $visibleCount = 0
+    $i = 0
+    $len = $Text.Length
+
+    while ($i -lt $len) {
+        if ($Text[$i] -eq [char]0x1B) {
+            $m = $script:ClapAnsiPattern.Match($Text, $i)
+            if ($m.Success -and $m.Index -eq $i) {
+                $esc = $m.Value
+                if ($visibleCount -lt $Start) {
+                    if ($esc -eq "`e[0m") {
+                        $activeEscapes.Clear()
+                    } else {
+                        [void]$activeEscapes.Add($esc)
+                    }
+                } else {
+                    [void]$sb.Append($esc)
+                }
+                $i += $m.Length
+                continue
+            }
+        }
+
+        if ($visibleCount -ge $Start -and $visibleCount -lt ($Start + $Width)) {
+            if ($visibleCount -eq $Start) {
+                foreach ($e in $activeEscapes) {
+                    [void]$sb.Append($e)
+                }
+            }
+            [void]$sb.Append($Text[$i])
+        }
+        $visibleCount++
+        $i++
+    }
+
+    [void]$sb.Append("`e[0m")
+    return $sb.ToString()
+}
  
 function Pad-AnsiString {
     <#
@@ -141,7 +197,7 @@ function Pad-AnsiString {
         [ValidateSet('Left', 'Right', 'Center')]
         [string]$Align = 'Left',
  
-        [char]$PadChar = ' ',
+        [string]$PadChar = ' ',
  
         [switch]$Truncate,
  
@@ -166,13 +222,30 @@ function Pad-AnsiString {
     $deficit = $Width - $visibleLen
     if ($deficit -le 0) { return $Text }
  
+    $GetPadding = {
+        param([string]$char, [int]$len)
+        if ($len -le 0) { return "" }
+        if ([string]::IsNullOrEmpty($char)) { $char = ' ' }
+        if ($char.Length -eq 1) { return $char * $len }
+        $pSb = [System.Text.StringBuilder]::new()
+        while ($pSb.Length -lt $len) { [void]$pSb.Append($char) }
+        if ($pSb.Length -gt $len) {
+            $res = $pSb.ToString(0, $len)
+            if ([char]::IsHighSurrogate($res[$len - 1])) {
+                $res = $res.Substring(0, $len - 1) + " "
+            }
+            return $res
+        }
+        return $pSb.ToString()
+    }
+ 
     switch ($Align) {
-        'Left'   { return $Text + ([string]::new($PadChar, $deficit)) }
-        'Right'  { return ([string]::new($PadChar, $deficit)) + $Text }
+        'Left'   { return $Text + (& $GetPadding $PadChar $deficit) }
+        'Right'  { return (& $GetPadding $PadChar $deficit) + $Text }
         'Center' {
             $leftLen  = [Math]::Floor($deficit / 2)
             $rightLen = $deficit - $leftLen
-            return ([string]::new($PadChar, $leftLen)) + $Text + ([string]::new($PadChar, $rightLen))
+            return (& $GetPadding $PadChar $leftLen) + $Text + (& $GetPadding $PadChar $rightLen)
         }
     }
 }

@@ -186,6 +186,8 @@ function Invoke-PHPager {
         # ReadKey returns ConsoleKeyInfo; we match on .Key
         $keyUp      = [System.ConsoleKey]::UpArrow
         $keyDown    = [System.ConsoleKey]::DownArrow
+        $keyLeft    = [System.ConsoleKey]::LeftArrow
+        $keyRight   = [System.ConsoleKey]::RightArrow
         $keyPgUp    = [System.ConsoleKey]::PageUp
         $keyPgDown  = [System.ConsoleKey]::PageDown
         $keyHome    = [System.ConsoleKey]::Home
@@ -218,16 +220,21 @@ function Invoke-PHPager {
             # Clear and render visible lines
             $winH = [Console]::WindowHeight
             $winW = [Console]::WindowWidth
-
+ 
             for ($row = 0; $row -lt $effectivePage; $row++) {
                 _clearLine ($row + $headerRows)
                 $lineIdx = $topLine + $row
                 if ($lineIdx -lt $totalLines) {
                     _moveTo ($row + $headerRows) 0
                     $line = $displayLines[$lineIdx]
-                    # Truncate visible width accounting for ANSI codes
-                    # We render as-is; terminal wrapping is the last resort
-                    [Console]::Write($line)
+                    # Render taking into account horizontal scrolling and console width
+                    # Use Clap-SliceAnsi to scroll and prevent line tearing/wrapping
+                    $renderedLine = if ($leftScroll -gt 0) {
+                        Clap-SliceAnsi -Text $line -Start $leftScroll -Width $winW
+                    } else {
+                        Clap-TruncateAnsi -Text $line -MaxVisible $winW
+                    }
+                    [Console]::Write($renderedLine)
                 }
             }
         }
@@ -242,7 +249,7 @@ function Invoke-PHPager {
         }
 
         function _renderFooter() {
-            $footerText = " ${hiGreen}${bold}↑↓${reset}${barStyle} Scroll  ${hiGreen}${bold}PgUp/PgDn${reset}${barStyle} Page  ${hiGreen}${bold}Home/End${reset}${barStyle} Jump  ${hiGreen}${bold}Q/ESC${reset}${barStyle} Quit"
+            $footerText = " ${hiGreen}${bold}↑↓←→${reset}${barStyle} Scroll  ${hiGreen}${bold}PgUp/PgDn${reset}${barStyle} Page  ${hiGreen}${bold}Home/End${reset}${barStyle} Jump  ${hiGreen}${bold}Q/ESC${reset}${barStyle} Quit"
             $row = $headerRows + $effectivePage
             _writeBar $footerText $row
         }
@@ -254,8 +261,9 @@ function Invoke-PHPager {
         # Save screen state (xterm alternate buffer)
         [Console]::Write("${esc}[?1049h")  # enter alternate screen buffer
         [Console]::Write($hideCur)
-
+ 
         $topLine = 0
+        $leftScroll = 0
 
         try {
             # Initial render
@@ -280,12 +288,19 @@ function Invoke-PHPager {
                     if ($topLine -lt $maxTop) { $topLine++; $changed = $true }
                 } elseif ($k -eq $keyUp) {
                     if ($topLine -gt 0) { $topLine--; $changed = $true }
+                } elseif ($k -eq $keyRight) {
+                    $leftScroll += 8; $changed = $true
+                } elseif ($k -eq $keyLeft) {
+                    if ($leftScroll -gt 0) {
+                        $leftScroll = [Math]::Max(0, $leftScroll - 8)
+                        $changed = $true
+                    }
                 } elseif ($k -eq $keyPgDown) {
                     $topLine = [Math]::Min($topLine + $effectivePage, $maxTop); $changed = $true
                 } elseif ($k -eq $keyPgUp) {
                     $topLine = [Math]::Max(0, $topLine - $effectivePage); $changed = $true
                 } elseif ($k -eq $keyHome) {
-                    $topLine = 0; $changed = $true
+                    $topLine = 0; $leftScroll = 0; $changed = $true
                 } elseif ($k -eq $keyEnd) {
                     $topLine = $maxTop; $changed = $true
                 } elseif ($k -eq $keyQ -or $k -eq $keyEsc) {
