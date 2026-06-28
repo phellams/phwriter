@@ -182,6 +182,25 @@ function Invoke-PHPager {
         $dimGreyRaw = New-AsciiColor -String "X" -Color $descCol
         $dimGrey = if ($dimGreyRaw.EndsWith("[0m")) { $dimGreyRaw.Substring(0, $dimGreyRaw.Length - 5) } else { "" }
 
+        # Pull additional theme keys for chrome chrome customization
+        # SectionChar drives the separator glyphs in header/footer bars
+        $themeSepChar = if ($themeObj.ContainsKey('SectionChar')) {
+            $sc = $themeObj['SectionChar']
+            # Only use single-column safe glyphs as separator; fall back to '|' for wide/emoji chars
+            if ($sc.Length -le 2 -and $sc -notmatch '[\x{1F000}-\x{1FAFF}]') { $sc } else { '|' }
+        } else { '|' }
+
+        # HeaderChar used as title prefix indicator
+        $themeTitleChar = if ($themeObj.ContainsKey('HeaderChar')) {
+            $hc = $themeObj['HeaderChar']
+            if ($hc.Length -le 2 -and $hc -notmatch '[\x{1F000}-\x{1FAFF}]') { $hc } else { '>' }
+        } else { '>' }
+
+        # SyntaxFg for key-hint text in footer
+        $syntaxCol = if ($themeObj.ContainsKey('SyntaxFg')) { $themeObj['SyntaxFg'] } else { 'white' }
+        $hiSyntaxRaw = New-AsciiColor -String "X" -Color $syntaxCol
+        $hiSyntax = if ($hiSyntaxRaw.EndsWith("[0m")) { $hiSyntaxRaw.Substring(0, $hiSyntaxRaw.Length - 5) } else { "" }
+
         # ── Key code map ──────────────────────────────────────────────────────
         # ReadKey returns ConsoleKeyInfo; we match on .Key
         $keyUp      = [System.ConsoleKey]::UpArrow
@@ -244,12 +263,14 @@ function Invoke-PHPager {
             $curPage    = [Math]::Floor($topLine / $effectivePage) + 1
             $pct        = if ($totalLines -gt 0) { [Math]::Round(($topLine + $effectivePage) / $totalLines * 100) } else { 100 }
             $pct        = [Math]::Min(100, $pct)
-            $headerText = " ${hiGreen}${bold}$Title${reset}${barStyle}  |  ${hiCyan}Page $curPage/$totalPages${reset}${barStyle}  |  Lines $($topLine+1)-$([Math]::Min($topLine+$effectivePage,$totalLines))/$totalLines"
+            $sep = "  ${themeSepChar}  "
+            $headerText = " ${hiGreen}${bold}$themeTitleChar $Title${reset}${barStyle}${sep}${hiCyan}Page $curPage/$totalPages${reset}${barStyle}${sep}Lines $($topLine+1)-$([Math]::Min($topLine+$effectivePage,$totalLines))/$totalLines  $pct%%"
             _writeBar $headerText 0
         }
 
         function _renderFooter() {
-            $footerText = " ${hiGreen}${bold}↑↓←→${reset}${barStyle} Scroll  ${hiGreen}${bold}PgUp/PgDn${reset}${barStyle} Page  ${hiGreen}${bold}Home/End${reset}${barStyle} Jump  ${hiGreen}${bold}Q/ESC${reset}${barStyle} Quit"
+            $sep = "  ${themeSepChar}  "
+            $footerText = " ${hiGreen}${bold}u/d${reset}${barStyle} Scroll${sep}${hiGreen}${bold}PgUp/PgDn${reset}${barStyle} Page${sep}${hiGreen}${bold}Home/End${reset}${barStyle} Jump${sep}${hiSyntax}l/r${reset}${barStyle} H-Scroll${sep}${hiGreen}${bold}q/ESC${reset}${barStyle} Quit"
             $row = $headerRows + $effectivePage
             _writeBar $footerText $row
         }
