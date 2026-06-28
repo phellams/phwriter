@@ -186,14 +186,42 @@ function Invoke-PHPager {
         # SectionChar drives the separator glyphs in header/footer bars
         $themeSepChar = if ($themeObj.ContainsKey('SectionChar')) {
             $sc = $themeObj['SectionChar']
+            $isWide = $false
+            if ($sc.Length -gt 0) {
+                if ([char]::IsHighSurrogate($sc[0])) {
+                    $isWide = $true
+                } else {
+                    $cp = [int]$sc[0]
+                    if (($cp -ge 0x1F300 -and $cp -le 0x1FAFF) -or
+                        ($cp -ge 0x2600  -and $cp -le 0x27BF)  -or
+                        ($cp -ge 0xFE30  -and $cp -le 0xFE4F)  -or
+                        ($cp -ge 0x4E00  -and $cp -le 0x9FFF)) {
+                        $isWide = $true
+                    }
+                }
+            }
             # Only use single-column safe glyphs as separator; fall back to '|' for wide/emoji chars
-            if ($sc.Length -le 2 -and $sc -notmatch '[\x{1F000}-\x{1FAFF}]') { $sc } else { '|' }
+            if ($sc.Length -gt 0 -and $sc.Length -le 2 -and -not $isWide) { $sc } else { '|' }
         } else { '|' }
 
         # HeaderChar used as title prefix indicator
         $themeTitleChar = if ($themeObj.ContainsKey('HeaderChar')) {
             $hc = $themeObj['HeaderChar']
-            if ($hc.Length -le 2 -and $hc -notmatch '[\x{1F000}-\x{1FAFF}]') { $hc } else { '>' }
+            $isWide = $false
+            if ($hc.Length -gt 0) {
+                if ([char]::IsHighSurrogate($hc[0])) {
+                    $isWide = $true
+                } else {
+                    $cp = [int]$hc[0]
+                    if (($cp -ge 0x1F300 -and $cp -le 0x1FAFF) -or
+                        ($cp -ge 0x2600  -and $cp -le 0x27BF)  -or
+                        ($cp -ge 0xFE30  -and $cp -le 0xFE4F)  -or
+                        ($cp -ge 0x4E00  -and $cp -le 0x9FFF)) {
+                        $isWide = $true
+                    }
+                }
+            }
+            if ($hc.Length -gt 0 -and $hc.Length -le 2 -and -not $isWide) { $hc } else { '>' }
         } else { '>' }
 
         # SyntaxFg for key-hint text in footer
