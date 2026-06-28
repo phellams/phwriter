@@ -39,6 +39,12 @@ function Show-PHTheme {
     .PARAMETER BorderCustomGradient
       An ordered array of two or more xterm-256 color indices defining the border gradient stops.
       Only used when -BorderGradient is also specified or -OuterBorder is specified with this param.
+    .PARAMETER SourceType
+      Header label identifying the documentation target type: 'module', 'script', 'tool', 'plugin', 'cli', 'function', or 'workflow'.
+      Passed through to New-PHWriter. Default is 'module'.
+    .PARAMETER TextSpacing
+      Enable character spacing in the banner header title (e.g. 'P H W R I T E R' instead of 'PHWRITER').
+      Passed through to Write-PHAsciiLogo via New-PHWriter.
     .PARAMETER Help
       Display help output for Show-PHTheme itself.
     .EXAMPLE
@@ -106,6 +112,20 @@ function Show-PHTheme {
         [Parameter(HelpMessage = "xterm-256 color-index stops for the border gradient.")]
         [Alias('BorderCustomGradnet')]
         [int[]]$BorderCustomGradient,
+
+        # ── Source type / header label ────────────────────────────────────────────
+        [Parameter(HelpMessage = "Header label type: module, script, tool, plugin, cli, function, workflow.")]
+        [ValidateSet('module', 'script', 'tool', 'plugin', 'cli', 'function', 'workflow')]
+        [string]$SourceType = 'module',
+
+        # ── Banner text spacing ───────────────────────────────────────────────────
+        [Parameter(HelpMessage = "Enable character spacing in the banner header title.")]
+        [switch]$TextSpacing,
+
+        # ── Outer border style ────────────────────────────────────────────
+        [Parameter(HelpMessage = "Outer border corner and side style. Requires -OuterBorder.")]
+        [ValidateSet('Rounded', 'Square', 'Double', 'Block', 'Simple')]
+        [string]$OuterBorderStyle = 'Rounded',
 
         [Parameter(HelpMessage = "Display Help for Show-PHTheme.")]
         [switch]$Help
@@ -320,7 +340,7 @@ function Show-PHTheme {
                 $styledHeadChar = if ($headerChar) { Format-ThemeText -String " $headerChar " -Theme $themeObj -Element 'Accent' } else { " " }
 
                 $headerParts = @()
-                $headerParts += "$(Format-ThemeText -String 'MODULE' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String 'SAMPLE' -Theme $themeObj -Element 'Header')"
+                $headerParts += "$(Format-ThemeText -String $SourceType.ToUpper() -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String 'SAMPLE' -Theme $themeObj -Element 'Header')"
                 $headerParts += "$(Format-ThemeText -String 'CMDLET' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String 'Get-SampleCmdlet' -Theme $themeObj -Element 'Header')"
                 $headerParts += "$(Format-ThemeText -String 'VERSION' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String 'v1.0.0' -Theme $themeObj -Element 'Version')"
 
@@ -339,13 +359,15 @@ function Show-PHTheme {
                     Theme       = $themeObj
                     Layout      = $Layout
                     LineSpacing = $resolvedLineSpacing
+                    SourceType  = $SourceType
                 }
 
-                if ($Gradient)      { $writerParams['Gradient']      = $true }
-                if ($CustomGradient){ $writerParams['CustomGradient'] = $CustomGradient }
-                if ($OuterBorder)   { $writerParams['OuterBorder']   = $true }
-                if ($BorderGradient){ $writerParams['BorderGradient'] = $true }
+                if ($Gradient)        { $writerParams['Gradient']         = $true }
+                if ($CustomGradient)  { $writerParams['CustomGradient']   = $CustomGradient }
+                if ($OuterBorder)     { $writerParams['OuterBorder']      = $true }
+                if ($BorderGradient)  { $writerParams['BorderGradient']   = $true }
                 if ($BorderCustomGradient) { $writerParams['BorderCustomGradient'] = $BorderCustomGradient }
+                if ($OuterBorderStyle -ne 'Rounded') { $writerParams['OuterBorderStyle'] = $OuterBorderStyle }
 
                 New-PHWriter @writerParams
             }
