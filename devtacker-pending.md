@@ -1,19 +1,32 @@
 # Developer Tracker - Pending Tasks
 
-## Pirority 1 - High-Priority Tasks
+## Priority 1 - High-Priority Tasks
+- [x] **Theme fixes and issues**
+  - [x] crystal theme is broken layout — replaced ambiguous-width glyphs (❖/✧/❄❅❆) with safe box-drawing chars (◆/»/╔══╗/╚══╝/▒)
+  - [x] nebula theme is broken layout — replaced ambiguous-width glyphs (✹/✸/❇❈) with safe box-drawing chars (◆/»/╠══╪══╣/░)
+  - [x] rust theme is broken layout — replaced ambiguous SectionChar ❖ with ◆
+  - [x] SYNTAX, PARAMETERS, EXAMPLES only need 1 space after — fixed all section headers to emit 1 blank line (not 2)
+  - [x] new-phwriter has the capability to change type, route, command, and cmdlet — SourceType param was already present; now surfaced clearly in help
+  - [x] add SourceType to the show-phtheme — added -SourceType parameter (module|script|tool|plugin|cli|function|workflow), passed through to New-PHWriter
+  - [x] outer border gradients — already implemented via -OuterBorder + -BorderGradient + -BorderCustomGradient
+  - [x] add multiple types of outer border types — added -OuterBorderStyle (Rounded|Square|Double|Block|Simple) to New-PHWriter and Show-PHTheme
+  - [x] main header title needs 1 space before and after — fixed header line to pad with 1 space before/after joined parts
+  - [x] add TextSpacing option to show-phtheme — added -TextSpacing switch parameter to Show-PHTheme (passes through)
+  - [ ] the [incomplete entry — original text truncated]
+- [x] **show-phpager** — now pulls from full theme schema: SectionChar for separators, HeaderChar for title prefix, SyntaxFg for footer key-hint color, AccentColor/BorderColor/HeaderFg/Bg/ParamDescFg for chrome colors
+
+> [!NOTE]
+> **Pad-AnsiString emoji PadChar error** — root cause was theme `BorderMiddle` containing emoji glyphs (e.g. 🔥).
+> Fixed by replacing all emoji/ambiguous-width glyphs in broken themes with safe box-drawing chars.
+> The `Pad-AnsiString` function itself is correct; the issue was upstream in theme definitions.
+
 - [x] **My Goal** - a cross platform helper writer that can be use with all of my modules and tools, and other tools if they want to use powershell for that perpose. i want to dev to have full control to output how they want theme how they want and have the ability to customize the theme to their liking.
-- [x] **READ** - extended-tui-knowleadge.md - some elements are to avioided for tear for tui
+- [x] **READ** - extended-tui-knowleadge.md - some elements are to avoided for tear for tui
   - [x] **FIX** - remove all problematic glyphs from the theme and only use safe glyphs
 - [x] **FIX** blaze theme error
 - [x] **Customize-extend** - allow header to be gradient perhaps have a switch for -gradient and -customgradnet where user can specify.
-- [x] for all themes i want to be able to optional put a border around the entire help output and have the border be a gradient, with custom gradient if spcified
+- [x] for all themes i want to be able to optional put a border around the entire help output and have the border be a gradient, with custom gradient if specified
 - [x] the parm name and description should be on the same line, for descriptions that are too long we can use the pager to scroll through the description unsure of the best way to allow the user to specify action.
-
-Pad-AnsiString: 
-Line |
-4749 |  … t $spacedName -Width $innerWidth -Align 'Center' -PadChar $middleChar
-     |                                                              ~~~~~~~~~~~
-     | Cannot process argument transformation on parameter 'PadChar'. Cannot convert value "🔥" to type "System.Char". Error: "String must be exactly one character long."
 
 ## Performance & Optimization
 
@@ -37,4 +50,3 @@ Line |
 - [x] Implement syntax highlighting for PowerShell examples using token-based regex parsing
 - [x] Extend theme color palette integration to `New-PHRouter` and `Invoke-PHPager`
 - [x] Update `PHWriter` module to fully utilize itself by adding a `-Help` switch to all public cmdlets
-
