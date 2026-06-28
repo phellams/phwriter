@@ -5,7 +5,8 @@ function Show-PHTheme {
     .DESCRIPTION
       Renders mock cmdlet help text and banner logos using the specified theme
       and layout, providing developers with a direct terminal preview of the themes.
-      Supports showcasing custom RGB / true-color palettes.
+      Supports showcasing custom RGB / true-color palettes, optional outer borders
+      with gradient support, header gradient rendering, and compact layout mode.
     .PARAMETER Name
       Name of the theme to preview (e.g. 'default', 'cyberpunk', 'aurora').
       Set to 'all' or use the -All switch to preview all themes.
@@ -18,6 +19,28 @@ function Show-PHTheme {
       Switch to display previews for all predefined themes.
     .PARAMETER Minimal
       Switch to render only the ASCII banner logo and version header rather than full cmdlet help.
+    .PARAMETER Compact
+      Switch to suppress blank lines between parameter rows, producing a tight, single-line-per-param
+      output. Equivalent to passing -LineSpacing 0 to New-PHWriter. Useful when previewing many
+      themes back-to-back or in narrow terminal environments.
+    .PARAMETER Gradient
+      Enable gradient color rendering for the banner header. Gradient stops are sourced from the
+      theme's GradientSteps key, or from -CustomGradient if supplied.
+    .PARAMETER CustomGradient
+      An ordered array of two or more xterm-256 color indices defining the header gradient stops.
+      Only used when -Gradient is also specified.
+    .PARAMETER OuterBorder
+      Wrap the entire preview output in a single-line border box. The border style and color are
+      sourced from the active theme. Use -BorderGradient or -BorderCustomGradient to apply gradient
+      coloring to the border itself.
+    .PARAMETER BorderGradient
+      Apply a gradient to the outer border lines. Gradient stops are sourced from the theme's
+      GradientSteps key, or from -BorderCustomGradient if supplied.
+    .PARAMETER BorderCustomGradient
+      An ordered array of two or more xterm-256 color indices defining the border gradient stops.
+      Only used when -BorderGradient is also specified or -OuterBorder is specified with this param.
+    .PARAMETER Help
+      Display help output for Show-PHTheme itself.
     .EXAMPLE
       Show-PHTheme -Name 'cyberpunk'
       Previews the 'cyberpunk' theme with the default 'Box' layout.
@@ -27,17 +50,27 @@ function Show-PHTheme {
     .EXAMPLE
       Show-PHTheme -Name 'custom-rgb' -Layout 'Classic'
       Previews a custom RGB/TrueColor theme using the 'Classic' banner layout.
+    .EXAMPLE
+      Show-PHTheme -Name 'aurora' -Gradient -OuterBorder -BorderGradient
+      Previews the 'aurora' theme with a gradient header and gradient outer border.
+    .EXAMPLE
+      Show-PHTheme -Name 'matrix' -Compact
+      Previews the 'matrix' theme with compact (no blank lines between params) output.
+    .EXAMPLE
+      Show-PHTheme -All -Compact -Layout 'Minimal'
+      Previews all themes in compact minimal mode — useful for rapid visual comparison.
     #>
     [CmdletBinding()]
     param(
         [Parameter(Position = 0, ValueFromPipeline = $true)]
         [ValidateSet(
-                'default', 'matrix', 'cyberpunk', 'dracula', 'nord', 'monokai', 'solarized', 
-                'sunset', 'forest', 'classic', 'aurora', 'neon-noir', 'lava', 'ocean', 'toxic', 
-                'midnight', 'gold', 'rose', 'steel', 'phwriter', 'glitch', 'cosmic', 
-                'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust', 
-                'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal', 
-                'copper', 'royal', 'desert-heat', 'sheriff', 'frost'
+                'default', 'matrix', 'cyberpunk', 'dracula', 'nord', 'monokai', 'solarized',
+                'sunset', 'forest', 'classic', 'aurora', 'neon-noir', 'lava', 'ocean', 'toxic',
+                'midnight', 'gold', 'rose', 'steel', 'phwriter', 'glitch', 'cosmic',
+                'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust',
+                'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal',
+                'copper', 'royal', 'desert-heat', 'sheriff', 'frost',
+                'custom-rgb', 'all'
         )]
         [string]$Name = 'default',
 
@@ -50,6 +83,29 @@ function Show-PHTheme {
 
         [Parameter()]
         [switch]$Minimal,
+
+        # ── Compact layout ───────────────────────────────────────────────────────
+        [Parameter(HelpMessage = "Suppress blank lines between parameter rows (LineSpacing 0).")]
+        [switch]$Compact,
+
+        # ── Header gradient ──────────────────────────────────────────────────────
+        [Parameter(HelpMessage = "Enable gradient color for the banner header.")]
+        [switch]$Gradient,
+
+        [Parameter(HelpMessage = "xterm-256 color-index stops for the header gradient.")]
+        [Alias('CustomGradnet')]
+        [int[]]$CustomGradient,
+
+        # ── Outer border ─────────────────────────────────────────────────────────
+        [Parameter(HelpMessage = "Wrap the entire preview output in a border box.")]
+        [switch]$OuterBorder,
+
+        [Parameter(HelpMessage = "Apply a gradient to the outer border.")]
+        [switch]$BorderGradient,
+
+        [Parameter(HelpMessage = "xterm-256 color-index stops for the border gradient.")]
+        [Alias('BorderCustomGradnet')]
+        [int[]]$BorderCustomGradient,
 
         [Parameter(HelpMessage = "Display Help for Show-PHTheme.")]
         [switch]$Help
@@ -86,6 +142,9 @@ function Show-PHTheme {
             "Get-SampleCmdlet -Path 'config.json' -Force",
             "Get-SampleCmdlet -Path '/etc/app/config.json' -Verbose"
         )
+
+        # Resolve compact → LineSpacing value
+        $resolvedLineSpacing = if ($Compact) { 0 } else { 1 }
     }
 
     process {
@@ -103,7 +162,7 @@ function Show-PHTheme {
                     name        = "Layout"
                     param       = "l|Layout"
                     type        = "String"
-                    description = "The ASCII banner layout style: 'Box', 'Classic', etc."
+                    description = "The ASCII banner layout style: 'Box', 'Classic', 'Minimal', 'Man', 'Terminal', 'Typewriter'."
                     required    = $false
                     inline      = $false
                 },
@@ -111,7 +170,7 @@ function Show-PHTheme {
                     name        = "All"
                     param       = "a|All"
                     type        = "Switch"
-                    description = "Preview all themes."
+                    description = "Preview all 41 built-in themes sequentially."
                     required    = $false
                     inline      = $true
                 },
@@ -122,17 +181,67 @@ function Show-PHTheme {
                     description = "Render only the ASCII banner logo and version header."
                     required    = $false
                     inline      = $true
+                },
+                @{
+                    name        = "Compact"
+                    param       = "c|Compact"
+                    type        = "Switch"
+                    description = "Suppress blank lines between parameter rows. Equivalent to -LineSpacing 0 on New-PHWriter."
+                    required    = $false
+                    inline      = $true
+                },
+                @{
+                    name        = "Gradient"
+                    param       = "g|Gradient"
+                    type        = "Switch"
+                    description = "Enable gradient color rendering for the banner header."
+                    required    = $false
+                    inline      = $true
+                },
+                @{
+                    name        = "CustomGradient"
+                    param       = "cg|CustomGradient"
+                    type        = "Int[]"
+                    description = "xterm-256 color-index stops defining the header gradient. Requires -Gradient."
+                    required    = $false
+                    inline      = $false
+                },
+                @{
+                    name        = "OuterBorder"
+                    param       = "ob|OuterBorder"
+                    type        = "Switch"
+                    description = "Wrap the entire preview output in a single-line border box."
+                    required    = $false
+                    inline      = $true
+                },
+                @{
+                    name        = "BorderGradient"
+                    param       = "bg|BorderGradient"
+                    type        = "Switch"
+                    description = "Apply a gradient to the outer border lines. Requires -OuterBorder."
+                    required    = $false
+                    inline      = $true
+                },
+                @{
+                    name        = "BorderCustomGradient"
+                    param       = "bcg|BorderCustomGradient"
+                    type        = "Int[]"
+                    description = "xterm-256 color-index stops defining the border gradient stops."
+                    required    = $false
+                    inline      = $false
                 }
             )
             $showtheme_commandinfo = @{
                 cmdlet      = "Show-PHTheme"
-                synopsis    = "Show-PHTheme [-Name <String>] [-Layout <String>] [-All] [-Minimal]"
-                description = "Displays a visual preview of one or all PHWriter themes."
+                synopsis    = "Show-PHTheme [-Name <String>] [-Layout <String>] [-All] [-Minimal] [-Compact] [-Gradient] [-OuterBorder] [-BorderGradient]"
+                description = "Displays a visual preview of one or all PHWriter themes. Supports compact layout, header gradients, and optional outer borders with gradient rendering."
                 source      = "https://gitlab.com/phellams/phwriter"
             }
             $showtheme_examples = @(
                 "Show-PHTheme -Name 'cyberpunk'",
-                "Show-PHTheme -All -Layout 'Terminal' -Minimal"
+                "Show-PHTheme -All -Layout 'Terminal' -Minimal",
+                "Show-PHTheme -Name 'aurora' -Gradient -OuterBorder -BorderGradient",
+                "Show-PHTheme -All -Compact -Layout 'Minimal'"
             )
             New-PHWriter -Name 'PHWRITER' -CommandInfo $showtheme_commandinfo -ParamTable $showtheme_ParamTable -Padding 4 -Indent 2 -Theme 'default' -Version '1.0.0' -Examples $showtheme_examples
             return
@@ -145,11 +254,11 @@ function Show-PHTheme {
         if ($All -or $Name -eq 'all') {
             # List of all unique predefined themes
             $themesToShow = @(
-                'default', 'matrix', 'cyberpunk', 'dracula', 'nord', 'monokai', 'solarized', 
-                'sunset', 'forest', 'classic', 'aurora', 'neon-noir', 'lava', 'ocean', 'toxic', 
-                'midnight', 'gold', 'rose', 'steel', 'phwriter', 'glitch', 'cosmic', 
-                'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust', 
-                'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal', 
+                'default', 'matrix', 'cyberpunk', 'dracula', 'nord', 'monokai', 'solarized',
+                'sunset', 'forest', 'classic', 'aurora', 'neon-noir', 'lava', 'ocean', 'toxic',
+                'midnight', 'gold', 'rose', 'steel', 'phwriter', 'glitch', 'cosmic',
+                'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust',
+                'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal',
                 'copper', 'royal', 'desert-heat', 'sheriff', 'frost'
             )
         } elseif ($Name -eq 'custom-rgb') {
@@ -176,7 +285,7 @@ function Show-PHTheme {
                     HeaderFg         = '0;255;255'       # Cyan RGB
                     ModuleBg         = '38;2;16;16;32'
                     ModuleFg         = '255;0;255'       # Magenta RGB
-                    VersionBg         = '38;2;16;16;32'
+                    VersionBg        = '38;2;16;16;32'
                     VersionFg        = '255;255;0'       # Yellow RGB
                     SyntaxFg         = '255;255;255'     # White RGB
                     SyntaxFormat     = 'none'
@@ -204,22 +313,41 @@ function Show-PHTheme {
             if ($Minimal) {
                 # Render only the logo and the version header
                 Write-PHAsciiLogo -Name 'SAMPLE' -Version '1.0.0' -Theme $themeObj -Layout $Layout
-                
+
                 # Render metadata line
                 $sectionChar = if ($themeObj.ContainsKey('SectionChar')) { $themeObj['SectionChar'] } else { '◉' }
                 $headerChar = if ($themeObj.ContainsKey('HeaderChar')) { $themeObj['HeaderChar'] } else { '▶' }
                 $styledHeadChar = if ($headerChar) { Format-ThemeText -String " $headerChar " -Theme $themeObj -Element 'Accent' } else { " " }
-                
+
                 $headerParts = @()
                 $headerParts += "$(Format-ThemeText -String 'MODULE' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String 'SAMPLE' -Theme $themeObj -Element 'Header')"
                 $headerParts += "$(Format-ThemeText -String 'CMDLET' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String 'Get-SampleCmdlet' -Theme $themeObj -Element 'Header')"
                 $headerParts += "$(Format-ThemeText -String 'VERSION' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String 'v1.0.0' -Theme $themeObj -Element 'Version')"
-                
+
                 [console]::WriteLine(" " + ($headerParts -join $styledHeadChar))
                 [console]::WriteLine("─" * 70)
             } else {
-                # Full cmdlet preview using New-PHWriter
-                New-PHWriter -Name 'SAMPLE' -Version '1.0.0' -CommandInfo $mockCommandInfo -ParamTable $mockParams -Examples $mockExamples -Theme $themeObj -Layout $Layout
+                # Build splatted params for New-PHWriter — only include gradient/border params when
+                # the caller has explicitly enabled them so that themes without GradientSteps do not
+                # attempt gradient rendering by default.
+                $writerParams = @{
+                    Name        = 'SAMPLE'
+                    Version     = '1.0.0'
+                    CommandInfo = $mockCommandInfo
+                    ParamTable  = $mockParams
+                    Examples    = $mockExamples
+                    Theme       = $themeObj
+                    Layout      = $Layout
+                    LineSpacing = $resolvedLineSpacing
+                }
+
+                if ($Gradient)      { $writerParams['Gradient']      = $true }
+                if ($CustomGradient){ $writerParams['CustomGradient'] = $CustomGradient }
+                if ($OuterBorder)   { $writerParams['OuterBorder']   = $true }
+                if ($BorderGradient){ $writerParams['BorderGradient'] = $true }
+                if ($BorderCustomGradient) { $writerParams['BorderCustomGradient'] = $BorderCustomGradient }
+
+                New-PHWriter @writerParams
             }
             [console]::WriteLine()
         }

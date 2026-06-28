@@ -7,19 +7,35 @@
 
 ---
 
+> [!NOTE]
+> **Demo recordings** — Terminal recordings below are generated with [VHS](https://github.com/charmbracelet/vhs).
+> Placeholder paths will be replaced with `.gif` recordings once VHS tape files are authored.
+>
+> | Demo | Command |
+> |---|---|
+> | `demo/aurora-gradient-border.gif` | `Show-PHTheme -Name 'aurora' -Gradient -OuterBorder -BorderGradient` |
+> | `demo/all-themes-compact.gif` | `Show-PHTheme -All -Compact -Layout 'Minimal'` |
+> | `demo/compact-example.gif` | `New-PHWriter -Name 'MyModule' -Theme 'cyberpunk' -Compact` |
+> | `demo/custom-rgb-classic.gif` | `Show-PHTheme -Name 'custom-rgb' -Layout 'Classic'` |
+
+---
+
 ## Overview
 
-**PHWriter** (PowerShell Help Writer) is a module for generating beautifully formatted, ANSI-coloured terminal help output. It reproduces the clarity and structure of Linux man pages with modern, themeable aesthetics and a zero-boilerplate API.
+PHWriter (PowerShell Help Writer) is a module for generating formatted, ANSI-coloured terminal help output. It reproduces the structure of Linux man pages with modern, themeable aesthetics and a zero-boilerplate API.
 
 Core capabilities:
 
-- **20 built-in themes** — 10 flat-colour themes + 10 new gradient-aware themes
+- **41 built-in themes** — 10 flat-colour + 10 gradient-aware + 20 extended hard-bordered themes
 - **6 ASCII/ANSI banner layouts** — Box, Classic, Minimal, Man, Terminal, Typewriter
 - **AST-powered zero-touch metadata extraction** — Parse cmdlet source files automatically
 - **Interactive TUI pager** — Arrow-key navigation, alternate screen buffer, ANSI-aware
 - **CLI router scaffold** — Subcommand dispatch, tab-completion, Levenshtein fuzzy matching
 - **Module and script-file aware** — Detects `.psd1` manifests; adapts header label accordingly
-- **Adjustable spacing and padding** — Compact to spacious output, developer-controlled
+- **Adjustable spacing and padding** — Compact (`-Compact`), default, or spacious output
+- **Outer border rendering** — Optional single-line border box with gradient support
+- **Header gradient rendering** — `-Gradient` / `-CustomGradient` for themed header coloring
+- **Cross-module reusable** — Designed as a shared dependency across 100+ PowerShell module projects
 
 ---
 
@@ -77,10 +93,16 @@ Import-Module ./phwriter.psm1
 | `-Padding` | Int | `3` | Column padding in spaces |
 | `-Indent` | Int | `1` | Left indentation in spaces |
 | `-LineSpacing` | Int | `1` | Blank lines between parameter rows (`0`=compact, `1`=default, `2`=spacious) |
+| `-Compact` | Switch | — | Convenience shorthand for `-LineSpacing 0`. Takes precedence over `-LineSpacing` |
 | `-SourceType` | String | `'module'` | Header label — `module`, `script`, `tool`, or `plugin` |
 | `-Theme` | String\|Hashtable | `'default'` | Theme name or custom theme hashtable |
 | `-Layout` | String | `'Box'` | Banner layout style |
 | `-CustomLogo` | String | — | Override banner with a custom ASCII string |
+| `-Gradient` | Switch | — | Apply gradient to the banner header (uses theme `GradientSteps`) |
+| `-CustomGradient` | Int[] | — | xterm-256 color-index stops for the header gradient |
+| `-OuterBorder` | Switch | — | Wrap entire output in a single-line border box |
+| `-BorderGradient` | Switch | — | Apply gradient coloring to the outer border |
+| `-BorderCustomGradient` | Int[] | — | xterm-256 color-index stops for the border gradient |
 | `-JsonFile` | String | — | Load all parameters from a JSON file |
 | `-Help` | Switch | — | Display PHWriter's own help output |
 
@@ -190,7 +212,15 @@ New-PHWriter `
     }
 ```
 
-#### Compact layout (developer preference)
+#### Compact layout — convenience switch
+
+```powershell
+# -Compact is equivalent to -LineSpacing 0 but more expressive at the call site.
+# When -Compact and -LineSpacing are both present, -Compact takes precedence.
+New-PHWriter @meta -Theme 'steel' -Layout 'Minimal' -Compact
+```
+
+#### Compact layout via LineSpacing (explicit)
 
 ```powershell
 # LineSpacing 0 = no blank lines between params — tight, compact output
@@ -273,7 +303,23 @@ These 20 additional themes utilize advanced ASCII characters and unique color st
 
 ### Previewing Themes (DX)
 
-PHWriter provides a built-in Developer Experience (DX) previewing tool `Show-PHTheme` to render themes directly in your terminal:
+PHWriter provides a built-in Developer Experience (DX) previewing tool `Show-PHTheme` to render themes directly in your terminal.
+
+#### Parameters
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `-Name` | String | `'default'` | Built-in theme name or `'custom-rgb'` |
+| `-Layout` | String | `'Box'` | Banner layout style |
+| `-All` | Switch | — | Preview all 41 built-in themes |
+| `-Minimal` | Switch | — | Render banner + header only (no params or examples) |
+| `-Compact` | Switch | — | Suppress blank lines between parameter rows (`LineSpacing 0`) |
+| `-Gradient` | Switch | — | Apply gradient to the banner header |
+| `-CustomGradient` | Int[] | — | xterm-256 color-index stops for the header gradient |
+| `-OuterBorder` | Switch | — | Wrap entire output in a border box |
+| `-BorderGradient` | Switch | — | Apply gradient coloring to the outer border |
+| `-BorderCustomGradient` | Int[] | — | xterm-256 color-index stops for the border gradient |
+| `-Help` | Switch | — | Display help for `Show-PHTheme` |
 
 ```powershell
 # Preview a single theme in full layout mode
@@ -284,6 +330,15 @@ Show-PHTheme -All -Minimal -Layout 'Terminal'
 
 # Preview a dynamic custom RGB theme
 Show-PHTheme -Name 'custom-rgb' -Layout 'Classic'
+
+# Preview with gradient header and outer border
+Show-PHTheme -Name 'aurora' -Gradient -OuterBorder -BorderGradient
+
+# Preview all themes in compact mode for rapid visual comparison
+Show-PHTheme -All -Compact -Layout 'Minimal'
+
+# Preview with a custom border gradient ramp
+Show-PHTheme -Name 'matrix' -OuterBorder -BorderCustomGradient @(22, 28, 40, 46)
 ```
 
 ---
@@ -645,6 +700,10 @@ All `New-PHWriter` parameters can be loaded from a JSON file. Useful for storing
     "theme": "cyberpunk",
     "layout": "Terminal",
     "linespacing": 1,
+    "compact": false,
+    "gradient": false,
+    "outerborder": false,
+    "bordergradient": false,
     "sourcetype": "module",
     "commandinfo": {
         "cmdlet": "Invoke-MyCommand",
