@@ -1,10 +1,18 @@
 function New-PHWriter {
     <#
     .SYNOPSIS
-      Generates formatted, colored help text for PowerShell cmdlets and router functions.
+      Generates formatted, ANSI-colored help text for PowerShell cmdlets and router functions.
     .DESCRIPTION
-      Outputs man-page style documentation with customizable layout, alignment, and 10 default themes.
-      Supports documenting both parameters and router subcommands.
+      Outputs man-page style documentation with customizable layout, alignment, and 41 built-in themes.
+      Supports documenting both parameters and router subcommands. All output is ANSI/VT100 formatted
+      and rendered via [System.Console]::WriteLine for cross-platform compatibility and raw performance.
+
+      Layout spacing is controlled by -LineSpacing (0=compact, 1=default, 2=spacious) or the
+      convenience -Compact switch which is equivalent to -LineSpacing 0. When -Compact and -LineSpacing
+      are both supplied, -Compact takes precedence.
+
+      Outer borders with optional gradient rendering are supported via -OuterBorder, -BorderGradient,
+      and -BorderCustomGradient. Header gradient rendering is supported via -Gradient and -CustomGradient.
     .PARAMETER JsonFile
       JSON file containing help configuration parameters to load.
     .PARAMETER Name
@@ -25,15 +33,30 @@ function New-PHWriter {
       Spaces of left indentation for each line. Default is 1.
     .PARAMETER LineSpacing
       Number of blank lines between each parameter row. Default is 1. Set 0 for compact mode.
+    .PARAMETER Compact
+      Convenience switch that sets LineSpacing to 0. Produces a tight, single-line-per-param output.
+      Takes precedence over -LineSpacing when both are specified.
     .PARAMETER SourceType
       Header label identifying the documentation target type: 'module', 'script', 'tool', or 'plugin'. Default is 'module'.
-      Label type for the header line: 'module', 'script', 'tool', or 'plugin'. Default: 'module'.
     .PARAMETER Theme
-      The name of a default theme ('default', 'matrix', 'cyberpunk', etc.) or a custom theme object.
+      The name of a default theme ('default', 'matrix', 'cyberpunk', etc.) or a custom theme hashtable.
     .PARAMETER Layout
       The ASCII banner layout: 'Box', 'Classic', 'Minimal', 'Man', 'Terminal', 'Typewriter'. Default is 'Box'.
     .PARAMETER CustomLogo
       An optional custom ASCII logo string.
+    .PARAMETER Gradient
+      Enable gradient color for the banner header. Gradient stops sourced from the theme's GradientSteps
+      key, or from -CustomGradient when supplied.
+    .PARAMETER CustomGradient
+      An ordered array of two or more xterm-256 color indices defining the header gradient stops.
+    .PARAMETER OuterBorder
+      Wrap the entire help output in a single-line border box. Border style and color are sourced from
+      the active theme. Use -BorderGradient or -BorderCustomGradient for gradient border coloring.
+    .PARAMETER BorderGradient
+      Apply a gradient to the outer border lines. Gradient stops sourced from the theme's GradientSteps
+      key, or from -BorderCustomGradient when supplied.
+    .PARAMETER BorderCustomGradient
+      An ordered array of two or more xterm-256 color indices defining the border gradient stops.
     .PARAMETER Help
       Switch to display help information for New-PHWriter itself.
     #>
@@ -71,19 +94,28 @@ function New-PHWriter {
         [ValidateRange(0, 4)]
         [int]$LineSpacing = 1,
 
+        [Parameter(HelpMessage = "Convenience switch — sets LineSpacing to 0. Takes precedence over -LineSpacing.")]
+        [switch]$Compact,
+
         [Parameter(HelpMessage = "Header label type: module, script, tool, or plugin.")]
         [ValidateSet('module', 'script', 'tool', 'plugin')]
         [string]$SourceType = 'module',
 
-        [Parameter(HelpMessage = "Theme name or custom theme object.")]
-        [ValidateSet(
-            'default', 'matrix', 'cyberpunk', 'dracula', 'nord', 'monokai', 'solarized', 
-            'sunset', 'forest', 'classic', 'aurora', 'neon-noir', 'lava', 'ocean', 'toxic', 
-            'midnight', 'gold', 'rose', 'steel', 'phwriter', 'glitch', 'cosmic', 
-            'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust', 
-            'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal', 
-            'copper', 'royal', 'desert-heat', 'sheriff', 'frost'
-        )]
+        [Parameter(HelpMessage = "Theme name or custom theme hashtable.")]
+        [ValidateScript({
+            # Accept a hashtable (custom theme object) or a valid built-in name string
+            if ($_ -is [hashtable]) { return $true }
+            $validNames = @(
+                'default', 'matrix', 'cyberpunk', 'dracula', 'nord', 'monokai', 'solarized',
+                'sunset', 'forest', 'classic', 'aurora', 'neon-noir', 'lava', 'ocean', 'toxic',
+                'midnight', 'gold', 'rose', 'steel', 'phwriter', 'glitch', 'cosmic',
+                'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust',
+                'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal',
+                'copper', 'royal', 'desert-heat', 'sheriff', 'frost'
+            )
+            if ($_ -is [string] -and $validNames -contains $_) { return $true }
+            throw "Invalid -Theme value '$_'. Provide a valid built-in theme name or a custom theme hashtable."
+        })]
         $Theme = 'default',
 
         [Parameter(HelpMessage = "The ASCII banner layout style.")]
@@ -191,6 +223,14 @@ function New-PHWriter {
                     inline      = $false
                 },
                 @{
+                    name        = "Compact"
+                    param       = "co|Compact"
+                    type        = "Switch"
+                    description = "Convenience switch that forces LineSpacing to 0. Overrides -LineSpacing when both are supplied."
+                    required    = $false
+                    inline      = $true
+                },
+                @{
                     name        = "SourceType"
                     param       = "st|SourceType"
                     type        = "String"
@@ -270,6 +310,7 @@ function New-PHWriter {
                     if ($jsonData.ContainsKey('bordergradient')) { $BorderGradient = [bool]$jsonData.bordergradient }
                     if ($jsonData.ContainsKey('bordercustomgradient')) { $BorderCustomGradient = [int[]]$jsonData.bordercustomgradient }
                     elseif ($jsonData.ContainsKey('bordercustomgradnet')) { $BorderCustomGradient = [int[]]$jsonData.bordercustomgradnet }
+                    if ($jsonData.ContainsKey('compact')) { $Compact = [bool]$jsonData.compact }
                 } catch {
                     Write-Warning "Failed to parse JSON file: $_"
                     return
@@ -283,6 +324,10 @@ function New-PHWriter {
         # Fallbacks
         if (!$Name) { $Name = 'PHW' }
         if (!$Version) { $Version = '1.0.0' }
+
+        # -Compact takes precedence over -LineSpacing
+        if ($Compact) { $LineSpacing = 0 }
+
         $indentString  = " " * $Indent
         $blankLine     = "`n" * $LineSpacing  # blank lines between param rows
 
