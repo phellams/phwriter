@@ -351,4 +351,35 @@ Describe "PHWriter-Priority-1-Features" {
     It "Should render New-PHWriter with CustomGradient steps without throwing" {
         New-PHWriter @params -CustomGradient @(196, 202, 226) -OuterBorder -BorderCustomGradient @(17, 21)
     }
+
+    It "Should render New-PHWriter with -Compact switch (LineSpacing=0) without throwing" {
+        New-PHWriter @params -Compact
+    }
+
+    It "Should render New-PHWriter with -Compact overriding -LineSpacing without throwing" {
+        # -Compact takes precedence — both supplied together should not error
+        New-PHWriter @params -Compact -LineSpacing 2
+    }
+}
+
+Describe "Show-PHTheme-Enhancements" {
+    It "Should render Show-PHTheme in compact mode without throwing" {
+        Show-PHTheme -Name 'default' -Compact
+    }
+
+    It "Should render Show-PHTheme with OuterBorder without throwing" {
+        Show-PHTheme -Name 'nord' -OuterBorder
+    }
+
+    It "Should render Show-PHTheme with Gradient and BorderGradient without throwing" {
+        Show-PHTheme -Name 'aurora' -Gradient -OuterBorder -BorderGradient
+    }
+
+    It "Should render Show-PHTheme with custom-rgb in minimal mode without throwing" {
+        Show-PHTheme -Name 'custom-rgb' -Minimal
+    }
+
+    It "Should render Show-PHTheme help without throwing" {
+        Show-PHTheme -Help
+    }
 }
