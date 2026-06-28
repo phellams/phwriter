@@ -57,6 +57,10 @@ function New-PHWriter {
       key, or from -BorderCustomGradient when supplied.
     .PARAMETER BorderCustomGradient
       An ordered array of two or more xterm-256 color indices defining the border gradient stops.
+    .PARAMETER OuterBorderStyle
+      Selects the corner and side glyph style for the outer border. One of: 'Rounded' (default, ╭╮╰╯│),
+      'Square' (┌┐└┘│), 'Double' (╔╗╚╝║═), 'Block' (██▓▓), 'Simple' (++--).
+      Only takes effect when -OuterBorder is specified.
     .PARAMETER Help
       Switch to display help information for New-PHWriter itself.
     #>
@@ -98,7 +102,7 @@ function New-PHWriter {
         [switch]$Compact,
 
         [Parameter(HelpMessage = "Header label type: module, script, tool, or plugin.")]
-        [ValidateSet('module', 'script', 'tool', 'plugin')]
+        [ValidateSet('module', 'script', 'tool', 'plugin', 'cli', 'function', 'workflow')]
         [string]$SourceType = 'module',
 
         [Parameter(HelpMessage = "Theme name or custom theme hashtable.")]
@@ -141,6 +145,10 @@ function New-PHWriter {
         [Parameter(HelpMessage = "Custom gradient color steps for the outer border.")]
         [Alias('BorderCustomGradnet')]
         [int[]]$BorderCustomGradient,
+
+        [Parameter(HelpMessage = "Outer border corner and side style. One of: Rounded, Square, Double, Block, Simple.")]
+        [ValidateSet('Rounded', 'Square', 'Double', 'Block', 'Simple')]
+        [string]$OuterBorderStyle = 'Rounded',
 
         [Parameter(HelpMessage = "Display Help for New-PHWriter.")]
         [switch]$Help
@@ -253,6 +261,14 @@ function New-PHWriter {
                     description = "Banner layout: 'Box', 'Classic', 'Minimal', 'Man', 'Terminal', 'Typewriter'."
                     required    = $false
                     inline      = $false
+                },
+                @{
+                    name        = "OuterBorderStyle"
+                    param       = "obs|OuterBorderStyle"
+                    type        = "String"
+                    description = "Outer border style: 'Rounded' (default), 'Square', 'Double', 'Block', 'Simple'. Requires -OuterBorder."
+                    required    = $false
+                    inline      = $false
                 }
             )
             $phwriter_commandinfo = @{
@@ -353,31 +369,31 @@ function New-PHWriter {
         }
         $headerParts += "$(Format-ThemeText -String 'VERSION' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String "v$Version" -Theme $themeObj -Element 'Version')"
 
-        [console]::WriteLine($indentString + ($headerParts -join $styledHeadChar))
-        [console]::WriteLine("`n")
+        [console]::WriteLine($indentString + " " + ($headerParts -join $styledHeadChar) + " ")
+        [console]::WriteLine()
 
         # 1. SYNTAX Section
         if ($CommandInfo.synopsis) {
             $syntaxTitle = Format-ThemeText -String "SYNTAX" -Theme $themeObj -Element 'Accent'
-            [console]::WriteLine("${indentString}${styledSecChar}${syntaxTitle}`n")
+            [console]::WriteLine("${indentString}${styledSecChar}${syntaxTitle}")
             $syntaxText = Format-ThemeText -String ($CommandInfo.synopsis) -Theme $themeObj -Element 'Syntax'
             [console]::WriteLine($(New-Paragraph -position 100 -indent ($Indent + 2) -string $syntaxText))
-            [console]::WriteLine("`n")
+            [console]::WriteLine()
         }
 
         # 2. DESCRIPTION Section
         if ($CommandInfo.description) {
             $descTitle = Format-ThemeText -String "DESCRIPTION" -Theme $themeObj -Element 'Accent'
-            [console]::WriteLine("${indentString}${styledSecChar}${descTitle}`n")
+            [console]::WriteLine("${indentString}${styledSecChar}${descTitle}")
             $descText = Format-ThemeText -String ($CommandInfo.description) -Theme $themeObj -Element 'Description'
             [console]::WriteLine($(New-Paragraph -position 100 -indent ($Indent + 2) -string $descText))
-            [console]::WriteLine("`n")
+            [console]::WriteLine()
         }
 
         # 3. SUBCOMMANDS Section (For Router functions)
         if ($Subcommands -and $Subcommands.Count -gt 0) {
             $subTitle = Format-ThemeText -String "SUBCOMMANDS" -Theme $themeObj -Element 'Accent'
-            [console]::WriteLine("${indentString}${styledSecChar}${subTitle}`n")
+            [console]::WriteLine("${indentString}${styledSecChar}${subTitle}")
 
             $maxSubLength = 0
             foreach ($sub in $Subcommands) {
@@ -395,14 +411,14 @@ function New-PHWriter {
                 [console]::WriteLine("${indentString}   ${styledSubName}${styledSubSyntax}")
                 $descIndent = $indentString + (" " * ($maxSubLength + $Padding + 4))
                 [console]::WriteLine("${descIndent}${styledSubDesc}")
-                [console]::WriteLine("`n")
+                [console]::WriteLine()
             }
         }
 
         # 4. PARAMETERS Section
         if ($ParamTable -and $ParamTable.Count -gt 0) {
             $paramTitle = Format-ThemeText -String "PARAMETERS" -Theme $themeObj -Element 'Accent'
-            [console]::WriteLine("${indentString}${styledSecChar}${paramTitle}`n")
+            [console]::WriteLine("${indentString}${styledSecChar}${paramTitle}")
 
             $maxParamLength = 0
             $maxTypeLength = 0
@@ -488,7 +504,7 @@ function New-PHWriter {
         # 5. EXAMPLES Section
         if ($Examples -and $Examples.Count -gt 0) {
             $exTitle = Format-ThemeText -String "EXAMPLES" -Theme $themeObj -Element 'Accent'
-            [console]::WriteLine("${indentString}${styledSecChar}${exTitle}`n")
+            [console]::WriteLine("${indentString}${styledSecChar}${exTitle}")
 
             $getHighlightedExample = {
                 param(
@@ -611,11 +627,40 @@ function New-PHWriter {
                 if ($w -gt $maxW) { $maxW = $w }
             }
 
-            # Define border characters
-            $borderLeft   = "│"
-            $borderRight  = "│"
-            $topBorder    = "╭" + ("─" * ($maxW + 2)) + "╮"
-            $bottomBorder = "╰" + ("─" * ($maxW + 2)) + "╯"
+            # Resolve border characters based on OuterBorderStyle
+            switch ($OuterBorderStyle) {
+                'Square'  {
+                    $borderLeft   = '│'
+                    $borderRight  = '│'
+                    $topBorder    = '┌' + ('─' * ($maxW + 2)) + '┐'
+                    $bottomBorder = '└' + ('─' * ($maxW + 2)) + '┘'
+                }
+                'Double'  {
+                    $borderLeft   = '║'
+                    $borderRight  = '║'
+                    $topBorder    = '╔' + ('═' * ($maxW + 2)) + '╗'
+                    $bottomBorder = '╚' + ('═' * ($maxW + 2)) + '╝'
+                }
+                'Block'   {
+                    $borderLeft   = '█'
+                    $borderRight  = '█'
+                    $topBorder    = '█' + ('█' * ($maxW + 2)) + '█'
+                    $bottomBorder = '▓' + ('▓' * ($maxW + 2)) + '▓'
+                }
+                'Simple'  {
+                    $borderLeft   = '|'
+                    $borderRight  = '|'
+                    $topBorder    = '+' + ('-' * ($maxW + 2)) + '+'
+                    $bottomBorder = '+' + ('-' * ($maxW + 2)) + '+'
+                }
+                default   {
+                    # Rounded (default)
+                    $borderLeft   = '│'
+                    $borderRight  = '│'
+                    $topBorder    = '╭' + ('─' * ($maxW + 2)) + '╮'
+                    $bottomBorder = '╰' + ('─' * ($maxW + 2)) + '╯'
+                }
+            }
 
             # Color borders
             $useBorderGrad = $BorderGradient -or ($null -ne $BorderCustomGradient)
