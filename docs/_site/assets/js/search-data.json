@@ -119,138 +119,131 @@
     "relUrl": "/downloads.html"
   },"17": {
     "doc": "Home",
-    "title": "PHWriter",
-    "content": "Formatted, ANSI-coloured terminal help output generator for PowerShell. Replicating the structured clarity of Linux man pages with modern themeable aesthetics. ",
-    "url": "/#phwriter",
-    
-    "relUrl": "/#phwriter"
-  },"18": {
-    "doc": "Home",
     "title": "Interactive Terminal Preview (VHS Demo)",
     "content": "Below is a live-rendered visualization of a PHWriter CLI help screen using the aurora gradient theme and outer borders: . pwsh — Show-PHTheme -Name 'aurora' PS &gt; Show-PHTheme -Name 'aurora' -Gradient -OuterBorder -BorderGradient ╭──────────────────────────────────────────────────────────╮ │ S A M P L E │ ╰──────────────────────────────────────────────────────────╯ CLI SAMPLE ◈ FUNCTION Get-SampleCmdlet ◈ VERSION v1.0.0 ◈ SYNTAX Get-SampleCmdlet [-Path &lt;String&gt;] [-Force] [-Verbose] ◈ DESCRIPTION This sample cmdlet retrieves configuration data and performs basic validation checks. It is formatted to show the colors and layouts of the theme. ◈ PARAMETERS -p|Path [String] Path (Req) Specifies the filesystem path to the target config file. -f|Force [Switch] Force Force the operation to complete without prompting. ◈ EXAMPLES Get-SampleCmdlet -Path 'config.json' -Force Get-SampleCmdlet -Path '/etc/app/config.json' -Verbose ★ Docs: https://gitlab.com/phellams/phwriter for more info . ",
     "url": "/#interactive-terminal-preview-vhs-demo",
     
     "relUrl": "/#interactive-terminal-preview-vhs-demo"
-  },"19": {
+  },"18": {
     "doc": "Home",
     "title": "Feature Overview",
     "content": ". | 🎨 41 Predefined Themes — Vibrant, gradient-aware, or solid retro styles matching your project’s brand. | 📦 AST Metadata Extraction — Zero-touch parsing of comment-based help blocks directly from source files. | 📟 Interactive TUI Pager — Alt-buffer terminal scrolling supporting custom width and console resize recalculation. | 🚏 CLI Router Scaffolding — Subcommand dispatching with fuzzy Levenshtein recommendations and auto-completion. | 🔖 Tag-Padded Headers — Modern tag blocks for clean, high-impact version metadata. | . ",
     "url": "/#feature-overview",
     
     "relUrl": "/#feature-overview"
-  },"20": {
+  },"19": {
     "doc": "Home",
     "title": "Quick Start",
     "content": "Initialize, render, and page help details in seconds: . # Import the module Import-Module PHWriter # Render the built-in theme preview Show-PHTheme -Name 'phwriter' # Generate documentation with a specific theme and compact layout New-PHWriter @MyMetadata -Theme 'cyberpunk' -Compact . ",
     "url": "/#quick-start",
     
     "relUrl": "/#quick-start"
-  },"21": {
+  },"20": {
     "doc": "Home",
     "title": "Learning More",
     "content": "Use the sidebar navigation to read deep-dives on individual features, or explore: . | ➔ API Reference — Fully documented parameters and syntax for all cmdlets. | ➔ Installation &amp; Downloads — PowerShell Gallery, Chocolatey, and release assets. | . ",
     "url": "/#learning-more",
     
     "relUrl": "/#learning-more"
-  },"22": {
+  },"21": {
     "doc": "Home",
     "title": "Home",
     "content": " ",
     "url": "/",
     
     "relUrl": "/"
-  },"23": {
+  },"22": {
     "doc": "Metadata Extraction",
     "title": "Metadata Extraction",
     "content": "PHWriter includes an AST-powered extraction engine called Export-PHWriterMetadata (aliased as phextract) that extracts parameters, descriptions, and syntax information from your PowerShell cmdlet files statically. ",
     "url": "/metadata-extraction.html",
     
     "relUrl": "/metadata-extraction.html"
-  },"24": {
+  },"23": {
     "doc": "Metadata Extraction",
     "title": "Usage",
     "content": "Export-PHWriterMetadata -FilePath \"./Public/Get-MyData.ps1\" . ",
     "url": "/metadata-extraction.html#usage",
     
     "relUrl": "/metadata-extraction.html#usage"
-  },"25": {
+  },"24": {
     "doc": "Metadata Extraction",
     "title": "How It Works",
     "content": ". | AST Parsing: The cmdlet parses the PowerShell script’s Abstract Syntax Tree (AST). | CBH Association: It parses Comment-Based Help (CBH) blocks placed immediately preceding the param(...) block inside the function body. | Module Detection: It automatically walks up directory trees to find a .psd1 manifest file, setting the sourcetype metadata to module or script accordingly. | . ",
     "url": "/metadata-extraction.html#how-it-works",
     
     "relUrl": "/metadata-extraction.html#how-it-works"
-  },"26": {
+  },"25": {
     "doc": "Metadata Extraction",
     "title": "Placement Rules",
     "content": "To extract help comments correctly, place the comment block inside the function body, immediately before the parameter declarations: . function Get-MyData { &lt;# .SYNOPSIS Gets some data.PARAMETER Path The path to check. #&gt; param( [string]$Path ) } . ",
     "url": "/metadata-extraction.html#placement-rules",
     
     "relUrl": "/metadata-extraction.html#placement-rules"
-  },"27": {
+  },"26": {
     "doc": "Themes & Customization",
     "title": "Themes &amp; Customization",
     "content": "PHWriter features 41 built-in themes spanning three distinct categories. ",
     "url": "/themes.html#themes--customization",
     
     "relUrl": "/themes.html#themes--customization"
-  },"28": {
+  },"27": {
     "doc": "Themes & Customization",
     "title": "1. Base Themes (10)",
     "content": "These use solid 16-color or 256-color palettes designed for maximum compatibility across various terminal emulators. | Theme | Character | Style Description | . | default | ◉ | Retro Modern — neon cyan and dark green | . | matrix | $ | Cyberpunk Green — high-contrast bright green | . | cyberpunk | ▲ | Neon Synthwave — hot pink, yellow, and cyan | . | dracula | 🧛 | Dracula Dark — purple, pink, green, and yellow | . | nord | ❄ | Nordic Frost — icy blues and clean white | . | monokai | ❖ | Monokai — classic pink, yellow, green, and orange | . | solarized | ☼ | Solarized Dark — muted cyan and green on dark | . | sunset | 🌅 | Golden Hour — deep reds, oranges, and gold | . | forest | 🌲 | Natural Autumn — forest greens and warm gold | . | classic | ` ` | Old-School Man — monochrome bold and underline | . ",
     "url": "/themes.html#1-base-themes-10",
     
     "relUrl": "/themes.html#1-base-themes-10"
-  },"29": {
+  },"28": {
     "doc": "Themes & Customization",
     "title": "2. Gradient Themes (10)",
     "content": "These themes declare specific gradient steps and color ramps. | Theme | Palette Stops | Accent Color | . | aurora | [51, 93, 129, 201] | Cyan → Purple | . | neon-noir | [201, 198, 196, 200] | Magenta → Pink | . | lava | [196, 202, 214, 220] | Red → Yellow | . | ocean | [17, 20, 27, 39, 51] | Blue → Cyan | . | toxic | [46, 82, 118, 154] | Acid Greens | . | midnight | [17, 54, 91, 128, 165] | Indigo → Violet | . | gold | [136, 172, 214, 220, 226] | Gold → Yellow | . | rose | [161, 197, 199, 207, 213] | Deep → Light Pink | . | steel | [233, 238, 243, 248, 253] | Dark → Light Grey | . | phwriter | flat | Classic orange/yellow | . ",
     "url": "/themes.html#2-gradient-themes-10",
     
     "relUrl": "/themes.html#2-gradient-themes-10"
-  },"30": {
+  },"29": {
     "doc": "Themes & Customization",
     "title": "3. Extended Themes (20)",
     "content": "These utilize advanced ASCII characters and unique color steps. | Theme | Symbol (Sect/Head) | Gradient Stops | Description | . | glitch | ▚ / ▞ | [196, 201, 45, 51] | Cyberpunk Glitchy | . | cosmic | ☄ / ★ | [17, 21, 57, 93, 129] | Space &amp; Starry Night | . | forest-mist | 🍀 / 🌿 | [22, 28, 64, 106, 244] | Moss Green / Earthy | . | blood-moon | 🥀 / 🩸 | [232, 52, 88, 124, 160] | Dark Vampire Red | . | retro-arcade | 🕹 / 👾 | [196, 201, 93, 39] | 80s Synthwave Arcade | . | abyss | ⦿ / ⁘ | [232, 17, 18, 19, 21] | Deep Ocean Trench | . | zen | ⛩ / ☯ | [245, 248, 252, 255] | Minimalist Zen | . | blaze | ☄ / 🔥 | [196, 202, 208, 214, 220] | Intense Fire | . | rust | ⚙ / ⚒ | [52, 94, 130, 166] | Industrial Rust | . | matrix-neon | ⁙ / ⁚ | [22, 28, 34, 40, 46] | Code Stream | . | quantum | ⬢ / ⬟ | [57, 93, 129, 81] | Subatomic Scientific | . | radioactive | ☣ / ☢ | [232, 190, 226, 190] | Toxic Nuclear Fallout | . | vaporwave | 🌴 / 🐬 | [201, 165, 129, 81, 51] | 80s Teal/Pink | . | nebula | ✹ / ✸ | [129, 135, 163, 199, 201] | Star Dust | . | crystal | ◆ / » | [159, 195, 231, 255] | Diamond &amp; Glacier Ice | . | copper | ╞ / ╡ | [130, 136, 172, 214] | Copper / Orange | . | royal | ⚜ / ✦ | [17, 20, 21, 220, 226] | Gold on Royal Blue | . | desert-heat | ☀ / 🏜 | [130, 166, 202, 214, 220] | Warm Sands | . | sheriff | ✶ / ↱ | [52, 94, 137, 180] | Western Leather | . | frost | ❄ / ❆ | [240, 244, 248, 117, 159] | Arctic Blizzard | . ",
     "url": "/themes.html#3-extended-themes-20",
     
     "relUrl": "/themes.html#3-extended-themes-20"
-  },"31": {
+  },"30": {
     "doc": "Themes & Customization",
     "title": "4. Custom Theme Configurations",
     "content": "You can define a custom theme by passing a hashtable containing the layout color and formatting variables: . $CustomTheme = @{ AccentColor = 'yellow' AccentFormat = 'bold' BorderColor = 'darkgray' BorderFormat = 'none' HeaderFg = 'white' SyntaxFg = 'white' DescriptionFg = 'white' ParamNameFg = 'cyan' ParamTypeFg = 'darkcyan' ParamReqFg = 'red' ParamReqFormat = 'bold' ParamDescFg = 'gray' ExampleFg = 'yellow' DocsFg = 'cyan' SectionChar = '◆' HeaderChar = '»' BorderTop = '┌────────────────────────────────────────────────────────┐' BorderBottom = '└────────────────────────────────────────────────────────┘' BorderMiddle = ' ' } New-PHWriter -Name 'MyModule' -Theme $CustomTheme . ",
     "url": "/themes.html#4-custom-theme-configurations",
     
     "relUrl": "/themes.html#4-custom-theme-configurations"
-  },"32": {
+  },"31": {
     "doc": "Themes & Customization",
     "title": "Themes & Customization",
     "content": " ",
     "url": "/themes.html",
     
     "relUrl": "/themes.html"
-  },"33": {
+  },"32": {
     "doc": "TUI Pager",
     "title": "TUI Pager",
     "content": "Invoke-PHPager (aliased as phpager) provides an interactive, terminal-native paging view for reading long help pages without cluttered text overflow. ",
     "url": "/tui-pager.html",
     
     "relUrl": "/tui-pager.html"
-  },"34": {
+  },"33": {
     "doc": "TUI Pager",
     "title": "Keyboard Controls",
     "content": "| Key | Action | . | Up / Down / PgUp / PgDn | Scroll lines or pages up/down | . | Home / End | Go to the top / bottom of the content | . | q / Escape | Exit pager | . ",
     "url": "/tui-pager.html#keyboard-controls",
     
     "relUrl": "/tui-pager.html#keyboard-controls"
-  },"35": {
+  },"34": {
     "doc": "TUI Pager",
     "title": "Alternate Screen Buffer",
     "content": "By default, the pager runs inside the alternate screen buffer, meaning when you exit, the original terminal contents are restored cleanly. ",
     "url": "/tui-pager.html#alternate-screen-buffer",
     
     "relUrl": "/tui-pager.html#alternate-screen-buffer"
-  },"36": {
+  },"35": {
     "doc": "TUI Pager",
     "title": "Non-Interactive Host Bypass",
     "content": "To prevent blocking in non-interactive environments (like CI/CD pipelines), set the following environment variable: . $env:PHWRITER_TEST_MODE = 'true' . This forces the pager to print all contents directly to standard output and exit immediately. ",

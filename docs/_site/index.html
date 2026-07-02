@@ -64,12 +64,18 @@
       font-family: 'JetBrains Mono', monospace !important;
     }
     main pre {
-      background-color: #171b21 !important;
-      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      background-color: #0b0d13 !important;
+      border: 1px solid rgba(255, 255, 255, 0.06) !important;
+      border-left: 3px solid #ff9f1a !important;
       padding: 15px;
-      border-radius: 6px;
+      border-radius: 8px;
       overflow-x: auto;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    main pre:hover {
+      border-color: rgba(255, 159, 26, 0.4) !important;
+      box-shadow: 0 10px 32px rgba(255, 159, 26, 0.08), 0 8px 24px rgba(0, 0, 0, 0.6);
     }
     main code {
       background-color: #171b21;
@@ -111,21 +117,7 @@
     </header>
 
     <main>
-      <h1 id="phwriter">PHWriter</h1>
-
-<div align="center" style="margin: 30px 0;">
-  <img src="https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png" width="128" alt="PHWriter Logo" />
-  <p style="font-size: 1.25em; font-weight: 500; color: #ff9f1a; margin-top: 15px;">
-    Formatted, ANSI-coloured terminal help output generator for PowerShell.
-  </p>
-  <p style="font-style: italic; color: #8a99ad;">
-    Replicating the structured clarity of Linux man pages with modern themeable aesthetics.
-  </p>
-</div>
-
-<hr />
-
-<h2 id="interactive-terminal-preview-vhs-demo">Interactive Terminal Preview (VHS Demo)</h2>
+      <h2 id="interactive-terminal-preview-vhs-demo">Interactive Terminal Preview (VHS Demo)</h2>
 
 <p>Below is a live-rendered visualization of a PHWriter CLI help screen using the <strong>aurora</strong> gradient theme and outer borders:</p>
 
