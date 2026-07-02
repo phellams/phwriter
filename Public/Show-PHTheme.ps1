@@ -78,7 +78,7 @@ function Show-PHTheme {
                 'copper', 'royal', 'desert-heat', 'sheriff', 'frost',
                 'custom-rgb', 'all'
         )]
-        [string]$Name = 'default',
+        [string]$Name = 'phwriter',
 
         [Parameter()]
         [ValidateSet('Box', 'Classic', 'Minimal', 'Man', 'Terminal', 'Typewriter')]
@@ -115,7 +115,7 @@ function Show-PHTheme {
 
         # ── Source type / header label ────────────────────────────────────────────
         [Parameter(HelpMessage = "Header label type: module, script, tool, plugin, cli, function, workflow.")]
-        [ValidateSet('module', 'script', 'tool', 'plugin', 'cli', 'function', 'workflow')]
+        [ValidateSet('module', 'script', 'tool', 'plugin', 'cli', 'function', 'workflow', 'router')]
         [string]$SourceType = 'module',
 
         # ── Banner text spacing ───────────────────────────────────────────────────
@@ -339,10 +339,13 @@ function Show-PHTheme {
                 $headerChar = if ($themeObj.ContainsKey('HeaderChar')) { $themeObj['HeaderChar'] } else { '▶' }
                 $styledHeadChar = if ($headerChar) { Format-ThemeText -String " $headerChar " -Theme $themeObj -Element 'Accent' } else { " " }
 
+                $typeStr = if ($SourceType -eq 'router') { 'CLI' } else { $SourceType.ToUpper() }
+                $cmdletLabel = if ($SourceType -eq 'router') { 'FUNCTION' } else { 'CMDLET' }
+
                 $headerParts = @()
-                $headerParts += "$(Format-ThemeText -String $SourceType.ToUpper() -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String 'SAMPLE' -Theme $themeObj -Element 'Header')"
-                $headerParts += "$(Format-ThemeText -String 'CMDLET' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String 'Get-SampleCmdlet' -Theme $themeObj -Element 'Header')"
-                $headerParts += "$(Format-ThemeText -String 'VERSION' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String 'v1.0.0' -Theme $themeObj -Element 'Version')"
+                $headerParts += "$(Format-ThemeText -String " $typeStr " -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String " SAMPLE " -Theme $themeObj -Element 'Header')"
+                $headerParts += "$(Format-ThemeText -String " $cmdletLabel " -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String " Get-SampleCmdlet " -Theme $themeObj -Element 'Header')"
+                $headerParts += "$(Format-ThemeText -String ' VERSION ' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String ' v1.0.0 ' -Theme $themeObj -Element 'Version')"
 
                 [console]::WriteLine(" " + ($headerParts -join $styledHeadChar))
                 [console]::WriteLine("─" * 70)

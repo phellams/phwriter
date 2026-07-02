@@ -102,7 +102,7 @@ function New-PHWriter {
         [switch]$Compact,
 
         [Parameter(HelpMessage = "Header label type: module, script, tool, or plugin.")]
-        [ValidateSet('module', 'script', 'tool', 'plugin', 'cli', 'function', 'workflow')]
+        [ValidateSet('module', 'script', 'tool', 'plugin', 'cli', 'function', 'workflow', 'router')]
         [string]$SourceType = 'module',
 
         [Parameter(HelpMessage = "Theme name or custom theme hashtable.")]
@@ -120,7 +120,7 @@ function New-PHWriter {
             if ($_ -is [string] -and $validNames -contains $_) { return $true }
             throw "Invalid -Theme value '$_'. Provide a valid built-in theme name or a custom theme hashtable."
         })]
-        $Theme = 'default',
+        $Theme = 'phwriter',
 
         [Parameter(HelpMessage = "The ASCII banner layout style.")]
         [ValidateSet('Box', 'Classic', 'Minimal', 'Man', 'Terminal', 'Typewriter')]
@@ -149,6 +149,13 @@ function New-PHWriter {
         [Parameter(HelpMessage = "Outer border corner and side style. One of: Rounded, Square, Double, Block, Simple.")]
         [ValidateSet('Rounded', 'Square', 'Double', 'Block', 'Simple')]
         [string]$OuterBorderStyle = 'Rounded',
+
+        [Parameter(HelpMessage = "The target width of the help output. Can be 'man' (80 cols), 'full' (console width), or a custom integer.")]
+        [object]$Width = 'full',
+
+        [Parameter(HelpMessage = "The output mode: 'Standard' (direct dump to standard console), 'Alt' (page dump in alternate screen buffer), 'String' (return output as string), or 'Auto' (page if fits, else alt).")]
+        [ValidateSet('Standard', 'Alt', 'String', 'Auto')]
+        [string]$OutMode = 'Standard',
 
         [Parameter(HelpMessage = "Display Help for New-PHWriter.")]
         [switch]$Help
@@ -295,12 +302,6 @@ function New-PHWriter {
             $themeObj = Get-PHTheme -Name $Theme
         }
 
-        if ($OuterBorder) {
-            $originalOut = [System.Console]::Out
-            $stringWriter = [System.IO.StringWriter]::new()
-            [System.Console]::SetOut($stringWriter)
-        }
-
         # Load JSON data if a JsonFile is provided
         if ($JsonFile) {
             $jsonFile_FullPath = Get-ChildItem -Path $JsonFile | Select-Object -First 1
@@ -347,285 +348,374 @@ function New-PHWriter {
         $indentString  = " " * $Indent
         $blankLine     = "`n" * $LineSpacing  # blank lines between param rows
 
-        # Resolve Theme (already resolved at the beginning)
+        # ── Resolve Width ─────────────────────────────────────────────────────
+        $resolvedWidth = 80
+        $consoleWidth = 80
+        try {
+            $consoleWidth = [Console]::WindowWidth
+        } catch {}
 
-        # Output Logo
-        Write-PHAsciiLogo -Name $Name -Version $Version -Theme $themeObj -Layout $Layout -CustomLogo $CustomLogo -Gradient:$Gradient -CustomGradient $CustomGradient
-
-        # Sections config
-        $sectionChar = if ($themeObj.ContainsKey('SectionChar')) { $themeObj['SectionChar'] } else { '◉' }
-        $headerChar = if ($themeObj.ContainsKey('HeaderChar')) { $themeObj['HeaderChar'] } else { '▶' }
-        
-        $styledSecChar = if ($sectionChar) { Format-ThemeText -String "$sectionChar " -Theme $themeObj -Element 'Accent' } else { "" }
-        $styledHeadChar = if ($headerChar) { Format-ThemeText -String " $headerChar " -Theme $themeObj -Element 'Accent' } else { " " }
-
-        # Display Version / Metadata Header
-        # Format: <SourceType> <Name> ▶ CMDLET <Cmdlet> ▶ VERSION <Version>
-        $typeLabel  = $SourceType.ToUpper()
-        $headerParts = @()
-        $headerParts += "$(Format-ThemeText -String $typeLabel -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String $Name -Theme $themeObj -Element 'Header')"
-        if ($CommandInfo.cmdlet) {
-            $headerParts += "$(Format-ThemeText -String 'CMDLET' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String ($CommandInfo.cmdlet) -Theme $themeObj -Element 'Header')"
-        }
-        $headerParts += "$(Format-ThemeText -String 'VERSION' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String "v$Version" -Theme $themeObj -Element 'Version')"
-
-        [console]::WriteLine($indentString + " " + ($headerParts -join $styledHeadChar) + " ")
-        [console]::WriteLine()
-
-        # 1. SYNTAX Section
-        if ($CommandInfo.synopsis) {
-            $syntaxTitle = Format-ThemeText -String "SYNTAX" -Theme $themeObj -Element 'Accent'
-            [console]::WriteLine("${indentString}${styledSecChar}${syntaxTitle}")
-            $syntaxText = Format-ThemeText -String ($CommandInfo.synopsis) -Theme $themeObj -Element 'Syntax'
-            [console]::WriteLine($(New-Paragraph -position 100 -indent ($Indent + 2) -string $syntaxText))
-            [console]::WriteLine()
-        }
-
-        # 2. DESCRIPTION Section
-        if ($CommandInfo.description) {
-            $descTitle = Format-ThemeText -String "DESCRIPTION" -Theme $themeObj -Element 'Accent'
-            [console]::WriteLine("${indentString}${styledSecChar}${descTitle}")
-            $descText = Format-ThemeText -String ($CommandInfo.description) -Theme $themeObj -Element 'Description'
-            [console]::WriteLine($(New-Paragraph -position 100 -indent ($Indent + 2) -string $descText))
-            [console]::WriteLine()
-        }
-
-        # 3. SUBCOMMANDS Section (For Router functions)
-        if ($Subcommands -and $Subcommands.Count -gt 0) {
-            $subTitle = Format-ThemeText -String "SUBCOMMANDS" -Theme $themeObj -Element 'Accent'
-            [console]::WriteLine("${indentString}${styledSecChar}${subTitle}")
-
-            $maxSubLength = 0
-            foreach ($sub in $Subcommands) {
-                if ($sub.name.Length -gt $maxSubLength) {
-                    $maxSubLength = $sub.name.Length
-                }
-            }
-
-            foreach ($sub in $Subcommands) {
-                $subNameFormatted = $sub.name.PadRight($maxSubLength + $Padding)
-                $styledSubName = Format-ThemeText -String $subNameFormatted -Theme $themeObj -Element 'ParamName'
-                $styledSubSyntax = Format-ThemeText -String $sub.syntax -Theme $themeObj -Element 'ParamType'
-                $styledSubDesc = Format-ThemeText -String $sub.description -Theme $themeObj -Element 'ParamDesc'
-
-                [console]::WriteLine("${indentString}   ${styledSubName}${styledSubSyntax}")
-                $descIndent = $indentString + (" " * ($maxSubLength + $Padding + 4))
-                [console]::WriteLine("${descIndent}${styledSubDesc}")
-                [console]::WriteLine()
+        if ($null -eq $Width -or $Width -eq 'full') {
+            $resolvedWidth = $consoleWidth
+        } elseif ($Width -eq 'man') {
+            $resolvedWidth = [Math]::Min(80, $consoleWidth)
+        } else {
+            if ($Width -match '^\d+$') {
+                $resolvedWidth = [int]$Width
+            } else {
+                $resolvedWidth = $consoleWidth
             }
         }
 
-        # 4. PARAMETERS Section
-        if ($ParamTable -and $ParamTable.Count -gt 0) {
-            $paramTitle = Format-ThemeText -String "PARAMETERS" -Theme $themeObj -Element 'Accent'
-            [console]::WriteLine("${indentString}${styledSecChar}${paramTitle}")
-
-            $maxParamLength = 0
-            $maxTypeLength = 0
-
-            foreach ($paramInfo in $ParamTable) {
-                if (-not ($paramInfo.name -and $paramInfo.param -and $paramInfo.type -and $paramInfo.description)) {
-                    continue
-                }
-                $paramField = "-$($paramInfo.param)"
-                if ($paramField.Length -gt $maxParamLength) {
-                    $maxParamLength = $paramField.Length
-                }
-                $typeField = "[$($paramInfo.type)]"
-                if ($typeField.Length -gt $maxTypeLength) {
-                    $maxTypeLength = $typeField.Length
-                }
+        # Safeguard: Minimum width constraint
+        $minWidth = 45
+        if ($resolvedWidth -lt $minWidth) {
+            $errMsg = "[PHWriter] Console width ($resolvedWidth) is below the minimum required width ($minWidth)."
+            if ($OutMode -eq 'String') {
+                return @($errMsg)
+            } else {
+                [System.Console]::WriteLine($errMsg)
+                return
             }
+        }
 
-            foreach ($paramInfo in $ParamTable) {
-                if (-not ($paramInfo.name -and $paramInfo.param -and $paramInfo.type -and $paramInfo.description)) {
-                    continue
-                }
+        # Adjust content width based on whether we wrap inside an outer border
+        $contentWidth = if ($OuterBorder) { $resolvedWidth - 4 } else { $resolvedWidth }
+        if ($contentWidth -lt 20) { $contentWidth = 20 }
 
-                $paramType = "[$($paramInfo.type)]"
-                $paramName = $paramInfo.name
-                $paramDesc = $paramInfo.description
-                $required = $paramInfo.required -or $false
-                $inline = [bool]$paramInfo.inline
-
-                # Swap (req) to the end of param name, styled.
-                $reqText = if ($required) { " " + (Format-ThemeText -String "(Req)" -Theme $themeObj -Element 'ParamReq') } else { "" }
-
-                # Format alias with pipe coloring if present
-                if ($paramInfo.param -like '*|*') {
-                    $parts = $paramInfo.param -split '\|', 2
-                    $shorthandRaw = "-$($parts[0])"
-                    $pipeRaw = "|"
-                    $targetLongNameLength = ($maxParamLength + $Padding) - ($shorthandRaw.Length + 1)
-                    $longNameRaw = $parts[1].PadRight($targetLongNameLength)
-
-                    $styledShorthand = Format-ThemeText -String $shorthandRaw -Theme $themeObj -Element 'ParamName'
-                    $styledPipe = Format-ThemeText -String $pipeRaw -Theme $themeObj -Element 'Border'
-                    $styledLongName = Format-ThemeText -String $longNameRaw -Theme $themeObj -Element 'ParamName'
-                    $styledAlias = $styledShorthand + $styledPipe + $styledLongName
+        # ── Define local formatting & wrapping helpers ────────────────────────
+        $HighlightDescription = {
+            param([string]$Text, $Theme)
+            if ([string]::IsNullOrEmpty($Text)) { return "" }
+            $descParts = $Text -split "'"
+            $resultParts = [System.Collections.Generic.List[string]]::new()
+            for ($i = 0; $i -lt $descParts.Count; $i++) {
+                if ($i % 2 -eq 1) {
+                    $quotedText = "'$($descParts[$i])'"
+                    $colorValue = if ($Theme.ContainsKey('AccentColor')) { $Theme['AccentColor'] } else { 'cyan' }
+                    $styledQuoted = New-AsciiColor -String $quotedText -Color $colorValue -Format @('bold', 'italic')
+                    $resultParts.Add($styledQuoted)
                 } else {
-                    $paramAlias = "-$($paramInfo.param)"
-                    $formattedAlias = $paramAlias.PadRight($maxParamLength + $Padding)
-                    $styledAlias = Format-ThemeText -String $formattedAlias -Theme $themeObj -Element 'ParamName'
-                }
-
-                $formattedType = $paramType.PadRight($maxTypeLength + $Padding)
-                $styledType = Format-ThemeText -String $formattedType -Theme $themeObj -Element 'ParamType'
-                $styledName = Format-ThemeText -String $paramName -Theme $themeObj -Element 'Header'
-
-                [console]::Write("${indentString}   ${styledAlias}${styledType}${styledName}${reqText}")
-
-                # Format single quotes inside $paramDesc
-                $descParts = $paramDesc -split "'"
-                $resultParts = [System.Collections.Generic.List[string]]::new()
-                for ($i = 0; $i -lt $descParts.Count; $i++) {
-                    if ($i % 2 -eq 1) {
-                        $quotedText = "'$($descParts[$i])'"
-                        $colorValue = if ($themeObj.ContainsKey('AccentColor')) { $themeObj['AccentColor'] } else { 'cyan' }
-                        $styledQuoted = New-AsciiColor -String $quotedText -Color $colorValue -Format @('bold', 'italic')
-                        $resultParts.Add($styledQuoted)
-                    } else {
-                        if ($descParts[$i].Length -gt 0) {
-                            $styledOutside = Format-ThemeText -String $descParts[$i] -Theme $themeObj -Element 'ParamDesc'
-                            $resultParts.Add($styledOutside)
-                        }
+                    if ($descParts[$i].Length -gt 0) {
+                        $styledOutside = Format-ThemeText -String $descParts[$i] -Theme $Theme -Element 'ParamDesc'
+                        $resultParts.Add($styledOutside)
                     }
                 }
-                $styledDescText = $resultParts -join ""
-
-                # Description is always printed on the same line as the parameter name
-                $styledDesc = "  " + $styledDescText
-                [console]::WriteLine($styledDesc)
-                # Emit $LineSpacing blank lines between param entries
-                for ($ls = 0; $ls -lt $LineSpacing; $ls++) { [console]::WriteLine() }
             }
+            return $resultParts -join ""
         }
 
-        # 5. EXAMPLES Section
-        if ($Examples -and $Examples.Count -gt 0) {
-            $exTitle = Format-ThemeText -String "EXAMPLES" -Theme $themeObj -Element 'Accent'
-            [console]::WriteLine("${indentString}${styledSecChar}${exTitle}")
+        $WrapPlainParagraph = {
+            param([string]$String, [int]$Position, [int]$Indent)
+            if ([string]::IsNullOrEmpty($String)) { return @() }
+            $words = $String.Split(' ')
+            $lines = [System.Collections.Generic.List[string]]::new()
+            $currentLine = [System.Text.StringBuilder]::new()
+            
+            foreach ($word in $words) {
+                $wordVisualLen = Get-ClapVisibleLength -Text $word
+                if ($currentLine.Length + $wordVisualLen -gt $Position) {
+                    if ($currentLine.Length -gt 0) {
+                        [void]$lines.Add((" " * $Indent) + $currentLine.ToString().TrimEnd())
+                        [void]$currentLine.Clear()
+                    }
+                }
+                [void]$currentLine.Append($word).Append(' ')
+            }
+            if ($currentLine.Length -gt 0) {
+                [void]$lines.Add((" " * $Indent) + $currentLine.ToString().TrimEnd())
+            }
+            return $lines.ToArray()
+        }
 
-            $getHighlightedExample = {
-                param(
-                    [string]$ExText,
-                    $Theme
-                )
-                $cmdletFormat = if ($Theme.AccentFormat) { @($Theme.AccentFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
-                $cParams = @{ String = "X"; Color = $Theme.AccentColor }
-                $cFormatList = [System.Collections.Generic.List[string]]::new()
-                foreach ($f in $cmdletFormat) { [void]$cFormatList.Add($f) }
-                if (-not $cFormatList.Contains('bold')) { [void]$cFormatList.Add('bold') }
-                $cParams['Format'] = $cFormatList.ToArray()
-                $cmdletColor = New-AsciiColor @cParams
-                $cmdletSeq = if ($cmdletColor.EndsWith("[0m")) { $cmdletColor.Substring(0, $cmdletColor.Length - 5) } else { "" }
+        # ── Setup Dynamic Resize Callback ─────────────────────────────────────
+        $outerBoundParams = [hashtable]::new($PSBoundParameters)
+        $onResizeCallback = {
+            param([int]$newWidth, [int]$newHeight)
+            $params = $outerBoundParams.Clone()
+            $params['OutMode'] = 'String'
+            # Width will be re-resolved to the new console dimensions internally
+            New-PHWriter @params
+        }
 
-                $pFormat = if ($Theme.ParamNameFormat) { @($Theme.ParamNameFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
-                $pParams = @{ String = "X"; Color = $Theme.ParamNameFg }
-                if ($pFormat -and $pFormat.Count -gt 0) { $pParams['Format'] = $pFormat }
-                $pEsc = New-AsciiColor @pParams
-                $paramSeq = if ($pEsc.EndsWith("[0m")) { $pEsc.Substring(0, $pEsc.Length - 5) } else { "" }
+        # Redirect Console output to capture the entire formatted document
+        $originalOut = [System.Console]::Out
+        $stringWriter = [System.IO.StringWriter]::new()
+        [System.Console]::SetOut($stringWriter)
 
-                $sFormat = if ($Theme.ParamTypeFormat) { @($Theme.ParamTypeFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
-                $sParams = @{ String = "X"; Color = $Theme.ParamTypeFg }
-                if ($sFormat -and $sFormat.Count -gt 0) { $sParams['Format'] = $sFormat }
-                $sEsc = New-AsciiColor @sParams
-                $stringSeq = if ($sEsc.EndsWith("[0m")) { $sEsc.Substring(0, $sEsc.Length - 5) } else { "" }
+        try {
+            # Output Logo
+            Write-PHAsciiLogo -Name $Name -Version $Version -Theme $themeObj -Layout $Layout -CustomLogo $CustomLogo -Gradient:$Gradient -CustomGradient $CustomGradient
 
-                $reset = [char]27 + "[0m"
+            # Sections config
+            $sectionChar = if ($themeObj.ContainsKey('SectionChar')) { $themeObj['SectionChar'] } else { '◉' }
+            $headerChar = if ($themeObj.ContainsKey('HeaderChar')) { $themeObj['HeaderChar'] } else { '▶' }
+            
+            $styledSecChar = if ($sectionChar) { Format-ThemeText -String "$sectionChar " -Theme $themeObj -Element 'SectionChar' } else { "" }
+            $styledHeadChar = if ($headerChar) { Format-ThemeText -String " $headerChar " -Theme $themeObj -Element 'Accent' } else { " " }
 
-                $pattern = '(?<string>\''[^\'']*\''|"[^"]*")|(?<param>-\w+(\|\w+)?)|(?<cmdlet>\b[A-Za-z]+-[A-Za-z]+\w*\b)|(?<word>\S+)|(?<space>\s+)'
-                $matches = [System.Text.RegularExpressions.Regex]::Matches($ExText, $pattern)
-                $sb = [System.Text.StringBuilder]::new()
-                $seenFirstWord = $false
+            # Display Version / Metadata Header
+            # Format: <SourceType> <Name> ▶ CMDLET <Cmdlet> ▶ VERSION <Version>
+            # For router, displays CLI <Name> ▶ FUNCTION <Cmdlet> ▶ VERSION <Version>
+            # Pad labels with 1 space on left/right for tag appearance.
+            $typeStr = if ($SourceType -eq 'router') { 'CLI' } else { $SourceType.ToUpper() }
+            $cmdletLabel = if ($SourceType -eq 'router') { 'FUNCTION' } else { 'CMDLET' }
 
-                foreach ($m in $matches) {
-                    if ($m.Groups['string'].Success) {
-                        [void]$sb.Append("${stringSeq}$($m.Value)${reset}")
-                    } elseif ($m.Groups['param'].Success) {
-                        if ($m.Value -like '*|*') {
-                            $parts = $m.Value -split '\|', 2
-                            $pipeEsc = New-AsciiColor -String "|" -Color $Theme.BorderColor
-                            [void]$sb.Append("${paramSeq}$($parts[0])${reset}${pipeEsc}${paramSeq}$($parts[1])${reset}")
-                        } else {
-                            [void]$sb.Append("${paramSeq}$($m.Value)${reset}")
+            $headerParts = @()
+            $headerParts += "$(Format-ThemeText -String " $typeStr " -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String " $Name " -Theme $themeObj -Element 'Header')"
+            if ($CommandInfo.cmdlet) {
+                $headerParts += "$(Format-ThemeText -String " $cmdletLabel " -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String " $($CommandInfo.cmdlet) " -Theme $themeObj -Element 'Header')"
+            }
+            $headerParts += "$(Format-ThemeText -String ' VERSION ' -Theme $themeObj -Element 'Accent') $(Format-ThemeText -String " v$Version " -Theme $themeObj -Element 'Version')"
+
+            [console]::WriteLine($indentString + " " + ($headerParts -join $styledHeadChar) + " ")
+            [console]::WriteLine()
+
+            # 1. SYNTAX Section
+            if ($CommandInfo.synopsis) {
+                $syntaxTitle = Format-ThemeText -String "SYNTAX" -Theme $themeObj -Element 'Accent'
+                [console]::WriteLine("${indentString}${styledSecChar}${syntaxTitle}")
+                $syntaxWrapCol = $contentWidth - ($Indent + 2) - 4
+                if ($syntaxWrapCol -lt 20) { $syntaxWrapCol = 20 }
+                $wrappedSyntaxLines = & $WrapPlainParagraph ($CommandInfo.synopsis) $syntaxWrapCol ($Indent + 2)
+                foreach ($line in $wrappedSyntaxLines) {
+                    $indentPart = $line.Substring(0, $Indent + 2)
+                    $textPart = $line.Substring($Indent + 2)
+                    $styledText = Format-ThemeText -String $textPart -Theme $themeObj -Element 'Syntax'
+                    [console]::WriteLine($indentPart + $styledText)
+                }
+                [console]::WriteLine()
+            }
+
+            # 2. DESCRIPTION Section
+            if ($CommandInfo.description) {
+                $descTitle = Format-ThemeText -String "DESCRIPTION" -Theme $themeObj -Element 'Accent'
+                [console]::WriteLine("${indentString}${styledSecChar}${descTitle}")
+                $descWrapCol = $contentWidth - ($Indent + 2) - 4
+                if ($descWrapCol -lt 20) { $descWrapCol = 20 }
+                $wrappedDescLines = & $WrapPlainParagraph ($CommandInfo.description) $descWrapCol ($Indent + 2)
+                foreach ($line in $wrappedDescLines) {
+                    $indentPart = $line.Substring(0, $Indent + 2)
+                    $textPart = $line.Substring($Indent + 2)
+                    $styledText = & $HighlightDescription $textPart $themeObj
+                    [console]::WriteLine($indentPart + $styledText)
+                }
+                [console]::WriteLine()
+            }
+
+            # 3. SUBCOMMANDS Section (For Router functions)
+            if ($Subcommands -and $Subcommands.Count -gt 0) {
+                $subTitle = Format-ThemeText -String "SUBCOMMANDS" -Theme $themeObj -Element 'Accent'
+                [console]::WriteLine("${indentString}${styledSecChar}${subTitle}")
+
+                $maxSubLength = 0
+                foreach ($sub in $Subcommands) {
+                    if ($sub.name.Length -gt $maxSubLength) {
+                        $maxSubLength = $sub.name.Length
+                    }
+                }
+
+                foreach ($sub in $Subcommands) {
+                    $subNameFormatted = $sub.name.PadRight($maxSubLength + $Padding)
+                    $styledSubName = Format-ThemeText -String $subNameFormatted -Theme $themeObj -Element 'ParamName'
+                    $styledSubSyntax = Format-ThemeText -String $sub.syntax -Theme $themeObj -Element 'ParamType'
+                    $styledSubDesc = Format-ThemeText -String $sub.description -Theme $themeObj -Element 'ParamDesc'
+
+                    [console]::WriteLine("${indentString}   ${styledSubName}${styledSubSyntax}")
+                    $descIndent = $indentString + (" " * ($maxSubLength + $Padding + 4))
+                    $subDescWrapCol = $contentWidth - $descIndent.Length - 4
+                    if ($subDescWrapCol -lt 20) { $subDescWrapCol = 20 }
+                    [console]::WriteLine($(New-Paragraph -position $subDescWrapCol -indent $descIndent.Length -string $styledSubDesc))
+                    [console]::WriteLine()
+                }
+            }
+
+            # 4. PARAMETERS Section
+            if ($ParamTable -and $ParamTable.Count -gt 0) {
+                $paramTitle = Format-ThemeText -String "PARAMETERS" -Theme $themeObj -Element 'Accent'
+                [console]::WriteLine("${indentString}${styledSecChar}${paramTitle}")
+
+                $maxParamLength = 0
+                $maxTypeLength = 0
+
+                foreach ($paramInfo in $ParamTable) {
+                    if (-not ($paramInfo.name -and $paramInfo.param -and $paramInfo.type -and $paramInfo.description)) {
+                        continue
+                    }
+                    $paramField = "-$($paramInfo.param)"
+                    if ($paramField.Length -gt $maxParamLength) {
+                        $maxParamLength = $paramField.Length
+                    }
+                    $typeField = "[$($paramInfo.type)]"
+                    if ($typeField.Length -gt $maxTypeLength) {
+                        $maxTypeLength = $typeField.Length
+                    }
+                }
+
+                foreach ($paramInfo in $ParamTable) {
+                    if (-not ($paramInfo.name -and $paramInfo.param -and $paramInfo.type -and $paramInfo.description)) {
+                        continue
+                    }
+
+                    $paramType = "[$($paramInfo.type)]"
+                    $paramName = $paramInfo.name
+                    $paramDesc = $paramInfo.description
+                    $required = $paramInfo.required -or $false
+                    $inline = [bool]$paramInfo.inline
+
+                    $reqText = if ($required) { " " + (Format-ThemeText -String "(Req)" -Theme $themeObj -Element 'ParamReq') } else { "" }
+
+                    if ($paramInfo.param -like '*|*') {
+                        $parts = $paramInfo.param -split '\|', 2
+                        $shorthandRaw = "-$($parts[0])"
+                        $pipeRaw = "|"
+                        $targetLongNameLength = ($maxParamLength + $Padding) - ($shorthandRaw.Length + 1)
+                        $longNameRaw = $parts[1].PadRight($targetLongNameLength)
+
+                        $styledShorthand = Format-ThemeText -String $shorthandRaw -Theme $themeObj -Element 'ParamName'
+                        $styledPipe = Format-ThemeText -String $pipeRaw -Theme $themeObj -Element 'Border'
+                        $styledLongName = Format-ThemeText -String $longNameRaw -Theme $themeObj -Element 'ParamName'
+                        $styledAlias = $styledShorthand + $styledPipe + $styledLongName
+                    } else {
+                        $paramAlias = "-$($paramInfo.param)"
+                        $formattedAlias = $paramAlias.PadRight($maxParamLength + $Padding)
+                        $styledAlias = Format-ThemeText -String $formattedAlias -Theme $themeObj -Element 'ParamName'
+                    }
+
+                    $formattedType = $paramType.PadRight($maxTypeLength + $Padding)
+                    $styledType = Format-ThemeText -String $formattedType -Theme $themeObj -Element 'ParamType'
+                    $styledName = Format-ThemeText -String $paramName -Theme $themeObj -Element 'Header'
+
+                    [console]::Write("${indentString}   ${styledAlias}${styledType}${styledName}${reqText}")
+
+                    # Layout description with width constraint
+                    $descIndent = $Indent + 6
+                    $wrapCol = $contentWidth - $descIndent - 2
+                    if ($wrapCol -lt 20) { $wrapCol = 20 }
+
+                    $reqLen = if ($required) { 6 } else { 0 }
+                    $prefixPlainLen = $Indent + 3 + ($maxParamLength + $Padding) + ($maxTypeLength + $Padding) + $paramName.Length + $reqLen
+                    $remSpace = $contentWidth - $prefixPlainLen - 2
+                    
+                    $isInline = $false
+                    if ($inline -and $remSpace -ge 20 -and $paramDesc.Length -le $remSpace) {
+                        $isInline = $true
+                    }
+
+                    if ($isInline) {
+                        $styledDescText = & $HighlightDescription $paramDesc $themeObj
+                        [console]::WriteLine("  " + $styledDescText)
+                    } else {
+                        [console]::WriteLine()
+                        $wrappedLines = & $WrapPlainParagraph $paramDesc $wrapCol $descIndent
+                        foreach ($line in $wrappedLines) {
+                            $indentPart = $line.Substring(0, $descIndent)
+                            $textPart = $line.Substring($descIndent)
+                            $styledText = & $HighlightDescription $textPart $themeObj
+                            [console]::WriteLine($indentPart + $styledText)
                         }
-                    } elseif ($m.Groups['cmdlet'].Success) {
-                        $seenFirstWord = $true
-                        [void]$sb.Append("${cmdletSeq}$($m.Value)${reset}")
-                    } elseif ($m.Groups['word'].Success) {
-                        if (-not $seenFirstWord) {
+                    }
+
+                    for ($ls = 0; $ls -lt $LineSpacing; $ls++) { [console]::WriteLine() }
+                }
+            }
+
+            # 5. EXAMPLES Section
+            if ($Examples -and $Examples.Count -gt 0) {
+                $exTitle = Format-ThemeText -String "EXAMPLES" -Theme $themeObj -Element 'Accent'
+                [console]::WriteLine("${indentString}${styledSecChar}${exTitle}")
+
+                $getHighlightedExample = {
+                    param(
+                        [string]$ExText,
+                        $Theme
+                    )
+                    $cmdletFormat = if ($Theme.AccentFormat) { @($Theme.AccentFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
+                    $cParams = @{ String = "X"; Color = $Theme.AccentColor }
+                    $cFormatList = [System.Collections.Generic.List[string]]::new()
+                    foreach ($f in $cmdletFormat) { [void]$cFormatList.Add($f) }
+                    if (-not $cFormatList.Contains('bold')) { [void]$cFormatList.Add('bold') }
+                    $cParams['Format'] = $cFormatList.ToArray()
+                    $cmdletColor = New-AsciiColor @cParams
+                    $cmdletSeq = if ($cmdletColor.EndsWith("[0m")) { $cmdletColor.Substring(0, $cmdletColor.Length - 5) } else { "" }
+
+                    $pFormat = if ($Theme.ParamNameFormat) { @($Theme.ParamNameFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
+                    $pParams = @{ String = "X"; Color = $Theme.ParamNameFg }
+                    if ($pFormat -and $pFormat.Count -gt 0) { $pParams['Format'] = $pFormat }
+                    $pEsc = New-AsciiColor @pParams
+                    $paramSeq = if ($pEsc.EndsWith("[0m")) { $pEsc.Substring(0, $pEsc.Length - 5) } else { "" }
+
+                    $sFormat = if ($Theme.ParamTypeFormat) { @($Theme.ParamTypeFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
+                    $sParams = @{ String = "X"; Color = $Theme.ParamTypeFg }
+                    if ($sFormat -and $sFormat.Count -gt 0) { $sParams['Format'] = $sFormat }
+                    $sEsc = New-AsciiColor @sParams
+                    $stringSeq = if ($sEsc.EndsWith("[0m")) { $sEsc.Substring(0, $sEsc.Length - 5) } else { "" }
+
+                    $reset = [char]27 + "[0m"
+
+                    $pattern = '(?<string>\''[^\'']*\''|"[^"]*")|(?<param>-\w+(\|\w+)?)|(?<cmdlet>\b[A-Za-z]+-[A-Za-z]+\w*\b)|(?<word>\S+)|(?<space>\s+)'
+                    $matches = [System.Text.RegularExpressions.Regex]::Matches($ExText, $pattern)
+                    $sb = [System.Text.StringBuilder]::new()
+                    $seenFirstWord = $false
+
+                    foreach ($m in $matches) {
+                        if ($m.Groups['string'].Success) {
+                            [void]$sb.Append("${stringSeq}$($m.Value)${reset}")
+                        } elseif ($m.Groups['param'].Success) {
+                            if ($m.Value -like '*|*') {
+                                $parts = $m.Value -split '\|', 2
+                                $pipeEsc = New-AsciiColor -String "|" -Color $Theme.BorderColor
+                                [void]$sb.Append("${paramSeq}$($parts[0])${reset}${pipeEsc}${paramSeq}$($parts[1])${reset}")
+                            } else {
+                                [void]$sb.Append("${paramSeq}$($m.Value)${reset}")
+                            }
+                        } elseif ($m.Groups['cmdlet'].Success) {
                             $seenFirstWord = $true
                             [void]$sb.Append("${cmdletSeq}$($m.Value)${reset}")
+                        } elseif ($m.Groups['word'].Success) {
+                            if (-not $seenFirstWord) {
+                                $seenFirstWord = $true
+                                [void]$sb.Append("${cmdletSeq}$($m.Value)${reset}")
+                            } else {
+                                [void]$sb.Append($m.Value)
+                            }
                         } else {
                             [void]$sb.Append($m.Value)
                         }
-                    } else {
-                        [void]$sb.Append($m.Value)
                     }
+                    return $sb.ToString()
                 }
-                return $sb.ToString()
+
+                foreach ($example in $Examples) {
+                    $cleanedExample = $example.Replace("//", "/")
+                    $styledEx = & $getHighlightedExample $cleanedExample $themeObj
+                    [console]::WriteLine("${indentString}    ${styledEx}`n")
+                }
             }
 
-            foreach ($example in $Examples) {
-                $cleanedExample = $example.Replace("//", "/")
-                $styledEx = & $getHighlightedExample $cleanedExample $themeObj
-                [console]::WriteLine("${indentString}    ${styledEx}`n")
+            # 8. Docs / Source Link
+            if ($CommandInfo.source) {
+                $docsTitle = Format-ThemeText -String "★ Docs:" -Theme $themeObj -Element 'Accent'
+                $docsLink = Format-ThemeText -String ($CommandInfo.source) -Theme $themeObj -Element 'Docs'
+                [console]::WriteLine("${indentString} ${docsTitle} ${docsLink} for more info")
+                [console]::WriteLine()
             }
-        }
-
-        # 6. Docs / Source Link
-        if ($CommandInfo.source) {
-            $docsTitle = Format-ThemeText -String "★ Docs:" -Theme $themeObj -Element 'Accent'
-            $docsLink = Format-ThemeText -String ($CommandInfo.source) -Theme $themeObj -Element 'Docs'
-            [console]::WriteLine("${indentString} ${docsTitle} ${docsLink} for more info")
-            [console]::WriteLine()
-        }
-
-        if ($OuterBorder) {
+        } finally {
             [System.Console]::SetOut($originalOut)
-            $capturedText = $stringWriter.ToString()
+        }
 
-            # Now parse, pad, and format the captured lines
+        $capturedText = $stringWriter.ToString()
+        $finalString = $capturedText
+
+        # Apply Outer Border wrapping if requested
+        if ($OuterBorder) {
             $lines = $capturedText -split '\r?\n'
             if ($lines.Count -gt 0 -and [string]::IsNullOrEmpty($lines[-1])) {
                 $lines = $lines[0..($lines.Count - 2)]
             }
 
-            # Measure visual widths
-            $MeasureWidth = {
-                param([string]$Text)
-                $plain = [System.Text.RegularExpressions.Regex]::Replace($Text, '\x1b\[[0-?]*[ -/]*[@-~]', '')
-                $width = 0
-                $chars = $plain.ToCharArray()
-                $i = 0
-                while ($i -lt $chars.Length) {
-                    $ch = $chars[$i]
-                    if ([char]::IsHighSurrogate($ch) -and ($i + 1) -lt $chars.Length -and [char]::IsLowSurrogate($chars[$i + 1])) {
-                        $cp = [char]::ConvertToUtf32($ch, $chars[$i + 1])
-                        $width += 2
-                        $i += 2
-                        continue
-                    }
-                    $cp = [int]$ch
-                    if (($cp -ge 0x1F300 -and $cp -le 0x1FAFF) -or
-                        ($cp -ge 0x2600  -and $cp -le 0x27BF)  -or
-                        ($cp -ge 0xFE30  -and $cp -le 0xFE4F)  -or
-                        ($cp -ge 0x4E00  -and $cp -le 0x9FFF)) {
-                        $width += 2
-                    } else {
-                        $width += 1
-                    }
-                    $i++
-                }
-                return $width
-            }
-
-            $maxW = 0
-            foreach ($line in $lines) {
-                $w = & $MeasureWidth $line
-                if ($w -gt $maxW) { $maxW = $w }
-            }
+            $maxW = $resolvedWidth - 4
+            if ($maxW -lt 20) { $maxW = 20 }
 
             # Resolve border characters based on OuterBorderStyle
             switch ($OuterBorderStyle) {
@@ -684,13 +774,36 @@ function New-PHWriter {
                 $styledRight  = Format-ThemeText -String $borderRight  -Theme $themeObj -Element 'Border'
             }
 
-            # Print bordered output
-            [console]::WriteLine($styledTop)
+            # Build bordered string using high-performance StringBuilder
+            $sbBordered = [System.Text.StringBuilder]::new()
+            [void]$sbBordered.AppendLine($styledTop)
             foreach ($line in $lines) {
                 $padded = Pad-AnsiString -Text $line -Width $maxW -Align 'Left' -PadChar ' '
-                [console]::WriteLine("${styledLeft} ${padded} ${styledRight}")
+                [void]$sbBordered.AppendLine("${styledLeft} ${padded} ${styledRight}")
             }
-            [console]::WriteLine($styledBottom)
+            [void]$sbBordered.AppendLine($styledBottom)
+            $finalString = $sbBordered.ToString()
+        }
+
+        # ── Output Mode Dispatch ──────────────────────────────────────────────
+        $doPager = $false
+        if ($OutMode -eq 'Alt') {
+            $doPager = $true
+        } elseif ($OutMode -eq 'Auto') {
+            $consoleHeight = 24
+            try { $consoleHeight = [Console]::WindowHeight } catch {}
+            $lineCount = ($finalString -split '\r?\n').Count
+            if ($lineCount -gt ($consoleHeight - 2)) {
+                $doPager = $true
+            }
+        }
+
+        if ($OutMode -eq 'String') {
+            return $finalString -split '\r?\n'
+        } elseif ($doPager) {
+            Invoke-PHPager -Content $finalString -Title $Name -Theme $themeObj -OnResize $onResizeCallback
+        } else {
+            [System.Console]::Write($finalString)
         }
     }
 }

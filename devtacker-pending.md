@@ -1,6 +1,20 @@
 # Developer Tracker - Pending Tasks
 
-## Priority 1 - High-Priority Tasks
+## Priority 1 - High-Priority Tasks-
+- [x] I think the module has grown large enough for a jekyll docs site, lets use just the docs theme, but put a dark theme well with outlines and access in orange yellow, to matach module logo, lets all add a default theme called phwriter, and will make it of the same accent.
+- [x] after a couple fixes and polish phwriter will go into its second release, make sure we have a summary in readme.md with all features quick getting started details on building etc, and we can leave the more complex documenation for the docs site.
+- [x] **sourcetpye** - we can do it two differnt ways, if module/tool/function is a router type function we assume there are subcommands do it would need to read, "cli NAME Function: NAME VERSION" and a module can be both to i gues we split it up standard|router, in doin this we can have each cmdlet have an help and router functions can use command add help and command remove custom Help.
+- [x] the tool/modulename function/cmdlet name and Version needs to have padding of +1 left and right giving it that tag like apearance
+- [x] the ascii extended chars we use for SYNTAX, DESCRIPTIONm, PARAMETERS, needs to be coloured we what maximum readabilly colors that blend tother that give it that handcraft primum feal, complete, allows the reader to focus on the help content
+- [x] **bug/fix** - some themes Description output second line is in a another color, this does happen for all more a few.
+- [x] **modern Evolution and nuoucecs** - these are some of the workflows i would use phwriter in invoke-command -help if its a router invoke-Router -mode help which is one of the modes also subcommands Invoke-Router -Mode add -submod Help.
+- [x] **Alt Buffer & Paging** — support direct standard buffer dump vs Alt buffer page dump (pager), and default/support automatic pager view like man.
+- [x] **Output Width Defaults & Custom** — support output width modes/values: man (80 cols), full (console width), or custom integer size.
+- [x] **Console Resize Autoscale** — implement dynamic autoscaling/recalculating of text wrapping and layout when user resizes the terminal console.
+- [x] **Minimum Width Safeguard** — add a default minimum width (45 cols) safeguard that displays a notification instead of printing broken/torn layout.
+- [x] **High-Performance C# classes** — utilize high-performance C# types like StringBuilder and accurate length-calculations prior to ANSI encoding.
+- [x] **alt** buffer is New-PHWriter using the alternate buffer? if its not i think we should use it for better performance and.
+- [x] **bug** - `minor` show-phtheme if ctl+c is fired there is some weirdness with the output causing returned terminal to have where spacing
 - [x] **Theme fixes and issues**
   - [x] crystal theme is broken layout — replaced ambiguous-width glyphs (❖/✧/❄❅❆) with safe box-drawing chars (◆/»/╔══╗/╚══╝/▒)
   - [x] nebula theme is broken layout — replaced ambiguous-width glyphs (✹/✸/❇❈) with safe box-drawing chars (◆/»/╠══╪══╣/░)
@@ -12,7 +26,7 @@
   - [x] add multiple types of outer border types — added -OuterBorderStyle (Rounded|Square|Double|Block|Simple) to New-PHWriter and Show-PHTheme
   - [x] main header title needs 1 space before and after — fixed header line to pad with 1 space before/after joined parts
   - [x] add TextSpacing option to show-phtheme — added -TextSpacing switch parameter to Show-PHTheme (passes through)
-  - [ ] the [incomplete entry — original text truncated]
+  - [x] the [incomplete entry — original text truncated]
 - [x] **show-phpager** — now pulls from full theme schema: SectionChar for separators, HeaderChar for title prefix, SyntaxFg for footer key-hint color, AccentColor/BorderColor/HeaderFg/Bg/ParamDescFg for chrome colors
 
 > [!NOTE]

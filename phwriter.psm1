@@ -32,6 +32,8 @@ if ([System.IO.Directory]::Exists($publicPath)) {
 # Execute the combined script block in the module's session state
 . ([scriptblock]::Create($codeBuilder.ToString()))
 
+# NOTE! for future self i prefer a hashtable then passing it to Export-ModuleMember @params
+
 Export-ModuleMember -Function `
     New-PHWriter,
     Write-PHAsciiLogo,

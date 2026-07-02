@@ -1,0 +1,90 @@
+- name: search
+  syntax: "search <query>"
+  desc: "Search for a series on TheTVDB. Queries the API by title, alias, or external ID. Supports language filtering. Results are saved in the local DB."
+- name: get-series
+  syntax: "get-series <id>"
+  desc: "Retrieve detailed metadata for a specific series. Includes overview, status, network, first aired date, and other rich information. Returns custom structured objects."
+- name: get-episode
+  syntax: "get-episode <id>"
+  desc: "Get detailed information about a single episode by its unique ID. Returns metadata, guest stars, director, writer, runtime, and synopsis."
+- name: get-season
+  syntax: "get-season <id>"
+  desc: "Retrieve season metadata by ID."
+- name: get-actor
+  syntax: "get-actor <id>"
+  desc: "Get actor details by ID."
+- name: get-artwork
+  syntax: "get-artwork <id>"
+  desc: "Get artwork url by ID."
+- name: get-genres
+  syntax: "get-genres"
+  desc: "List all movie and series genres supported by TheTVDB."
+- name: list-episodes
+  syntax: "list-episodes <seriesId> [-Season <int>]"
+  desc: "Query and list all episodes belonging to a series. Can filter by season number if provided. Outputs in a structured table."
+- name: search-actor
+  syntax: "search-actor <name>"
+  desc: "Search actors by name."
+- name: get-updates
+  syntax: "get-updates [-Since <datetime>]"
+  desc: "Fetch a list of series and movies that have been updated on TheTVDB since a specified timestamp. Used to synchronize local cache databases with official upstream changes."
+- name: update-cache
+  syntax: "update-cache"
+  desc: "Scan local series database and fetch updates for stale items."
+- name: clear-cache
+  syntax: "clear-cache"
+  desc: "Delete all cached entries from the local database."
+- name: show-cache
+  syntax: "show-cache"
+  desc: "Print database storage metrics, table row counts, and disk file size."
+- name: set-token
+  syntax: "set-token <token>"
+  desc: "Configure bearer token."
+- name: get-status
+  syntax: "get-status"
+  desc: "Check TVDB API connection health, ping latency, rate limits, and remaining quota."
+- name: list-languages
+  syntax: "list-languages"
+  desc: "List supported languages."
+- name: get-movie
+  syntax: "get-movie <id>"
+  desc: "Retrieve detailed movie metadata, runtime, and release date."
+- name: search-movie
+  syntax: "search-movie <title>"
+  desc: "Search movie database."
+- name: list-seasons
+  syntax: "list-seasons <seriesId>"
+  desc: "List seasons."
+- name: get-ratings
+  syntax: "get-ratings <seriesId>"
+  desc: "Retrieve user rating stats, average scores, and vote counts."
+- name: export-data
+  syntax: "export-data <seriesId> -Path <string>"
+  desc: "Export fetched TVDB series and episode metadata to external files on disk. Supported formats include JSON, XML, and CSV. Replaces existing destination files if -Force is passed."
+- name: import-data
+  syntax: "import-data -Path <string>"
+  desc: "Import cached data."
+- name: set-config
+  syntax: "set-config -Key <string> -Value <string>"
+  desc: "Modify local client configuration parameters such as timeouts, connection retries, default language, and user authentication credentials securely. Changes are written to config.json."
+- name: get-config
+  syntax: "get-config"
+  desc: "Display current configuration settings."
+- name: test-api
+  syntax: "test-api"
+  desc: "Run automated diagnostics to verify TVDB API credentials, endpoints, network routing, and JSON parser compatibility."
+- name: get-user-info
+  syntax: "get-user-info"
+  desc: "Retrieve active TVDB subscriber profile and subscription details."
+- name: get-favorites
+  syntax: "get-favorites"
+  desc: "List user favorites."
+- name: add-favorite
+  syntax: "add-favorite <seriesId>"
+  desc: "Add a series to user favorites."
+- name: remove-favorite
+  syntax: "remove-favorite <seriesId>"
+  desc: "Remove a series from user favorites."
+- name: get-banners
+  syntax: "get-banners <seriesId>"
+  desc: "Fetch links to banner art, posters, fanart, and background images."

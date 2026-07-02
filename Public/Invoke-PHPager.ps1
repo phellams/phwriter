@@ -42,7 +42,10 @@ function Invoke-PHPager {
         [switch]$NoColor,
 
         [Parameter(Mandatory = $false, HelpMessage = "Theme name or custom theme object.")]
-        [object]$Theme = 'default',
+        [object]$Theme = 'phwriter',
+
+        [Parameter(Mandatory = $false, HelpMessage = "ScriptBlock callback executed on console resize to regenerate content.")]
+        [scriptblock]$OnResize,
 
         [Parameter(HelpMessage = "Display Help for Invoke-PHPager.")]
         [switch]$Help
@@ -276,7 +279,9 @@ function Invoke-PHPager {
                     $line = $displayLines[$lineIdx]
                     # Render taking into account horizontal scrolling and console width
                     # Use Clap-SliceAnsi to scroll and prevent line tearing/wrapping
-                    $renderedLine = if ($leftScroll -gt 0) {
+                    $renderedLine = if ([string]::IsNullOrEmpty($line)) {
+                        ""
+                    } elseif ($leftScroll -gt 0) {
                         Clap-SliceAnsi -Text $line -Start $leftScroll -Width $winW
                     } else {
                         Clap-TruncateAnsi -Text $line -MaxVisible $winW
@@ -306,10 +311,13 @@ function Invoke-PHPager {
         # ── Pre-render setup ──────────────────────────────────────────────────
         $origCursorVisible = $true
         try { $origCursorVisible = [Console]::CursorVisible } catch {}
+        $origTreatCAsInput = $false
+        try { $origTreatCAsInput = [Console]::TreatControlCAsInput } catch {}
 
         # Save screen state (xterm alternate buffer)
         [Console]::Write("${esc}[?1049h")  # enter alternate screen buffer
         [Console]::Write($hideCur)
+        try { [Console]::TreatControlCAsInput = $true } catch {}
  
         $topLine = 0
         $leftScroll = 0
@@ -326,48 +334,112 @@ function Invoke-PHPager {
                 # In test mode or non-interactive CI environments, bypass key reading
                 break
             }
+
+            $lastWidth = [Console]::WindowWidth
+            $lastHeight = [Console]::WindowHeight
+
             while ($true) {
-                $keyInfo = [Console]::ReadKey($true)
-                $k       = $keyInfo.Key
-                $changed = $false
+                # ── Check for Console Resize ──────────────────────────────────
+                $curWidth = [Console]::WindowWidth
+                $curHeight = [Console]::WindowHeight
+                if ($curWidth -ne $lastWidth -or $curHeight -ne $lastHeight) {
+                    $lastWidth = $curWidth
+                    $lastHeight = $curHeight
 
-                $maxTop = [Math]::Max(0, $totalLines - $effectivePage)
-
-                if ($k -eq $keyDown) {
-                    if ($topLine -lt $maxTop) { $topLine++; $changed = $true }
-                } elseif ($k -eq $keyUp) {
-                    if ($topLine -gt 0) { $topLine--; $changed = $true }
-                } elseif ($k -eq $keyRight) {
-                    $leftScroll += 8; $changed = $true
-                } elseif ($k -eq $keyLeft) {
-                    if ($leftScroll -gt 0) {
-                        $leftScroll = [Math]::Max(0, $leftScroll - 8)
-                        $changed = $true
+                    if ($null -ne $OnResize) {
+                        # Trigger regeneration callback with new dimensions
+                        $newContent = & $OnResize $curWidth $curHeight
+                        
+                        $buffer.Clear()
+                        foreach ($item in $newContent) {
+                            if ($null -eq $item) { continue }
+                            $text = $item.ToString()
+                            $lines = $text -split '\r?\n'
+                            foreach ($line in $lines) { $buffer.Add($line) }
+                        }
+                        
+                        $displayLines = [System.Collections.Generic.List[string]]::new()
+                        if ($NoColor) {
+                            foreach ($l in $buffer) {
+                                $displayLines.Add($ansiPattern.Replace($l, ''))
+                            }
+                        } else {
+                            foreach ($l in $buffer) {
+                                $displayLines.Add($l)
+                            }
+                        }
+                        $totalLines = $displayLines.Count
                     }
-                } elseif ($k -eq $keyPgDown) {
-                    $topLine = [Math]::Min($topLine + $effectivePage, $maxTop); $changed = $true
-                } elseif ($k -eq $keyPgUp) {
-                    $topLine = [Math]::Max(0, $topLine - $effectivePage); $changed = $true
-                } elseif ($k -eq $keyHome) {
-                    $topLine = 0; $leftScroll = 0; $changed = $true
-                } elseif ($k -eq $keyEnd) {
-                    $topLine = $maxTop; $changed = $true
-                } elseif ($k -eq $keyQ -or $k -eq $keyEsc) {
-                    break
-                }
 
-                if ($changed) {
+                    # Recalculate effective page height
+                    $effectivePage = if ($PageSize -gt 0) {
+                        $PageSize
+                    } else {
+                        [Math]::Max(5, $curHeight - $headerRows - $footerRows - 1)
+                    }
+
+                    # Cap topLine to new bounds
+                    $maxTop = [Math]::Max(0, $totalLines - $effectivePage)
+                    if ($topLine -gt $maxTop) {
+                        $topLine = $maxTop
+                    }
+
+                    [Console]::Write($clearSc)
                     _renderHeader $topLine
                     _renderPage $topLine
-                    # Footer is static; only re-render if window resized (basic check)
                     _renderFooter
                 }
+
+                if ([Console]::KeyAvailable) {
+                    $keyInfo = [Console]::ReadKey($true)
+                    $k       = $keyInfo.Key
+                    $changed = $false
+
+                    # Intercept Ctrl+C
+                    if ($k -eq [System.ConsoleKey]::C -and ($keyInfo.Modifiers -band [System.ConsoleModifiers]::Control)) {
+                        break
+                    }
+
+                    $maxTop = [Math]::Max(0, $totalLines - $effectivePage)
+
+                    if ($k -eq $keyDown) {
+                        if ($topLine -lt $maxTop) { $topLine++; $changed = $true }
+                    } elseif ($k -eq $keyUp) {
+                        if ($topLine -gt 0) { $topLine--; $changed = $true }
+                    } elseif ($k -eq $keyRight) {
+                        $leftScroll += 8; $changed = $true
+                    } elseif ($k -eq $keyLeft) {
+                        if ($leftScroll -gt 0) {
+                            $leftScroll = [Math]::Max(0, $leftScroll - 8)
+                            $changed = $true
+                        }
+                    } elseif ($k -eq $keyPgDown) {
+                        $topLine = [Math]::Min($topLine + $effectivePage, $maxTop); $changed = $true
+                    } elseif ($k -eq $keyPgUp) {
+                        $topLine = [Math]::Max(0, $topLine - $effectivePage); $changed = $true
+                    } elseif ($k -eq $keyHome) {
+                        $topLine = 0; $leftScroll = 0; $changed = $true
+                    } elseif ($k -eq $keyEnd) {
+                        $topLine = $maxTop; $changed = $true
+                    } elseif ($k -eq $keyQ -or $k -eq $keyEsc) {
+                        break
+                    }
+
+                    if ($changed) {
+                        _renderHeader $topLine
+                        _renderPage $topLine
+                        _renderFooter
+                    }
+                }
+
+                [System.Threading.Thread]::Sleep(30)
             }
         } finally {
             # ── Restore terminal state ────────────────────────────────────────
             [Console]::Write($showCur)
             [Console]::Write("${esc}[?1049l")  # exit alternate screen buffer
             try { [Console]::CursorVisible = $origCursorVisible } catch {}
+            try { [Console]::TreatControlCAsInput = $origTreatCAsInput } catch {}
         }
     }
 }

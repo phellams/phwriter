@@ -76,7 +76,7 @@ function New-PHRouter {
         [object]$Metadata,
 
         [Parameter(Mandatory = $false, HelpMessage = "Theme name or custom theme object.")]
-        [object]$Theme = 'default',
+        [object]$Theme = 'phwriter',
 
         [Parameter(HelpMessage = "Display Help for New-PHRouter.")]
         [switch]$Help
@@ -179,8 +179,63 @@ function New-PHRouter {
     }
 
     # ── Resolve subcommand ────────────────────────────────────────────────────
-    $subcommand = if ($ArgumentList.Count -gt 0) { $ArgumentList[0] } else { $null }
-    $restArgs   = if ($ArgumentList.Count -gt 1) { $ArgumentList[1..($ArgumentList.Count - 1)] } else { @() }
+    $subcommand = $null
+    $restArgsList = [System.Collections.Generic.List[string]]::new()
+
+    $i = 0
+    while ($i -lt $ArgumentList.Count) {
+        $arg = $ArgumentList[$i]
+        if ($arg -ieq '-mode' -or $arg -ieq '-m') {
+            if ($i + 1 -lt $ArgumentList.Count) {
+                $subcommand = $ArgumentList[$i + 1]
+                $i += 2
+                continue
+            }
+        }
+        if ($arg -ieq '-submod' -or $arg -ieq '-submode' -or $arg -ieq '-s') {
+            if ($i + 1 -lt $ArgumentList.Count) {
+                $submodVal = $ArgumentList[$i + 1]
+                [void]$restArgsList.Add($submodVal)
+                $i += 2
+                continue
+            }
+        }
+        # Regular positional arguments
+        if ($null -eq $subcommand -and -not $arg.StartsWith('-')) {
+            $subcommand = $arg
+        } else {
+            [void]$restArgsList.Add($arg)
+        }
+        $i++
+    }
+    $restArgs = $restArgsList.ToArray()
+
+    $helpKeywords = @('help', '-help', '--help', '-h', 'h')
+
+    # If subcommand is a help request (e.g. mycli help build)
+    if ($subcommand -and $subcommand.ToLower() -in $helpKeywords) {
+        if ($restArgs.Count -gt 0) {
+            $potentialSub = $restArgs[0]
+            $matchedPotential = $null
+            foreach ($key in $Routes.Keys) {
+                if ($key.ToLower() -eq $potentialSub.ToLower()) {
+                    $matchedPotential = $key
+                    break
+                }
+            }
+            if ($matchedPotential) {
+                $subcommand = $matchedPotential
+                $restArgs = @('-help')
+            }
+        } else {
+            # Just 'help' -> execute default route
+            if ($Routes.ContainsKey('default')) {
+                $target = $Routes['default']
+                _PHRouter_Invoke $target $restArgs
+                return
+            }
+        }
+    }
 
     # Handle empty / no subcommand
     if (-not $subcommand -or $subcommand -eq '') {
@@ -237,7 +292,7 @@ function _PHRouter_NoRoute {
         [string]$ModuleName,
         [hashtable]$Routes,
         [string]$Subcommand,
-        [object]$Theme = 'default'
+        [object]$Theme = 'phwriter'
     )
 
     $themeObj = $null

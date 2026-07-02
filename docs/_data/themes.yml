@@ -1,0 +1,145 @@
+base_themes:
+  - name: default
+    symbol: ◉
+    style: "Retro Modern — neon cyan and dark green"
+  - name: matrix
+    symbol: $
+    style: "Cyberpunk Green — high-contrast bright green"
+  - name: cyberpunk
+    symbol: ▲
+    style: "Neon Synthwave — hot pink, yellow, and cyan"
+  - name: dracula
+    symbol: 🧛
+    style: "Dracula Dark — purple, pink, green, and yellow"
+  - name: nord
+    symbol: ❄
+    style: "Nordic Frost — icy blues and clean white"
+  - name: monokai
+    symbol: ❖
+    style: "Monokai — classic pink, yellow, green, and orange"
+  - name: solarized
+    symbol: ☼
+    style: "Solarized Dark — muted cyan and green on dark"
+  - name: sunset
+    symbol: 🌅
+    style: "Golden Hour — deep reds, oranges, and gold"
+  - name: forest
+    symbol: 🌲
+    style: "Natural Autumn — forest greens and warm gold"
+  - name: classic
+    symbol: " "
+    style: "Old-School Man — monochrome bold and underline"
+
+gradient_themes:
+  - name: aurora
+    stops: "[51, 93, 129, 201]"
+    direction: "Cyan → Purple"
+  - name: neon-noir
+    stops: "[201, 198, 196, 200]"
+    direction: "Magenta → Pink"
+  - name: lava
+    stops: "[196, 202, 214, 220]"
+    direction: "Red → Yellow"
+  - name: ocean
+    stops: "[17, 20, 27, 39, 51]"
+    direction: "Blue → Cyan"
+  - name: toxic
+    stops: "[46, 82, 118, 154]"
+    direction: "Acid Greens"
+  - name: midnight
+    stops: "[17, 54, 91, 128, 165]"
+    direction: "Indigo → Violet"
+  - name: gold
+    stops: "[136, 172, 214, 220, 226]"
+    direction: "Gold → Yellow"
+  - name: rose
+    stops: "[161, 197, 199, 207, 213]"
+    direction: "Deep → Light Pink"
+  - name: steel
+    stops: "[233, 238, 243, 248, 253]"
+    direction: "Dark → Light Grey"
+  - name: phwriter
+    stops: "flat"
+    direction: "Classic orange/yellow"
+
+extended_themes:
+  - name: glitch
+    symbol: "▚ / ▞"
+    stops: "[196, 201, 45, 51]"
+    desc: "Cyberpunk Glitchy"
+  - name: cosmic
+    symbol: "☄ / ★"
+    stops: "[17, 21, 57, 93, 129]"
+    desc: "Space & Starry Night"
+  - name: forest-mist
+    symbol: "🍀 / 🌿"
+    stops: "[22, 28, 64, 106, 244]"
+    desc: "Moss Green / Earthy"
+  - name: blood-moon
+    symbol: "🥀 / 🩸"
+    stops: "[232, 52, 88, 124, 160]"
+    desc: "Dark Vampire Red"
+  - name: retro-arcade
+    symbol: "🕹 / 👾"
+    stops: "[196, 201, 93, 39]"
+    desc: "80s Synthwave Arcade"
+  - name: abyss
+    symbol: "⦿ / ⁘"
+    stops: "[232, 17, 18, 19, 21]"
+    desc: "Deep Ocean Trench"
+  - name: zen
+    symbol: "⛩ / ☯"
+    stops: "[245, 248, 252, 255]"
+    desc: "Minimalist Zen"
+  - name: blaze
+    symbol: "☄ / 🔥"
+    stops: "[196, 202, 208, 214, 220]"
+    desc: "Intense Fire"
+  - name: rust
+    symbol: "⚙ / ⚒"
+    stops: "[52, 94, 130, 166]"
+    desc: "Industrial Rust"
+  - name: matrix-neon
+    symbol: "⁙ / ⁚"
+    stops: "[22, 28, 34, 40, 46]"
+    desc: "Code Stream"
+  - name: quantum
+    symbol: "⬢ / ⬟"
+    stops: "[57, 93, 129, 81]"
+    desc: "Subatomic Scientific"
+  - name: radioactive
+    symbol: "☣ / ☢"
+    stops: "[232, 190, 226, 190]"
+    desc: "Toxic Nuclear Fallout"
+  - name: vaporwave
+    symbol: "🌴 / 🐬"
+    stops: "[201, 165, 129, 81, 51]"
+    desc: "80s Teal/Pink"
+  - name: nebula
+    symbol: "✹ / ✸"
+    stops: "[129, 135, 163, 199, 201]"
+    desc: "Star Dust"
+  - name: crystal
+    symbol: "◆ / »"
+    stops: "[159, 195, 231, 255]"
+    desc: "Diamond & Glacier Ice"
+  - name: copper
+    symbol: "╞ / ╡"
+    stops: "[130, 136, 172, 214]"
+    desc: "Copper / Orange"
+  - name: royal
+    symbol: "⚜ / ✦"
+    stops: "[17, 20, 21, 220, 226]"
+    desc: "Gold on Royal Blue"
+  - name: desert-heat
+    symbol: "☀ / 🏜"
+    stops: "[130, 166, 202, 214, 220]"
+    desc: "Warm Sands"
+  - name: sheriff
+    symbol: "✶ / ↱"
+    stops: "[52, 94, 137, 180]"
+    desc: "Western Leather"
+  - name: frost
+    symbol: "❄ / ❆"
+    stops: "[240, 244, 248, 117, 159]"
+    desc: "Arctic Blizzard"

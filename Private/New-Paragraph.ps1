@@ -30,7 +30,8 @@ function New-Paragraph {
     [void]$sb.Append([char]' ', $indent)
 
     foreach ($word in $words) {
-        if ($currentLineLength + $word.Length -gt $position) {
+        $wordVisualLen = Get-ClapVisibleLength -Text $word
+        if ($currentLineLength + $wordVisualLen -gt $position) {
             [void]$sb.AppendLine()
             [void]$sb.Append([char]' ', $indent)
             $currentLineLength = 0
@@ -38,7 +39,7 @@ function New-Paragraph {
 
         [void]$sb.Append($word)
         [void]$sb.Append([char]' ')
-        $currentLineLength += $word.Length + 1
+        $currentLineLength += $wordVisualLen + 1
     }
 
     return $sb.ToString()

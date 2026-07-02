@@ -1,0 +1,21 @@
+- name: New-PHWriter
+  alias: "—"
+  purpose: "Render full help documentation"
+- name: Write-PHAsciiLogo
+  alias: "—"
+  purpose: "Render the themed ASCII banner only"
+- name: Export-PHWriterMetadata
+  alias: "phextract"
+  purpose: "Extract cmdlet metadata from source via AST"
+- name: Invoke-PHPager
+  alias: "phpager"
+  purpose: "Display content in an interactive TUI pager"
+- name: New-PHRouter
+  alias: "phroute"
+  purpose: "Dispatch CLI subcommands with tab-completion"
+- name: Show-PHTheme
+  alias: "—"
+  purpose: "Preview built-in and custom themes"
+- name: Get-TerminalPalette
+  alias: "terpal"
+  purpose: "Generate dynamic solid, conditional, or gradient palette objects"

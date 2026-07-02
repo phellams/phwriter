@@ -74,13 +74,13 @@ Describe "Get-PHTheme" {
     It "Should return the default theme by default" {
         $theme = Get-PHTheme
         $theme | Should -Not -BeNullOrEmpty
-        $theme.AccentColor | Should -Be 'darkgreen'
+        $theme.AccentColor | Should -Be '214'
     }
 
     It "Should return the default theme on invalid name" {
         $theme = Get-PHTheme -Name 'invalid-theme-name'
         $theme | Should -Not -BeNullOrEmpty
-        $theme.AccentColor | Should -Be 'darkgreen'
+        $theme.AccentColor | Should -Be '214'
     }
 
     It "Should load all predefined themes without throwing" {
@@ -381,5 +381,33 @@ Describe "Show-PHTheme-Enhancements" {
 
     It "Should render Show-PHTheme help without throwing" {
         Show-PHTheme -Help
+    }
+}
+
+Describe "PHWriter-Width-and-Paging-Features" {
+    It "Should support Width options ('man', 'full', custom)" {
+        $manOut = New-PHWriter @params -Width 'man' -OutMode String
+        $manOut | Should -Not -BeNullOrEmpty
+        
+        $fullOut = New-PHWriter @params -Width 'full' -OutMode String
+        $fullOut | Should -Not -BeNullOrEmpty
+
+        $customOut = New-PHWriter @params -Width 60 -OutMode String
+        $customOut | Should -Not -BeNullOrEmpty
+    }
+
+    It "Should respect minimum width safeguard" {
+        $shortOut = New-PHWriter @params -Width 30 -OutMode String
+        ($shortOut -join "") | Should -BeLike "*Console width*below the minimum*"
+    }
+
+    It "Should support OutMode Auto and Alt without throwing" {
+        $env:PHWRITER_TEST_MODE = 'true'
+        try {
+            New-PHWriter @params -OutMode Alt
+            New-PHWriter @params -OutMode Auto
+        } finally {
+            $env:PHWRITER_TEST_MODE = $null
+        }
     }
 }

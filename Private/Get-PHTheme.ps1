@@ -12,7 +12,7 @@ function Get-PHTheme {
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
-        [string]$Name = 'default'
+        [string]$Name = 'phwriter'
     )
 
     # ── Original 10 themes ────────────────────────────────────────────────────
@@ -1313,28 +1313,28 @@ function Get-PHTheme {
 
     # 10. phwriter — The original PHWriter retro theme (restored as a named theme)
     $Themes['phwriter'] = @{
-        AccentColor      = 'darkcyan'
+        AccentColor      = '214'
         AccentFormat     = 'bold'
-        BorderColor      = 'darkgreen'
+        BorderColor      = '208'
         BorderFormat     = 'bold'
         HeaderBg         = ''
-        HeaderFg         = 'cyan'
+        HeaderFg         = '220'
         ModuleBg         = ''
-        ModuleFg         = 'cyan'
+        ModuleFg         = '220'
         VersionBg        = ''
-        VersionFg        = 'cyan'
+        VersionFg        = '220'
         SyntaxFg         = 'white'
         SyntaxFormat     = 'none'
         DescriptionFg    = 'white'
-        ParamNameFg      = 'green'
+        ParamNameFg      = '220'
         ParamNameFormat  = 'bold'
-        ParamTypeFg      = 'darkcyan'
+        ParamTypeFg      = '208'
         ParamTypeFormat  = 'none'
         ParamReqFg       = 'red'
         ParamReqFormat   = 'bold'
         ParamDescFg      = 'gray'
         ExampleFg        = 'yellow'
-        DocsFg           = 'darkcyan'
+        DocsFg           = '214'
         DocsFormat       = 'bold,underline'
         SectionChar      = '◉'
         HeaderChar       = '▶'
@@ -1345,6 +1345,7 @@ function Get-PHTheme {
 
     # phman is an alias for the phwriter theme
     $Themes['phman'] = $Themes['phwriter']
+    $Themes['default'] = $Themes['phwriter']
 
     # ── 10 New Hard-Bordered Themes using ASCII shapes ───────────────────────────
 
@@ -1690,13 +1691,22 @@ function Format-ThemeText {
     $bgKey     = "${Element}Bg"
     $formatKey = "${Element}Format"
 
-    $color   = if ($Theme.ContainsKey($colorKey))  { $Theme[$colorKey]  } else { '' }
+    $color   = if ($Theme.ContainsKey($colorKey))  { $Theme[$colorKey]  } else {
+        if ($Element -eq 'SectionChar') { $Theme['BorderColor'] } else { '' }
+    }
     $bgColor = if ($Theme.ContainsKey($bgKey))      { $Theme[$bgKey]     } else { '' }
 
     $rawFormat = if ($Theme.ContainsKey($formatKey)) {
         if ($Theme[$formatKey] -is [array]) { $Theme[$formatKey] }
         else { $Theme[$formatKey] -split ',' }
-    } else { @() }
+    } else {
+        if ($Element -eq 'SectionChar') {
+            if ($Theme.ContainsKey('BorderFormat')) {
+                if ($Theme['BorderFormat'] -is [array]) { $Theme['BorderFormat'] }
+                else { $Theme['BorderFormat'] -split ',' }
+            } else { @() }
+        } else { @() }
+    }
 
     $format = @($rawFormat) | Where-Object { $_ -and $_ -ne 'none' }
 

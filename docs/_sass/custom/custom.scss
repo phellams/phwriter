@@ -1,0 +1,50 @@
+// Google Fonts import for JetBrains Mono
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+// JetBrains Mono for code blocks and inline code
+code, pre, kbd, samp {
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+// Custom retro-terminal sidebar styling to match module logo
+.sidebar {
+  border-right: 2px solid #ff9f1a !important;
+}
+
+code.highlighter-rouge {
+  border: 1px solid rgba(255, 159, 26, 0.2);
+  padding: 2px 6px;
+  background-color: #171b21;
+}
+
+// Remove orange border for block codeblocks as requested
+pre.highlight {
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  background-color: #171b21 !important;
+}
+
+// Heavy shadows for titles to bring high impact/contrast
+.site-title {
+  color: #ff9f1a !important;
+  font-weight: 800 !important;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9), 0 0 8px rgba(255, 159, 26, 0.5) !important;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 700 !important;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8), 0px 4px 10px rgba(0, 0, 0, 0.3) !important;
+}
+
+// Navigation links
+.nav-list-link {
+  &:hover {
+    color: #ff9f1a !important;
+  }
+}
+
+a.nav-list-link.active {
+  color: #ff9f1a !important;
+  font-weight: bold;
+}

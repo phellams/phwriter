@@ -69,7 +69,7 @@ function Write-PHAsciiLogo {
         [string]$Version = '',
 
         [Parameter()]
-        $Theme = 'default',
+        $Theme = 'phwriter',
 
         [Parameter()]
         [ValidateSet('Box', 'Classic', 'Minimal', 'Man', 'Terminal', 'Typewriter')]
