@@ -7,20 +7,6 @@ permalink: /
 has_toc: true
 ---
 
-# PHWriter
-
-<div align="center" style="margin: 30px 0;">
-  <img src="https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png" width="128" alt="PHWriter Logo" />
-  <p style="font-size: 1.25em; font-weight: 500; color: #ff9f1a; margin-top: 15px;">
-    Formatted, ANSI-coloured terminal help output generator for PowerShell.
-  </p>
-  <p style="font-style: italic; color: #8a99ad;">
-    Replicating the structured clarity of Linux man pages with modern themeable aesthetics.
-  </p>
-</div>
-
----
-
 ## Interactive Terminal Preview (VHS Demo)
 
 Below is a live-rendered visualization of a PHWriter CLI help screen using the **aurora** gradient theme and outer borders:
