@@ -10,8 +10,9 @@
     "phwriter": false,
     "phwriter_source": "https://gitlab.com/phellams/phwriter/-/blob/main/readme.md",
     "pester_test_files": [
-        ".\\cmdlets\\*.psm1", 
-        ".\\*.psm1"       
+        ".\\Public\\*.ps1",
+        ".\\Private\\*.ps1",
+        ".\\phwriter.psm1"
     ], 
     "modulefiles": [
         "phwriter.psm1",
@@ -22,7 +23,8 @@
         "readme.txt"
     ],
     "modulefolders": [
-        "cmdlets",
+        "Public",
+        "Private",
         "libs",
         "tools"
     ],

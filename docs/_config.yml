@@ -1,0 +1,34 @@
+title: PHWriter
+description: "Formatted, ANSI-coloured terminal help output generator for PowerShell"
+theme: just-the-docs
+
+# Color scheme configuration
+color_scheme: phwriter
+
+# Enable search and copy code button
+search_enabled: true
+enable_copy_code_button: true
+
+# Logo setting (supported natively by just-the-docs in the sidebar)
+logo: "https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png"
+
+# GitLab Repository & Edit Integration
+repository: phellams/phwriter
+repository_service: gitlab
+gh_edit_link: true
+gh_edit_link_text: "Edit this page on GitLab"
+gh_edit_repository: "https://gitlab.com/phellams/phwriter"
+gh_edit_view_mode: "tree"
+gh_edit_branch: "main"
+gh_edit_source: "docs"
+
+# Version Tag in Sidebar
+project_version: "v2.0.0"
+
+search:
+  tokenizer: separator
+  separator: '[\s\-,]+'
+
+aux_links:
+  "PowerShell Gallery": "https://www.powershellgallery.com/packages/PHWriter"
+  "GitLab Repository": "https://gitlab.com/phellams/phwriter"
