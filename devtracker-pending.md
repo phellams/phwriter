@@ -26,7 +26,7 @@ This is the canonical tracker for outstanding work. The historical `devtacker-pe
 - [x] Fix the homepage preview markup. It uses a valid responsive `<img>`, an H1, semantic main landmark, and horizontal scrolling only within the terminal example.
 - [x] Simplify code-block chrome and provide a keyboard-accessible copy control. Just the Docs native copy control remains enabled, has a visible focus state, and block code uses one border treatment.
 - [x] Replace emoji/ambiguous glyphs in the web theme catalogue with a clear decorative-terminal policy. The catalogue no longer renders them as web data; each theme links to an exact terminal preview command instead.
-- [ ] Generate per-theme preview assets from the checked-in VHS tapes. The per-theme command/configuration disclosures are present and the actual public theme count is now reconciled at 50; rendering assets under `docs/assets/themes-previews/` remains blocked until the external `vhs` CLI is installed.
+- [ ] Generate per-theme preview assets from the checked-in VHS tapes. The `vhs_build` CI job now installs VHS and renders the checked-in showcase tapes before the Pages build; per-theme assets under `docs/assets/themes-previews/` still need dedicated tapes and disclosures.
 - [x] Audit navigation ordering. Each page now has a unique, sequential `nav_order`.
 - [x] Host or bundle fonts deliberately and supply system fallbacks. External Google Font imports are removed and the site uses system UI/monospace font stacks.
 

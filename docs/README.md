@@ -13,6 +13,6 @@ BUNDLE_IGNORE_CONFIG=1 BUNDLE_PATH=/tmp/phwriter-bundle bundle exec jekyll build
 
 ## Deployment
 
-The `pages` job in the root GitLab CI configuration builds the site into `public/` and includes GZIP and Brotli variants of HTML, CSS, JavaScript, XML, text, and SVG assets. GitLab Pages selects a compressed variant when the browser supports it.
+The `vhs_build` job renders every tape in `vhs/` before the `pages` job builds the site into `public/`. The Pages artifact includes the generated GIFs plus GZIP and Brotli variants of HTML, CSS, JavaScript, XML, text, and SVG assets. GitLab Pages selects a compressed variant when the browser supports it.
 
 For regular local development, choose any local Bundler path outside the repository and run `bundle exec jekyll serve` with the same environment variables.

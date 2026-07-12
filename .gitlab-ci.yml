@@ -78,6 +78,26 @@ pester_coverage:
 # ?- build: Build the module using psmpacker
 # ?- nupkg_packages: Create NuGet packages
 #---------------------------------------------
+vhs_build:
+  stage: build
+  image: mcr.microsoft.com/powershell:7.4-ubuntu-22.04
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends ca-certificates curl ffmpeg gnupg
+    - curl -fsSLo /tmp/ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64
+    - curl -fsSLo /tmp/ttyd.sha256 https://github.com/tsl0922/ttyd/releases/download/1.7.7/SHA256SUMS
+    - grep 'ttyd.x86_64$' /tmp/ttyd.sha256 | sha256sum -c -
+    - install -m 755 /tmp/ttyd /usr/local/bin/ttyd
+    - curl -fsSL https://repo.charm.sh/apt/gpg.key | gpg --dearmor -o /usr/share/keyrings/charm.gpg
+    - echo "deb [signed-by=/usr/share/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" > /etc/apt/sources.list.d/charm.list
+    - apt-get update && apt-get install -y --no-install-recommends vhs
+  script:
+    - pwsh -NoProfile -File ./vhs/Invoke-VhsBuild.ps1
+  artifacts:
+    paths:
+      - docs/assets/images/*.gif
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
 psmpacker_build:
   stage: build
   needs:
@@ -281,6 +301,9 @@ codecov_release_coverage:
 pages:
   stage: deploy
   image: ruby:3.3
+  needs:
+    - job: vhs_build
+      artifacts: true
   before_script:
     - apt-get update && apt-get install -y --no-install-recommends brotli
   script:

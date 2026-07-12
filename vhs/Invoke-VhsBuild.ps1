@@ -6,7 +6,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $VhsDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$TapeFiles = Get-ChildItem -Path $VhsDir -Filter "*.tape"
+$TapeFiles = Get-ChildItem -Path $VhsDir -Filter "*.tape" | Sort-Object -Property Name
 
 # Check if vhs tool is installed
 if (-not (Get-Command vhs -ErrorAction SilentlyContinue)) {
@@ -29,11 +29,14 @@ foreach ($TapeFile in $TapeFiles) {
     Write-Host "Starting compilation for: $tapeName" -ForegroundColor Cyan
     try {
         # Run vhs compiler
-        vhs $tapeFilePath
+        & vhs $tapeFilePath
+        if ($LASTEXITCODE -ne 0) {
+            throw "VHS exited with code $LASTEXITCODE."
+        }
         Write-Host "Successfully compiled: $tapeName" -ForegroundColor Green
     }
     catch {
-        Write-Error "Failed to compile ${tapeName}: $_"
+        throw "Failed to compile ${tapeName}: $_"
     }
 }
 
