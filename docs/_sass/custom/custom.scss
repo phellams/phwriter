@@ -14,13 +14,64 @@ code.highlighter-rouge {
   background-color: #171b21;
 }
 
-pre.highlight {
-  border: 1px solid rgba(255, 159, 26, 0.3) !important;
-  border-left: 3px solid #ff9f1a !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-  border-radius: 8px;
-  background-color: #0b0d13 !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+div.highlighter-rouge {
+  background: #0b0d13;
+  border: 1px solid rgba(255, 159, 26, .32);
+  border-radius: .65rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .35);
+  overflow: hidden;
+  padding-top: 2.75rem;
+}
+
+div.highlighter-rouge::before {
+  background: #ff5f56;
+  border-radius: 50%;
+  box-shadow: 1.2rem 0 #ffbd2e, 2.4rem 0 #27c93f;
+  content: '';
+  height: .65rem;
+  left: 1rem;
+  position: absolute;
+  top: 1rem;
+  width: .65rem;
+}
+
+div.highlighter-rouge::after {
+  color: #a5adba;
+  content: attr(data-language);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: .72rem;
+  letter-spacing: .08em;
+  position: absolute;
+  right: 3.5rem;
+  text-transform: uppercase;
+  top: .88rem;
+}
+
+div.highlighter-rouge div.highlight,
+div.highlighter-rouge pre.highlight,
+div.highlighter-rouge pre.highlight code {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+div.highlighter-rouge div.highlight {
+  overflow-x: auto;
+  padding: 0 1.25rem 1.25rem;
+}
+
+div.highlighter-rouge pre.highlight {
+  margin: 0;
+  padding: 0;
+}
+
+div.highlighter-rouge > button {
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: .35rem;
+  color: #e5e9f0;
+  right: .75rem;
+  top: .52rem;
 }
 
 // Heavy shadows for titles to bring high impact/contrast

@@ -18,6 +18,7 @@ has_toc: false
     <div class="ph-hero__actions">
       <a class="ph-button" href="downloads.html">Install PHWriter</a>
       <a class="ph-button ph-button--secondary" href="themes.html">Browse 50 themes</a>
+      <a class="ph-button ph-button--secondary" href="theme-variant-gallery.html">Inspect variants</a>
     </div>
   </div>
 

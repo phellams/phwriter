@@ -14,7 +14,5 @@ Type "Import-Module ../phwriter.psd1 -Force" Enter
 Type "Clear-Host" Enter
 Show
 
-Type "Show-PHTheme -Name phwriter -Minimal" Enter
-Type "Show-PHTheme -Name aurora -Minimal -Gradient -OuterBorder -BorderGradient" Enter
-Type "Show-PHTheme -Name cyber-grid -Minimal -OuterBorder -OuterBorderStyle Double" Enter
+Type "pwsh -NoProfile -File ./Invoke-AllThemeVarients.ps1 -Theme aurora" Enter
 Sleep 8s
