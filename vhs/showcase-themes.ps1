@@ -23,7 +23,7 @@ $ShowcaseThemes = @(
 Clear-Host
 Write-Host "==========================================================" -ForegroundColor Yellow
 Write-Host "         PHWriter Live Color Themes Showcase" -ForegroundColor Yellow -NoNewline
-Write-Host " v0.18.0" -ForegroundColor Cyan
+Write-Host " v0.19.0" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Yellow
 Write-Host "This script will preview 8 highly-styled terminal themes." -ForegroundColor Gray
 Write-Host "Press any key to start..." -ForegroundColor Gray

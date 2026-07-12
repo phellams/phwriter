@@ -1,5 +1,5 @@
 @{
-    ModuleVersion     = '0.18.0'
+    ModuleVersion     = '0.19.0'
     GUID              = '083f04e0-3fe0-42ec-a918-f799e1f1df39'
     Author            = 'Garvey K. Snow'
     CompanyName       = 'Phallems'

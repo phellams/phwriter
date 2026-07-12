@@ -4,26 +4,54 @@ title: Home
 nav_order: 1
 description: "PHWriter is an advanced formatted, ANSI-coloured terminal help output generator for PowerShell."
 permalink: /
-has_toc: true
+has_toc: false
 ---
 
-# PHWriter
+<section class="ph-hero" aria-labelledby="phwriter">
+  <div class="ph-hero__content">
+    <p class="ph-eyebrow">PowerShell terminal documentation</p>
 
-PHWriter renders structured, themed command help for PowerShell modules and command-line tools.
+    <h1 id="phwriter">PHWriter</h1>
 
-## Interactive Terminal Preview
+    <p class="ph-hero__summary">Render structured, themed command help for PowerShell modules and command-line tools.</p>
 
-Below is a live-rendered visualization of a PHWriter CLI help screen using the **aurora** gradient theme and outer borders:
+    <div class="ph-hero__actions">
+      <a class="ph-button" href="downloads.html">Install PHWriter</a>
+      <a class="ph-button ph-button--secondary" href="themes.html">Browse 50 themes</a>
+    </div>
+  </div>
 
-<img class="ph-demo-image" src="./assets/images/aurora.gif" width="848" height="480" alt="PHWriter terminal preview using the aurora theme">
+  <figure class="ph-hero__media">
+    <img class="ph-demo-image" src="./assets/images/all-themes-compact.gif" width="1200" height="850" alt="Terminal preview cycling through PHWriter themes">
+    <figcaption>Terminal preview generated from the checked-in VHS tape.</figcaption>
+  </figure>
+</section>
 
-<div class="ph-terminal" aria-label="Terminal command example">
-  <div class="ph-terminal__titlebar"><span aria-hidden="true">● ● ●</span><span>pwsh — Show-PHTheme -Name 'aurora'</span></div>
-  <pre><code>PS&gt; Show-PHTheme -Name 'aurora' -Gradient -OuterBorder -BorderGradient
+## VHS Showcase
 
-╭──────────────────────────────────────────────────────────╮
-│                       S A M P L E                        │
-╰──────────────────────────────────────────────────────────╯</code></pre>
+Each recording is generated from a tape in the repository and shows a distinct PHWriter workflow.
+
+<div class="ph-showcase-grid">
+  <figure class="ph-showcase-card">
+    <img src="./assets/images/aurora.gif" width="1200" height="850" alt="Aurora theme preview with gradient border">
+    <figcaption><strong>Aurora</strong><span>Gradient header and border rendering.</span></figcaption>
+  </figure>
+  <figure class="ph-showcase-card">
+    <img src="./assets/images/cyberpunk.gif" width="1200" height="850" alt="Cyberpunk theme full help preview">
+    <figcaption><strong>Cyberpunk</strong><span>Full themed command help output.</span></figcaption>
+  </figure>
+  <figure class="ph-showcase-card">
+    <img src="./assets/images/matrix-custom-border.gif" width="1200" height="850" alt="Matrix theme with custom gradient border">
+    <figcaption><strong>Matrix</strong><span>Custom border-gradient configuration.</span></figcaption>
+  </figure>
+  <figure class="ph-showcase-card">
+    <img src="./assets/images/custom-rgb-classic.gif" width="1200" height="850" alt="Custom RGB theme using the classic layout">
+    <figcaption><strong>Custom RGB</strong><span>True-colour theme and classic layout.</span></figcaption>
+  </figure>
+  <figure class="ph-showcase-card">
+    <img src="./assets/images/compact-example.gif" width="1200" height="850" alt="Compact PHWriter output example">
+    <figcaption><strong>Compact output</strong><span>Dense layout for terminal workflows.</span></figcaption>
+  </figure>
 </div>
 
 ---

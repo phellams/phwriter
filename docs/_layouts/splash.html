@@ -5,18 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page.title }} | {{ site.title }}</title>
     <link rel="icon" href="https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ '/assets/css/just-the-docs-default.css' | relative_url }}">
   </head>
   <body class="ph-splash">
     <div class="ph-splash__container">
-      <header class="ph-splash__header">
-        <a class="ph-splash__brand" href="{{ '/' | relative_url }}" aria-label="PHWriter home">
-          <img src="https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png" width="48" height="48" alt="">
-          <span>PHWriter</span>
-        </a>
-        <a class="ph-button" href="{{ '/downloads.html' | relative_url }}">Get started</a>
-      </header>
-
       <main id="main-content" class="ph-splash__content">
         {{ content }}
       </main>

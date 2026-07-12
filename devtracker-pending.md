@@ -14,7 +14,7 @@ This is the canonical tracker for outstanding work. The historical `devtacker-pe
 
 ## P1 — Documentation correctness and release metadata
 
-- [x] Establish one release version as the source of truth. `Get-ConventionalCommitVersion` calculated `0.18.0` from tag `0.4.3-prerelease` (`minor`, 126 commits); the manifest, build environment, docs configuration, and theme showcase now use it.
+- [x] Establish one release version as the source of truth. `Get-ConventionalCommitVersion` calculated `0.19.0` from tag `0.4.3-prerelease` (`minor`, 134 commits); the manifest, build environment, docs configuration, and theme showcase now use it.
 - [x] Correct examples to match the public commands: `Export-PHWriterMetadata` now uses `-Path` and the router sample uses `-ArgumentList`.
 - [x] Complete the API reference from command metadata. It includes the omitted parameters, pager/palette signatures, and the exported `New-AsciiTokenGradient` function.
 - [x] Replace copied package/install references in `README.md` that point to `commitfusion`, and reconcile GitHub versus GitLab issue/source URLs and the stale `Docsurl` in `phwriter.psd1`.
@@ -28,7 +28,7 @@ This is the canonical tracker for outstanding work. The historical `devtacker-pe
 - [x] Replace emoji/ambiguous glyphs in the web theme catalogue with a clear decorative-terminal policy. The catalogue no longer renders them as web data; each theme links to an exact terminal preview command instead.
 - [ ] Generate per-theme preview assets from the checked-in VHS tapes. The `vhs_build` CI job now installs VHS and renders the checked-in showcase tapes before the Pages build; per-theme assets under `docs/assets/themes-previews/` still need dedicated tapes and disclosures.
 - [x] Audit navigation ordering. Each page now has a unique, sequential `nav_order`.
-- [x] Host or bundle fonts deliberately and supply system fallbacks. External Google Font imports are removed and the site uses system UI/monospace font stacks.
+- [x] Load JetBrains Mono deliberately for documentation code and retain system fallbacks. The splash layout preconnects to the font host and loads only the required weights.
 
 ## P3 — Module hardening
 

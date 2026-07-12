@@ -14,5 +14,5 @@ Type "Import-Module ../phwriter.psd1 -Force" Enter
 Type "Clear-Host" Enter
 Show
 
-Type "Write-PHAsciiLogo -Name PHWriter -Version 0.18.0 -Theme aurora -Gradient -GradientMode PerToken" Enter
+Type "Write-PHAsciiLogo -Name PHWriter -Version 0.19.0 -Theme aurora -Gradient -GradientMode PerToken" Enter
 Sleep 5s
