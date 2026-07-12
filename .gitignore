@@ -3,6 +3,7 @@ docs/.bundle/
 docs/.jekyll-cache/
 docs/.jekyll-metadata
 docs/_site/
+docs/public/
 docs/vendor/
 tools/commit-helper.ps1
 tools/VERIFICATION.txt
