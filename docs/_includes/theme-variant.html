@@ -5,10 +5,10 @@
     {% for variant in variants %}
     {% assign variant_slug = variant | downcase %}
     <figure class="ph-theme-preview-card">
-      <img loading="lazy" src="{{ '/assets/themes-previews/' | append: include.theme.name | append: '/' | append: variant_slug | append: '.gif' | relative_url }}" width="960" height="600" alt="{{ variant }} preview of the {{ include.theme.name }} PHWriter theme">
+      <img loading="lazy" src="./assets/themes-previews/{{ include.theme.name }}/{{ variant_slug }}.gif" width="960" height="600" alt="{{ variant }} preview of the {{ include.theme.name }} PHWriter theme">
       <figcaption>
         <strong>{{ variant }}</strong>
-        <code>pwsh ./vhs/Invoke-AllThemeVarients.ps1 -Theme {{ include.theme.name }} -Variant {{ variant }}</code>
+        <code>New-PHWriter @metadata -Theme '{{ include.theme.name }}' -Layout Minimal -Compact{% if variant == 'Rounded' %} -OuterBorder{% elsif variant == 'Double' %} -OuterBorder -OuterBorderStyle Double{% elsif variant == 'Gradient' %} -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201{% endif %}</code>
       </figcaption>
     </figure>
     {% endfor %}

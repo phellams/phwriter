@@ -115,7 +115,9 @@ function New-PHWriter {
                 'midnight', 'gold', 'rose', 'steel', 'phwriter', 'glitch', 'cosmic',
                 'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust',
                 'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal',
-                'copper', 'royal', 'desert-heat', 'sheriff', 'frost'
+                'copper', 'royal', 'desert-heat', 'sheriff', 'frost',
+                'drift-blue-orange', 'steel-plate', 'cyber-grid', 'retro-blocks', 'gothic-crypt',
+                'acid-shards', 'aurora-borealis', 'solar-flare', 'subspace', 'neon-horizon'
             )
             if ($_ -is [string] -and $validNames -contains $_) { return $true }
             throw "Invalid -Theme value '$_'. Provide a valid built-in theme name or a custom theme hashtable."

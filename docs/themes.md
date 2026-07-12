@@ -64,14 +64,7 @@ These themes combine distinct border treatments with their colour configurations
 
 ## 5. Theme Variants
 
-Every selectable theme has Base, Rounded, Double, and Gradient VHS previews with the exact terminal command used to generate each GIF. The `vhs_build` CI job derives the 200 tapes from `Show-PHTheme -Name`.
-
-{% assign theme_groups = site.data.themes.base_themes | concat: site.data.themes.gradient_themes | concat: site.data.themes.extended_themes | concat: site.data.themes.hard_bordered_themes %}
-<div class="ph-theme-variants">
-{% for theme in theme_groups %}
-{% include theme-variant.html theme=theme %}
-{% endfor %}
-</div>
+Every selectable theme has Base, Rounded, Double, and Gradient VHS previews. Browse the [Theme Variant Gallery](theme-variant-gallery.html) to inspect the generated output and copy the corresponding `New-PHWriter` command.
 
 ---
 

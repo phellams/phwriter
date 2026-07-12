@@ -7,18 +7,26 @@ description: "Terminal previews of PHWriter border and gradient variants."
 
 # Theme Variant Gallery
 
-`Invoke-AllThemeVarients.ps1` renders each supported presentation variant for a selected built-in theme.
+Every selectable PHWriter theme has Base, Rounded, Double, and Gradient recordings generated through `New-PHWriter`.
 
-{% assign aurora_theme = site.data.themes.gradient_themes | where: 'name', 'aurora' | first %}
-{% include theme-variant.html theme=aurora_theme %}
+{% assign theme_groups = site.data.themes.base_themes | concat: site.data.themes.gradient_themes | concat: site.data.themes.extended_themes | concat: site.data.themes.hard_bordered_themes %}
+<div class="ph-theme-variants">
+{% for theme in theme_groups %}
+{% include theme-variant.html theme=theme %}
+{% endfor %}
+</div>
 
 ## Generate a variant preview
 
 ```powershell
-pwsh ./vhs/Invoke-AllThemeVarients.ps1 -Theme aurora -Variant Gradient
+$metadata = @{
+    Name = 'SAMPLE'
+    CommandInfo = @{ cmdlet = 'Get-SampleData'; synopsis = 'Get-SampleData [-Path <String>]'; description = 'Sample output.'; source = 'https://gitlab.com/phellams/phwriter' }
+}
+New-PHWriter @metadata -Theme 'aurora' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201
 ```
 
-Use `-Variant Base`, `Rounded`, `Double`, or `Gradient` to render one GIF source. Omit `-Variant` or pass `All` to print all four variants in the terminal. Use any value accepted by `Show-PHTheme -Name`.
+The gallery’s command cards show the specific flags for Base, Rounded, Double, and Gradient output. Use any value accepted by `Show-PHTheme -Name`; `New-PHWriter` accepts the same 50 built-in theme names.
 
 ## VHS source
 

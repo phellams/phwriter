@@ -200,6 +200,14 @@ Describe "New-PHWriter" {
         $customParams['Padding'] = 1
         New-PHWriter @customParams
     }
+
+    It "Should render a hard-bordered theme without throwing" {
+        $customParams = $params.Clone()
+        $customParams['Theme'] = 'cyber-grid'
+        $customParams['OuterBorder'] = $true
+        $customParams['OuterBorderStyle'] = 'Double'
+        New-PHWriter @customParams
+    }
 }
 
 Describe "New-AsciiColor" {
