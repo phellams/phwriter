@@ -42,6 +42,17 @@ function New-AsciiColor {
     )
 
     begin {
+        $ColorSupported = $true
+        if ($env:NO_COLOR -or $env:PHWRITER_NO_COLOR -or $global:PHWriterNoColor) {
+            $ColorSupported = $false
+        }
+        $TrueColorSupported = $false
+        if ($ColorSupported) {
+            if ($env:COLORTERM -in @('truecolor', '24bit') -or $env:WT_SESSION -or $env:TERM_PROGRAM -eq 'vscode') {
+                $TrueColorSupported = $true
+            }
+        }
+
         $ColorMap = @{
             'black'       = 0
             'darkred'     = 1
@@ -166,8 +177,12 @@ function New-AsciiColor {
                     # ③ 3-part RGB: 'r;g;b' → nearest 256-color index
                     if ($r -le 255 -and $g -le 255 -and $b -le 255 -and
                         $r -ge 0   -and $g -ge 0   -and $b -ge 0) {
-                        $idx = _Find-NearestIndex $r $g $b
-                        return "${base};5;${idx}"
+                        if ($TrueColorSupported) {
+                            return "${base};2;${r};${g};${b}"
+                        } else {
+                            $idx = _Find-NearestIndex $r $g $b
+                            return "${base};5;${idx}"
+                        }
                     }
                 }
 
@@ -188,7 +203,7 @@ function New-AsciiColor {
     }
 
     process {
-        if ([string]::IsNullOrEmpty($String)) {
+        if (-not $ColorSupported -or [string]::IsNullOrEmpty($String)) {
             return $String
         }
 

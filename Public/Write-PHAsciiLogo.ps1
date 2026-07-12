@@ -85,6 +85,10 @@ function Write-PHAsciiLogo {
         [Alias('CustomGradnet')]
         [int[]]$CustomGradient,
 
+        [Parameter(HelpMessage = "The gradient mode: Horizontal, Vertical, or PerToken.")]
+        [ValidateSet('Horizontal', 'Vertical', 'PerToken')]
+        [string]$GradientMode = 'Horizontal',
+
         [Parameter(HelpMessage = "Display Help for Write-PHAsciiLogo.")]
         [switch]$Help
     )
@@ -169,11 +173,41 @@ function Write-PHAsciiLogo {
             }
         }
 
+        function Get-ColorIndexRGB ([int]$index) {
+            if ($index -lt 0 -or $index -gt 255) { return @(255, 255, 255) }
+            $sys = @(
+                @(0,0,0),     @(128,0,0),   @(0,128,0),   @(128,128,0),
+                @(0,0,128),   @(128,0,128), @(0,128,128), @(192,192,192),
+                @(128,128,128),@(255,0,0),  @(0,255,0),   @(255,255,0),
+                @(0,0,255),   @(255,0,255), @(0,255,255), @(255,255,255)
+            )
+            if ($index -lt 16) { return $sys[$index] }
+            if ($index -lt 232) {
+                $idx = $index - 16
+                $b = $idx % 6
+                $g = [int](($idx / 6) % 6)
+                $r = [int]($idx / 36)
+                $toV = { param($v) if ($v -eq 0) { 0 } else { 55 + $v * 40 } }
+                return @((&$toV $r), (&$toV $g), (&$toV $b))
+            }
+            $grey = 8 + ($index - 232) * 10
+            return @($grey, $grey, $grey)
+        }
+
         # If custom logo is provided, print it directly (with border styling applied to each line if wanted)
         if ($CustomLogo) {
-            $lines = $CustomLogo -split "`n" | ForEach-Object { $_.TrimEnd() }
-            foreach ($line in $lines) {
-                [console]::WriteLine($(Format-ThemeText -String $line -Theme $themeObj -Element 'Border'))
+            $lines = $CustomLogo -split "`r?\n" | ForEach-Object { $_.TrimEnd() }
+            if ($useGradient) {
+                $rgbStart = Get-ColorIndexRGB $steps[0]
+                $rgbEnd   = Get-ColorIndexRGB $steps[-1]
+                $colorized = New-AsciiTokenGradient -Lines $lines -StartColor $rgbStart -EndColor $rgbEnd -Mode $GradientMode
+                foreach ($line in $colorized) {
+                    [console]::WriteLine($line)
+                }
+            } else {
+                foreach ($line in $lines) {
+                    [console]::WriteLine($(Format-ThemeText -String $line -Theme $themeObj -Element 'Border'))
+                }
             }
             [console]::Write("`n")
             return
@@ -189,88 +223,90 @@ function Write-PHAsciiLogo {
                 $width  = [Math]::Max(60, $nameVisualWidth + 8)
                 $top    = "╭" + ("─" * ($width - 2)) + "╮"
                 $bottom = "╰" + ("─" * ($width - 2)) + "╯"
+                $innerPadded = Pad-AnsiString -Text $spacedName -Width ($width - 2) -Align 'Center' -PadChar ' '
+                $middle = "│" + $innerPadded + "│"
 
-                # Calculate the inner row text width (total width minus borders)
-                $innerWidth = $width - 2
-                
-                # Center the spaced name inside the borders with plain space characters
-                # before applying any ANSI color styling.
-                $innerPadded = Pad-AnsiString -Text $spacedName -Width $innerWidth -Align 'Center' -PadChar ' '
-
-                # Combine formatted borders and header contents
-                $borderChar = Format-ThemeText -String "│" -Theme $themeObj -Element 'Border'
-                $styledHeader = if ($useGradient) {
-                    New-AsciiGradient -Type 'fg' -Steps $steps -String $innerPadded
+                if ($useGradient) {
+                    $rgbStart = Get-ColorIndexRGB $steps[0]
+                    $rgbEnd   = Get-ColorIndexRGB $steps[-1]
+                    $colorized = New-AsciiTokenGradient -Lines @($top, $middle, $bottom) -StartColor $rgbStart -EndColor $rgbEnd -Mode $GradientMode
+                    foreach ($line in $colorized) { [console]::WriteLine($line) }
                 } else {
-                    Format-ThemeText -String $innerPadded -Theme $themeObj -Element 'Header'
+                    [console]::WriteLine($(Format-ThemeText -String $top    -Theme $themeObj -Element 'Border'))
+                    [console]::WriteLine(($(Format-ThemeText -String "│" -Theme $themeObj -Element 'Border') + $(Format-ThemeText -String $innerPadded -Theme $themeObj -Element 'Header') + $(Format-ThemeText -String "│" -Theme $themeObj -Element 'Border')))
+                    [console]::WriteLine($(Format-ThemeText -String $bottom -Theme $themeObj -Element 'Border'))
                 }
-                $middle = $borderChar + $styledHeader + $borderChar
-
-                [console]::WriteLine($(Format-ThemeText -String $top    -Theme $themeObj -Element 'Border'))
-                [console]::WriteLine($middle)
-                [console]::WriteLine($(Format-ThemeText -String $bottom -Theme $themeObj -Element 'Border'))
             }
             'Classic' {
                 $borderTop    = $themeObj['BorderTop']
                 $borderBottom = $themeObj['BorderBottom']
                 $borderMiddle = $themeObj['BorderMiddle']
 
-                # Compute padding based on visual width of BorderTop
                 $totalWidth = if ($borderTop) { _Measure-VisualWidth $borderTop } else { 70 }
                 $innerWidth = $totalWidth - 2
 
                 $middleChar = if ($borderMiddle) { $borderMiddle } else { "░" }
-                $nameVisualWidth = _Measure-VisualWidth $spacedName
-
-                # Center spaced name using the theme's middle character prior to ANSI coloring
                 $innerPadded = Pad-AnsiString -Text $spacedName -Width $innerWidth -Align 'Center' -PadChar $middleChar
 
-                $borderLeft  = Format-ThemeText -String "╟" -Theme $themeObj -Element 'Border'
-                $borderRight = Format-ThemeText -String "╢" -Theme $themeObj -Element 'Border'
-                $styledHeader = if ($useGradient) {
-                    New-AsciiGradient -Type 'fg' -Steps $steps -String $innerPadded
+                if ($useGradient) {
+                    $top = if ($borderTop) { $borderTop } else { "═══" }
+                    $bottom = if ($borderBottom) { $borderBottom } else { "═══" }
+                    $middle = "╟" + $innerPadded + "╢"
+                    $rgbStart = Get-ColorIndexRGB $steps[0]
+                    $rgbEnd   = Get-ColorIndexRGB $steps[-1]
+                    $colorized = New-AsciiTokenGradient -Lines @($top, $middle, $bottom) -StartColor $rgbStart -EndColor $rgbEnd -Mode $GradientMode
+                    foreach ($line in $colorized) { [console]::WriteLine($line) }
                 } else {
-                    Format-ThemeText -String $innerPadded -Theme $themeObj -Element 'Header'
-                }
-                $middle = $borderLeft + $styledHeader + $borderRight
+                    $borderLeft  = Format-ThemeText -String "╟" -Theme $themeObj -Element 'Border'
+                    $borderRight = Format-ThemeText -String "╢" -Theme $themeObj -Element 'Border'
+                    $styledHeader = Format-ThemeText -String $innerPadded -Theme $themeObj -Element 'Header'
+                    $middle = $borderLeft + $styledHeader + $borderRight
 
-                [console]::WriteLine($(Format-ThemeText -String $borderTop    -Theme $themeObj -Element 'Border'))
-                [console]::WriteLine($middle)
-                [console]::WriteLine($(Format-ThemeText -String $borderBottom -Theme $themeObj -Element 'Border'))
+                    [console]::WriteLine($(Format-ThemeText -String $borderTop    -Theme $themeObj -Element 'Border'))
+                    [console]::WriteLine($middle)
+                    [console]::WriteLine($(Format-ThemeText -String $borderBottom -Theme $themeObj -Element 'Border'))
+                }
             }
             'Minimal' {
                 $nameVisualWidth = _Measure-VisualWidth $spacedName
                 $width = [Math]::Max(60, $nameVisualWidth + 4)
                 $line  = "─" * $width
-                $styledHeader = if ($useGradient) {
-                    New-AsciiGradient -Type 'fg' -Steps $steps -String ("  " + $spacedName)
+                $headerStr = "  " + $spacedName
+
+                if ($useGradient) {
+                    $rgbStart = Get-ColorIndexRGB $steps[0]
+                    $rgbEnd   = Get-ColorIndexRGB $steps[-1]
+                    $colorized = New-AsciiTokenGradient -Lines @($headerStr, $line) -StartColor $rgbStart -EndColor $rgbEnd -Mode $GradientMode
+                    foreach ($l in $colorized) { [console]::WriteLine($l) }
                 } else {
-                    Format-ThemeText -String ("  " + $spacedName) -Theme $themeObj -Element 'Header'
+                    $styledHeader = Format-ThemeText -String $headerStr -Theme $themeObj -Element 'Header'
+                    [console]::WriteLine($styledHeader)
+                    [console]::WriteLine($(Format-ThemeText -String $line -Theme $themeObj -Element 'Border'))
                 }
-                [console]::WriteLine($styledHeader)
-                [console]::WriteLine($(Format-ThemeText -String $line -Theme $themeObj -Element 'Border'))
             }
             'Man' {
-                # Mimics a standard Linux man header: PHWRITER(1)   User Commands   PHWRITER(1)
                 $width      = 70
                 $leftText   = "$($Name.ToUpper())(1)"
                 $centerText = "User Commands"
                 $rightText  = "$($Name.ToUpper())(1)"
 
-                # Concatenate with correct cell widths and alignments using Clap
                 $headerLine = Clap -Cells @(
                     @{ Text = $leftText;   Width = 25; Align = 'Left' }
                     @{ Text = $centerText; Width = 20; Align = 'Center' }
                     @{ Text = $rightText;  Width = 25; Align = 'Right' }
                 )
+                $line = "─" * $width
 
-                $styledHeader = if ($useGradient) {
-                    New-AsciiGradient -Type 'fg' -Steps $steps -String $headerLine
+                if ($useGradient) {
+                    $rgbStart = Get-ColorIndexRGB $steps[0]
+                    $rgbEnd   = Get-ColorIndexRGB $steps[-1]
+                    $colorized = New-AsciiTokenGradient -Lines @($headerLine, $line) -StartColor $rgbStart -EndColor $rgbEnd -Mode $GradientMode
+                    foreach ($l in $colorized) { [console]::WriteLine($l) }
                 } else {
-                    Format-ThemeText -String $headerLine -Theme $themeObj -Element 'Header'
+                    $styledHeader = Format-ThemeText -String $headerLine -Theme $themeObj -Element 'Header'
+                    [console]::WriteLine($styledHeader)
+                    [console]::WriteLine($(Format-ThemeText -String $line -Theme $themeObj -Element 'Border'))
                 }
-                [console]::WriteLine($styledHeader)
-                [console]::WriteLine($(Format-ThemeText -String ("─" * $width) -Theme $themeObj -Element 'Border'))
             }
             'Terminal' {
                 $terminalArt = @(
@@ -281,27 +317,40 @@ function Write-PHAsciiLogo {
                     "   └───────────────┘"
                 )
 
-                foreach ($line in $terminalArt) {
-                    $rendered = $line
-                    if ($rendered -match '\{Name\}') {
-                        $styledName = if ($useGradient) {
-                            New-AsciiGradient -Type 'fg' -Steps $steps -String $spacedName
-                        } else {
-                            Format-ThemeText -String $spacedName -Theme $themeObj -Element 'Header'
+                if ($useGradient) {
+                    $rawLines = [System.Collections.Generic.List[string]]::new()
+                    foreach ($line in $terminalArt) {
+                        $rendered = $line
+                        if ($rendered -match '\{Name\}') {
+                            $rendered = $rendered -replace '\{Name\}', $spacedName
                         }
-                        $rendered   = $rendered -replace '\{Name\}', $styledName
+                        if ($rendered -match '\{Version\}') {
+                            $rendered = $rendered -replace '\{Version\}', $versionStr
+                        }
+                        [void]$rawLines.Add($rendered)
                     }
-                    if ($rendered -match '\{Version\}') {
-                        $styledVer = Format-ThemeText -String $versionStr -Theme $themeObj -Element 'Version'
-                        $rendered  = $rendered -replace '\{Version\}', $styledVer
+                    $rgbStart = Get-ColorIndexRGB $steps[0]
+                    $rgbEnd   = Get-ColorIndexRGB $steps[-1]
+                    $colorized = New-AsciiTokenGradient -Lines $rawLines.ToArray() -StartColor $rgbStart -EndColor $rgbEnd -Mode $GradientMode
+                    foreach ($l in $colorized) { [console]::WriteLine($l) }
+                } else {
+                    foreach ($line in $terminalArt) {
+                        $rendered = $line
+                        if ($rendered -match '\{Name\}') {
+                            $styledName = Format-ThemeText -String $spacedName -Theme $themeObj -Element 'Header'
+                            $rendered   = $rendered -replace '\{Name\}', $styledName
+                        }
+                        if ($rendered -match '\{Version\}') {
+                            $styledVer = Format-ThemeText -String $versionStr -Theme $themeObj -Element 'Version'
+                            $rendered  = $rendered -replace '\{Version\}', $styledVer
+                        }
+
+                        $boxPart  = $rendered.Substring(0, 20)
+                        $textPart = if ($rendered.Length -gt 20) { $rendered.Substring(20) } else { "" }
+
+                        $styledBox = Format-ThemeText -String $boxPart -Theme $themeObj -Element 'Border'
+                        [console]::WriteLine($styledBox + $textPart)
                     }
-
-                    # Highlight the terminal icon borders/text
-                    $boxPart  = $rendered.Substring(0, 20)
-                    $textPart = if ($rendered.Length -gt 20) { $rendered.Substring(20) } else { "" }
-
-                    $styledBox = Format-ThemeText -String $boxPart -Theme $themeObj -Element 'Border'
-                    [console]::WriteLine($styledBox + $textPart)
                 }
             }
             'Typewriter' {
@@ -316,26 +365,40 @@ function Write-PHAsciiLogo {
                     "   '───────────────────'"
                 )
 
-                foreach ($line in $typewriterArt) {
-                    $rendered = $line
-                    if ($rendered -match '\{Name\}') {
-                        $styledName = if ($useGradient) {
-                            New-AsciiGradient -Type 'fg' -Steps $steps -String $spacedName
-                        } else {
-                            Format-ThemeText -String $spacedName -Theme $themeObj -Element 'Header'
+                if ($useGradient) {
+                    $rawLines = [System.Collections.Generic.List[string]]::new()
+                    foreach ($line in $typewriterArt) {
+                        $rendered = $line
+                        if ($rendered -match '\{Name\}') {
+                            $rendered = $rendered -replace '\{Name\}', $spacedName
                         }
-                        $rendered   = $rendered -replace '\{Name\}', $styledName
+                        if ($rendered -match '\{Version\}') {
+                            $rendered = $rendered -replace '\{Version\}', $versionStr
+                        }
+                        [void]$rawLines.Add($rendered)
                     }
-                    if ($rendered -match '\{Version\}') {
-                        $styledVer = Format-ThemeText -String $versionStr -Theme $themeObj -Element 'Version'
-                        $rendered  = $rendered -replace '\{Version\}', $styledVer
+                    $rgbStart = Get-ColorIndexRGB $steps[0]
+                    $rgbEnd   = Get-ColorIndexRGB $steps[-1]
+                    $colorized = New-AsciiTokenGradient -Lines $rawLines.ToArray() -StartColor $rgbStart -EndColor $rgbEnd -Mode $GradientMode
+                    foreach ($l in $colorized) { [console]::WriteLine($l) }
+                } else {
+                    foreach ($line in $typewriterArt) {
+                        $rendered = $line
+                        if ($rendered -match '\{Name\}') {
+                            $styledName = Format-ThemeText -String $spacedName -Theme $themeObj -Element 'Header'
+                            $rendered   = $rendered -replace '\{Name\}', $styledName
+                        }
+                        if ($rendered -match '\{Version\}') {
+                            $styledVer = Format-ThemeText -String $versionStr -Theme $themeObj -Element 'Version'
+                            $rendered  = $rendered -replace '\{Version\}', $styledVer
+                        }
+
+                        $boxPart  = $rendered.Substring(0, 24)
+                        $textPart = if ($rendered.Length -gt 24) { $rendered.Substring(24) } else { "" }
+
+                        $styledBox = Format-ThemeText -String $boxPart -Theme $themeObj -Element 'Border'
+                        [console]::WriteLine($styledBox + $textPart)
                     }
-
-                    $boxPart  = $rendered.Substring(0, 24)
-                    $textPart = if ($rendered.Length -gt 24) { $rendered.Substring(24) } else { "" }
-
-                    $styledBox = Format-ThemeText -String $boxPart -Theme $themeObj -Element 'Border'
-                    [console]::WriteLine($styledBox + $textPart)
                 }
             }
         }

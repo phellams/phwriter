@@ -11,7 +11,7 @@ has_toc: true
 
 Below is a live-rendered visualization of a PHWriter CLI help screen using the **aurora** gradient theme and outer borders:
 
-![PHWriter Terminal Preview](./assets/images/aurora.gif)
+<image src="./assets/images/aurora.gif" width="848" alt="PHWriter Terminal Preview">
 
 <div style="background-color: #171b21; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: 'JetBrains Mono', monospace; padding: 15px; margin: 20px 0; overflow: hidden; color: #f8f8f2;">
   <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">

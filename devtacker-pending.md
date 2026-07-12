@@ -1,6 +1,11 @@
 # Developer Tracker - Pending Tasks
 
-## Priority 1 - High-Priority Tasks-
+## Priority 1 - High-Priority Tasks
+- [ ] there is still a border around the the inner code blocks the need to be one color, and lets have a better copy button and aslo the 3dot window header with langauge 
+- [ ] update docs site stylin, using heavy hands for h1 ,inter for paragragh h2 lets choose one that matchs, can we scale the git to fit on the space page, lets have themes, page where we have the theme name, the sytax required to genenration perhaps have that in a details drop down that hidden, we must genrate and addition assets/themes-previews, each theme whichhave a vhs gif where we render the theme name and its possible layout types grafidan borders, 
+- [x] make sure we are handle the alt buffer corret, output remains when leave phwriter, we want a smooth and seemless experience, user must clean experierce going from help back to the normal buffer, lets have the alt buffer by default and if the use just wants to print in the normal buffer we should allow that aswellm unsure of to programaticlly do this expecilly with the router function perhaps this is something we programctily see for the dev using the modeul to decide.
+- [x] ive authered New-AsciiTokenGradiant.ps1, it is the spiritual sucessor to New-AsciiGradient, employ both to give users with modern termials with RGB support to have the full experice and we keep New-AsciiColor for terminals that dont support, add to phwriter utf8 enable on module import and aslo a check for termalal color support and user 
+  - [x] Brialiant idea!! -- the -Mode PerToken we could use this to expand out theme range to infinate if i understand and have tested the logic ok, review this idea and report back.
 - [x] I think the module has grown large enough for a jekyll docs site, lets use just the docs theme, but put a dark theme well with outlines and access in orange yellow, to matach module logo, lets all add a default theme called phwriter, and will make it of the same accent.
 - [x] after a couple fixes and polish phwriter will go into its second release, make sure we have a summary in readme.md with all features quick getting started details on building etc, and we can leave the more complex documenation for the docs site.
 - [x] **sourcetpye** - we can do it two differnt ways, if module/tool/function is a router type function we assume there are subcommands do it would need to read, "cli NAME Function: NAME VERSION" and a module can be both to i gues we split it up standard|router, in doin this we can have each cmdlet have an help and router functions can use command add help and command remove custom Help.
@@ -20,7 +25,7 @@
   - [x] nebula theme is broken layout — replaced ambiguous-width glyphs (✹/✸/❇❈) with safe box-drawing chars (◆/»/╠══╪══╣/░)
   - [x] rust theme is broken layout — replaced ambiguous SectionChar ❖ with ◆
   - [x] SYNTAX, PARAMETERS, EXAMPLES only need 1 space after — fixed all section headers to emit 1 blank line (not 2)
-  - [x] new-phwriter has the capability to change type, route, command, and cmdlet — SourceType param was already present; now surfaced clearly in help
+  - [x] new-phwriter has the capability to change type, route, command, and cmdlet — SourceType eparam was already present; now surfaced clearly in help
   - [x] add SourceType to the show-phtheme — added -SourceType parameter (module|script|tool|plugin|cli|function|workflow), passed through to New-PHWriter
   - [x] outer border gradients — already implemented via -OuterBorder + -BorderGradient + -BorderCustomGradient
   - [x] add multiple types of outer border types — added -OuterBorderStyle (Rounded|Square|Double|Block|Simple) to New-PHWriter and Show-PHTheme
@@ -50,7 +55,7 @@
 - [x] Run local build (`localbuild.ps1 -Build -pester`) to verify 100% test coverage and zero regressions
 - [x] Conduct final pre-beta codebase, manifest, and performance review
 
-## Future Scope / Ideas
+## Future Scope / Ideas 
 - [ ] Implement build-time source consolidation directly into `psmpacker` to automate single-file packaging for release distributions
 
 ## Enhancements & Theme Implementations

@@ -42,6 +42,17 @@ function New-AsciiGradient {
     )
 
     begin {
+        $ColorSupported = $true
+        if ($env:NO_COLOR -or $env:PHWRITER_NO_COLOR -or $global:PHWriterNoColor) {
+            $ColorSupported = $false
+        }
+        $TrueColorSupported = $false
+        if ($ColorSupported) {
+            if ($env:COLORTERM -in @('truecolor', '24bit') -or $env:WT_SESSION -or $env:TERM_PROGRAM -eq 'vscode') {
+                $TrueColorSupported = $true
+            }
+        }
+
         # ── Build the full xterm-256 palette as RGB triples ──────────────────
         $script:_palette = New-Object 'object[]' 256
 
@@ -109,7 +120,7 @@ function New-AsciiGradient {
             }
         }
 
-        if ([string]::IsNullOrEmpty($String)) { return $String }
+        if (-not $ColorSupported -or [string]::IsNullOrEmpty($String)) { return $String }
 
         $stopRGB = [System.Collections.ArrayList]::new()
         foreach ($s in $Steps) { [void]$stopRGB.Add((Resolve-StopRGB $s)) }
@@ -119,7 +130,11 @@ function New-AsciiGradient {
         $segCount  = $Steps.Count - 1
         $result    = [System.Text.StringBuilder]::new($len * 20)
 
-        $escPrefix = if ($Type -eq 'fg') { "`e[38;5;" } else { "`e[48;5;" }
+        $escPrefix = if ($TrueColorSupported) {
+            if ($Type -eq 'fg') { "`e[38;2;" } else { "`e[48;2;" }
+        } else {
+            if ($Type -eq 'fg') { "`e[38;5;" } else { "`e[48;5;" }
+        }
 
         $formatMap = @{
             bold=1; dim=2; italic=3; underline=4; blink=5
@@ -149,9 +164,12 @@ function New-AsciiGradient {
             $tg = [int][Math]::Round($rgbA[1] + ($rgbB[1] - $rgbA[1]) * $frac)
             $tb = [int][Math]::Round($rgbA[2] + ($rgbB[2] - $rgbA[2]) * $frac)
 
-            $color = Find-NearestPaletteIndex $tr $tg $tb
-
-            [void]$result.Append("${formatPrefix}${escPrefix}${color}m$($chars[$i])")
+            if ($TrueColorSupported) {
+                [void]$result.Append("${formatPrefix}${escPrefix}${tr};${tg};${tb}m$($chars[$i])")
+            } else {
+                $color = Find-NearestPaletteIndex $tr $tg $tb
+                [void]$result.Append("${formatPrefix}${escPrefix}${color}m$($chars[$i])")
+            }
         }
 
         if ($Reset) { [void]$result.Append("`e[0m") }

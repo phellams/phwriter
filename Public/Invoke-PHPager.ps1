@@ -47,6 +47,9 @@ function Invoke-PHPager {
         [Parameter(Mandatory = $false, HelpMessage = "ScriptBlock callback executed on console resize to regenerate content.")]
         [scriptblock]$OnResize,
 
+        [Parameter(Mandatory = $false, HelpMessage = "Keep help output on stdout when leaving alternate screen buffer.")]
+        [switch]$KeepOutput = $true,
+
         [Parameter(HelpMessage = "Display Help for Invoke-PHPager.")]
         [switch]$Help
     )
@@ -440,6 +443,11 @@ function Invoke-PHPager {
             [Console]::Write("${esc}[?1049l")  # exit alternate screen buffer
             try { [Console]::CursorVisible = $origCursorVisible } catch {}
             try { [Console]::TreatControlCAsInput = $origTreatCAsInput } catch {}
+
+            if ($KeepOutput) {
+                $outputStr = $displayLines -join [Environment]::NewLine
+                [System.Console]::WriteLine($outputStr)
+            }
         }
     }
 }

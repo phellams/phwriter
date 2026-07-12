@@ -136,6 +136,10 @@ function New-PHWriter {
         [Alias('CustomGradnet')]
         [int[]]$CustomGradient,
 
+        [Parameter(HelpMessage = "The gradient mode: Horizontal, Vertical, or PerToken. Sourced from the active theme's GradientMode or defaults to Horizontal.")]
+        [ValidateSet('Horizontal', 'Vertical', 'PerToken')]
+        [string]$GradientMode = 'Horizontal',
+
         [Parameter(HelpMessage = "Wrap the entire help output in a border.")]
         [switch]$OuterBorder,
 
@@ -155,7 +159,10 @@ function New-PHWriter {
 
         [Parameter(HelpMessage = "The output mode: 'Standard' (direct dump to standard console), 'Alt' (page dump in alternate screen buffer), 'String' (return output as string), or 'Auto' (page if fits, else alt).")]
         [ValidateSet('Standard', 'Alt', 'String', 'Auto')]
-        [string]$OutMode = 'Standard',
+        [string]$OutMode = 'Auto',
+
+        [Parameter(HelpMessage = "Keep help output on stdout when leaving alternate screen buffer pager.")]
+        [switch]$KeepOutput = $true,
 
         [Parameter(HelpMessage = "Display Help for New-PHWriter.")]
         [switch]$Help
@@ -302,6 +309,12 @@ function New-PHWriter {
             $themeObj = Get-PHTheme -Name $Theme
         }
 
+        if ($PSBoundParameters.ContainsKey('GradientMode')) {
+            # User specified, keep it
+        } elseif ($themeObj.ContainsKey('GradientMode')) {
+            $GradientMode = $themeObj['GradientMode']
+        }
+
         # Load JSON data if a JsonFile is provided
         if ($JsonFile) {
             $jsonFile_FullPath = Get-ChildItem -Path $JsonFile | Select-Object -First 1
@@ -327,6 +340,7 @@ function New-PHWriter {
                     if ($jsonData.ContainsKey('bordergradient')) { $BorderGradient = [bool]$jsonData.bordergradient }
                     if ($jsonData.ContainsKey('bordercustomgradient')) { $BorderCustomGradient = [int[]]$jsonData.bordercustomgradient }
                     elseif ($jsonData.ContainsKey('bordercustomgradnet')) { $BorderCustomGradient = [int[]]$jsonData.bordercustomgradnet }
+                    if ($jsonData.ContainsKey('gradientmode')) { $GradientMode = [string]$jsonData.gradientmode }
                     if ($jsonData.ContainsKey('compact')) { $Compact = [bool]$jsonData.compact }
                 } catch {
                     Write-Warning "Failed to parse JSON file: $_"
@@ -445,7 +459,7 @@ function New-PHWriter {
 
         try {
             # Output Logo
-            Write-PHAsciiLogo -Name $Name -Version $Version -Theme $themeObj -Layout $Layout -CustomLogo $CustomLogo -Gradient:$Gradient -CustomGradient $CustomGradient
+            Write-PHAsciiLogo -Name $Name -Version $Version -Theme $themeObj -Layout $Layout -CustomLogo $CustomLogo -Gradient:$Gradient -CustomGradient $CustomGradient -GradientMode $GradientMode
 
             # Sections config
             $sectionChar = if ($themeObj.ContainsKey('SectionChar')) { $themeObj['SectionChar'] } else { '◉' }
@@ -801,7 +815,7 @@ function New-PHWriter {
         if ($OutMode -eq 'String') {
             return $finalString -split '\r?\n'
         } elseif ($doPager) {
-            Invoke-PHPager -Content $finalString -Title $Name -Theme $themeObj -OnResize $onResizeCallback
+            Invoke-PHPager -Content $finalString -Title $Name -Theme $themeObj -OnResize $onResizeCallback -KeepOutput:$KeepOutput
         } else {
             [System.Console]::Write($finalString)
         }

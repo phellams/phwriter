@@ -1,6 +1,10 @@
 BeforeAll { 
+    $env:PHWRITER_TEST_MODE = 'true'
     # Import the module
     Import-Module -Name ./phwriter.psm1 -Force
+}
+BeforeEach {
+    $env:PHWRITER_TEST_MODE = 'true'
 
     # Dot-source private helper files directly in the test scope for unit testing
     . ./Private/New-AsciiColor.ps1
@@ -407,7 +411,79 @@ Describe "PHWriter-Width-and-Paging-Features" {
             New-PHWriter @params -OutMode Alt
             New-PHWriter @params -OutMode Auto
         } finally {
-            $env:PHWRITER_TEST_MODE = $null
+            $env:PHWRITER_TEST_MODE = 'true'
         }
+    }
+}
+
+Describe "New-AsciiTokenGradient-and-Color-Support" {
+    BeforeAll {
+        . ./Public/New-AsciiTokenGradient.ps1
+        . ./Private/ConvertTo-AsciiTokens.ps1
+    }
+
+    It "Should tokenize and colorize ASCII art using New-AsciiTokenGradient" {
+        $art = @(
+            "(\ "
+            "\'\ "
+            " \'\     __________  "
+            " / '|   ()_________)"
+            " \ '/    \ ~~~~~~~~ \"
+            "   \       \ ~~~~~~   \"
+            "   ==).      \__________\"
+            "  (__)       ()__________)"
+        )
+        $outH = New-AsciiTokenGradient -Lines $art -Mode Horizontal
+        $outH | Should -Not -BeNullOrEmpty
+
+        $outV = New-AsciiTokenGradient -Lines $art -Mode Vertical
+        $outV | Should -Not -BeNullOrEmpty
+
+        $outP = New-AsciiTokenGradient -Lines $art -Mode PerToken
+        $outP | Should -Not -BeNullOrEmpty
+    }
+
+    It "Should respect NO_COLOR env variable in New-AsciiColor and New-AsciiGradient" {
+        $env:NO_COLOR = 'true'
+        try {
+            $colored = New-AsciiColor -String "Hello" -Color "255;0;0"
+            $colored | Should -Be "Hello"
+
+            $gradient = New-AsciiGradient -Type 'fg' -Steps @(16, 20) -String "World"
+            $gradient | Should -Be "World"
+        } finally {
+            $env:NO_COLOR = $null
+        }
+    }
+
+    It "Should use TrueColor output when truecolor is supported in New-AsciiGradient" {
+        $env:COLORTERM = 'truecolor'
+        try {
+            $gradient = New-AsciiGradient -Type 'fg' -Steps @(16, 20) -String "World"
+            # TrueColor escape code starts with \e[38;2;
+            $gradient | Should -Contain "`e[38;2;"
+        } finally {
+            $env:COLORTERM = $null
+        }
+    }
+
+    It "Should colorize logo using GradientMode (Horizontal, Vertical, PerToken)" {
+        $mockTheme = Get-PHTheme -Name 'aurora'
+        Write-PHAsciiLogo -Name 'TESTLOGO' -Theme $mockTheme -Layout 'Box' -Gradient -GradientMode Horizontal
+        Write-PHAsciiLogo -Name 'TESTLOGO' -Theme $mockTheme -Layout 'Box' -Gradient -GradientMode Vertical
+        Write-PHAsciiLogo -Name 'TESTLOGO' -Theme $mockTheme -Layout 'Box' -Gradient -GradientMode PerToken
+
+        Write-PHAsciiLogo -Name 'TESTLOGO' -Theme $mockTheme -Layout 'Terminal' -Gradient -GradientMode Horizontal
+        Write-PHAsciiLogo -Name 'TESTLOGO' -Theme $mockTheme -Layout 'Typewriter' -Gradient -GradientMode Horizontal
+
+        $custom = " (\ `n\'\'\ `n \'\     __________"
+        Write-PHAsciiLogo -CustomLogo $custom -Theme $mockTheme -Gradient -GradientMode Vertical
+    }
+
+    It "Should support GradientMode in New-PHWriter and Show-PHTheme" {
+        $writerOut = New-PHWriter -Name 'TESTWRITER' -OutMode String -Gradient -GradientMode PerToken
+        $writerOut | Should -Not -BeNullOrEmpty
+
+        Show-PHTheme -Name 'aurora' -Gradient -GradientMode Vertical -Minimal
     }
 }

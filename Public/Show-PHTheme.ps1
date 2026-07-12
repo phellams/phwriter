@@ -102,6 +102,10 @@ function Show-PHTheme {
         [Alias('CustomGradnet')]
         [int[]]$CustomGradient,
 
+        [Parameter(HelpMessage = "The gradient mode: Horizontal, Vertical, or PerToken.")]
+        [ValidateSet('Horizontal', 'Vertical', 'PerToken')]
+        [string]$GradientMode = 'Horizontal',
+
         # ── Outer border ─────────────────────────────────────────────────────────
         [Parameter(HelpMessage = "Wrap the entire preview output in a border box.")]
         [switch]$OuterBorder,
@@ -367,6 +371,7 @@ function Show-PHTheme {
 
                 if ($Gradient)        { $writerParams['Gradient']         = $true }
                 if ($CustomGradient)  { $writerParams['CustomGradient']   = $CustomGradient }
+                if ($PSBoundParameters.ContainsKey('GradientMode')) { $writerParams['GradientMode'] = $GradientMode }
                 if ($OuterBorder)     { $writerParams['OuterBorder']      = $true }
                 if ($BorderGradient)  { $writerParams['BorderGradient']   = $true }
                 if ($BorderCustomGradient) { $writerParams['BorderCustomGradient'] = $BorderCustomGradient }

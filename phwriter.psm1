@@ -41,5 +41,6 @@ Export-ModuleMember -Function `
     Invoke-PHPager,
     New-PHRouter,
     Show-PHTheme,
-    Get-TerminalPalette `
+    Get-TerminalPalette, `
+    New-AsciiTokenGradient `
     -Alias phextract, phpager, phroute, terpal

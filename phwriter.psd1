@@ -13,7 +13,8 @@
         'Invoke-PHPager',
         'New-PHRouter',
         'Show-PHTheme',
-        'Get-TerminalPalette'
+        'Get-TerminalPalette',
+        'New-AsciiTokenGradient'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()
