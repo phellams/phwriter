@@ -1,5 +1,5 @@
 @{
-    ModuleVersion     = '0.5.0'
+    ModuleVersion     = '0.18.0'
     GUID              = '083f04e0-3fe0-42ec-a918-f799e1f1df39'
     Author            = 'Garvey K. Snow'
     CompanyName       = 'Phallems'
@@ -18,7 +18,7 @@
     )
     CmdletsToExport   = @()
     VariablesToExport = @()
-    AliasesToExport   = @('phextract', 'phpager', 'phroute', 'terpal')
+    AliasesToExport   = @('phextract', 'phpager', 'phroute', 'terpal', 'Get-TerminalPallete')
     PrivateData       = @{
         PSData = @{
             Tags         = @('Help', 'Formatting', 'CLI', 'PowerShell', 'Documentation', 'AST', 'TUI', 'Router', 'Themes', 'Pager')
@@ -26,15 +26,15 @@
             RequireLicenseAcceptance = $false
             IconUri                  = 'https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png'
             LicenseUrl               = 'https://choosealicense.com/licenses/mit'
-            ProjectUrl               = 'https://github.com/phellams/phwriter'
+            ProjectUrl               = 'https://gitlab.com/phellams/phwriter'
             # CHOCOLATE ---------------------
             LicenseUri               = 'https://choosealicense.com/licenses/mit'
             ProjectUri               = 'https://gitlab.com/phellams/phwriter.git'
             IconUrl                  = 'https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png'
-            Docsurl                  = 'https://pages.gitlab.io/sgkens/ptoml'
-            MailingListUrl           = 'https://github.com/phellams/phwriter/issues'
-            projectSourceUrl         = 'https://github.com/phellams/phwriter'
-            bugTrackerUrl            = 'https://github.com/phellams/phwriter/issues'
+            Docsurl                  = 'https://phellams.gitlab.io/phwriter'
+            MailingListUrl           = 'https://gitlab.com/phellams/phwriter/-/issues'
+            projectSourceUrl         = 'https://gitlab.com/phellams/phwriter'
+            bugTrackerUrl            = 'https://gitlab.com/phellams/phwriter/-/issues'
             Summary                  = 'A PowerShell module for generating custom, colored help text with a man-page-like layout.'
             chocoDescription         = @"
 ## Overview

@@ -1,9 +1,6 @@
-// Google Fonts import for JetBrains Mono
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
-
-// JetBrains Mono for code blocks and inline code
+// System monospace stack for code blocks and inline code.
 code, pre, kbd, samp {
-  font-family: 'JetBrains Mono', monospace !important;
+  font-family: ui-monospace, 'Cascadia Code', 'SFMono-Regular', Consolas, monospace !important;
 }
 
 // Custom retro-terminal sidebar styling to match module logo
@@ -18,17 +15,12 @@ code.highlighter-rouge {
 }
 
 pre.highlight {
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 159, 26, 0.3) !important;
   border-left: 3px solid #ff9f1a !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
   border-radius: 8px;
   background-color: #0b0d13 !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover {
-    border-color: rgba(255, 159, 26, 0.4) !important;
-    box-shadow: 0 10px 32px rgba(255, 159, 26, 0.08), 0 8px 24px rgba(0, 0, 0, 0.6);
-  }
 }
 
 // Heavy shadows for titles to bring high impact/contrast
@@ -54,3 +46,28 @@ a.nav-list-link.active {
   color: #ff9f1a !important;
   font-weight: bold;
 }
+
+.copy-code-button:focus-visible,
+.ph-button:focus-visible,
+.ph-splash__brand:focus-visible {
+  outline: 3px solid #ffb86c;
+  outline-offset: 3px;
+}
+
+.ph-splash { background: #0d0f12; color: #e5e9f0; }
+.ph-splash__container { max-width: 1000px; margin: 0 auto; padding: clamp(1.25rem, 4vw, 2.5rem); }
+.ph-splash__header, .ph-terminal__titlebar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.ph-splash__header { border-bottom: 1px solid rgba(255, 159, 26, 0.2); padding-bottom: 1rem; }
+.ph-splash__brand { align-items: center; color: #ff9f1a; display: inline-flex; font-size: 1.5rem; font-weight: 800; gap: .75rem; text-decoration: none; }
+.ph-button { background: #ff9f1a; border-radius: .25rem; color: #0d0f12; font-weight: 700; padding: .5rem 1rem; text-decoration: none; }
+.ph-splash__content { max-width: 75rem; }
+.ph-splash__footer { border-top: 1px solid rgba(255, 159, 26, 0.2); color: #a5adba; font-size: .875rem; margin-top: 3rem; padding-top: 1.5rem; text-align: center; }
+.ph-demo-image { border: 1px solid rgba(255, 159, 26, 0.3); border-radius: .5rem; height: auto; max-width: 100%; }
+.ph-terminal { background: #0b0d13; border: 1px solid rgba(255, 159, 26, 0.3); border-radius: .5rem; margin: 1.5rem 0; overflow-x: auto; padding: 1rem; }
+.ph-terminal__titlebar { border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: #a5adba; font-size: .875rem; padding-bottom: .75rem; }
+.ph-terminal pre { background: transparent; border: 0; box-shadow: none; margin: 1rem 0 0; padding: 0; }
+.ph-theme-families { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); margin: 1.5rem 0; }
+.ph-theme-family { background: #171b21; border: 1px solid rgba(255, 159, 26, .3); border-radius: .5rem; color: #e5e9f0; display: grid; gap: .5rem; padding: 1rem; text-decoration: none; }
+.ph-theme-family:hover { border-color: #ff9f1a; color: #fff; }
+.ph-theme-family:focus-visible { outline: 3px solid #ffb86c; outline-offset: 3px; }
+.ph-theme-family span { color: #a5adba; font-size: .875rem; }

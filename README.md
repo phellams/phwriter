@@ -1,16 +1,15 @@
 <div align="center">
 
-<img width="128" src="https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png" alt="PHWriter Logo" /> 
+<img width="64" src="https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png" alt="PHWriter Logo" />
 
 <h1><b>Powershell Help Writer(PHWriter)</b></h1>
 
 <a href="https://gitlab.com/phellams/phwriter/-/blob/main/readme.md"><img src="https://img.shields.io/badge/License-mit-License?style=flat-square&labelColor=%23383838&color=%237A5ACF23CD5C5C" alt="MIT License" /></a> <a href="https://gitlab.com/phellams/phwriter/-/pipelines"><img src="https://img.shields.io/gitlab/pipeline-status/phellams%2Fphwriter?style=flat-square&logo=Gitlab&logoColor=%233478BD&labelColor=%232D2D34" alt="Build Status"></a> <a href="https://codecov.io/gh/phellams/phwriter"><img src="https://img.shields.io/codecov/c/gitlab/phellams/phwriter?style=flat-square&logo=codecov&logoColor=%23E6746B&logoSize=auto&labelColor=%234A7A82" alt="Coverage"></a> <a href="https://gitlab.com/phellams/phwriter/-/issues"><img src="https://img.shields.io/gitlab/issues/open/phellams%2Fphwriter?style=flat-square&logo=gitlab&logoColor=red&labelColor=%23ffffff&color=%236B8D29" alt="Open Issues"></a>
 
 <span>
-    <a href="https://phellams.gitlab.io/phwriter">🧷 <strong>Docs</strong></a>
-    <a href="https://www.powershellgallery.com/packages/PWSL">🧷 <strong>PSGallery</strong></a>
-    <a href="https://chocolatey.org/packages/pwphwritersl">🧷 <strong>Chocolatey</strong></a>
-    <a href="https://github.com/phellams/phwriter">🧷 <strong>GitHub</strong></a>
+    <a href="https://phellams.gitlab.io/phwriter">Docs</a>
+    <a href="https://www.powershellgallery.com/packages/PHWriter">PowerShell Gallery</a>
+    <a href="https://gitlab.com/phellams/phwriter">GitLab</a>
 </span>
 
 </div>
@@ -33,7 +32,7 @@ PHWriter (**PowerShell Help Writer**) is modeled in insperation from linux man p
 
 ## **Installation**
 
-Phellams modules are available from [**PowerShell Gallery**](https://www.powershellgallery.com/packages/commitfusion) and [**Chocolatey**](https://chocolatey.org/packages/commitfusion). you can access the raw assets via [**Gitlab Generic Assets**](https://gitlab.com/phellams/commitfusion/-/packages?orderBy=name&sort=desc&search[]=commitfusion) or nuget repository via [**Gitlab Packages**](https://gitlab.com/phellams/commitfusion/-/packages/?orderBy=name&sort=desc&search[]=commitfusion&type=NuGet).
+Install PHWriter from the [PowerShell Gallery](https://www.powershellgallery.com/packages/PHWriter), or obtain package and release assets from the [GitLab project](https://gitlab.com/phellams/phwriter/-/packages).
 
 |▓▓▓▓▒▒▒▒░░░|▓▓▓▓▒▒▒▒░░░|▓▓▓▓▒▒▒▒░░░|
 |-|-|-|
@@ -79,7 +78,7 @@ New-PHWriter -Name "MyModule" -Version "1.0.0" -Theme "phwriter"
 ### 2. Extracting Metadata Statically
 Extract comment-based help and parameters from your script:
 ```powershell
-$Meta = Export-PHWriterMetadata -FilePath "./Public/Get-MyData.ps1"
+$Meta = Export-PHWriterMetadata -Path "./Public/Get-MyData.ps1"
 New-PHWriter @Meta
 ```
 

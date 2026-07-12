@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Metadata Extraction
-nav_order: 2
+nav_order: 3
 description: "How to use Export-PHWriterMetadata to extract cmdlet help content statically via AST."
 ---
 
@@ -12,7 +12,7 @@ PHWriter includes an AST-powered extraction engine called `Export-PHWriterMetada
 ## Usage
 
 ```powershell
-Export-PHWriterMetadata -FilePath "./Public/Get-MyData.ps1"
+Export-PHWriterMetadata -Path "./Public/Get-MyData.ps1"
 ```
 
 ## How It Works

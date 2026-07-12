@@ -1,7 +1,17 @@
+Describe 'PHWriter module' {
 BeforeAll { 
+    $script:originalNoColor = $env:NO_COLOR
+    Remove-Item -Path Env:NO_COLOR -ErrorAction SilentlyContinue
     $env:PHWRITER_TEST_MODE = 'true'
     # Import the module
     Import-Module -Name ./phwriter.psm1 -Force
+}
+AfterAll {
+    if ($null -eq $script:originalNoColor) {
+        Remove-Item -Path Env:NO_COLOR -ErrorAction SilentlyContinue
+    } else {
+        $env:NO_COLOR = $script:originalNoColor
+    }
 }
 BeforeEach {
     $env:PHWRITER_TEST_MODE = 'true'
@@ -117,6 +127,10 @@ Describe "Show-PHTheme" {
 
     It "Should render custom-rgb theme without throwing" {
         Show-PHTheme -Name 'custom-rgb' -Minimal
+    }
+
+    It "Should render a hard-bordered theme without throwing" {
+        Show-PHTheme -Name 'cyber-grid' -Minimal
     }
 }
 
@@ -294,7 +308,7 @@ Describe "Invoke-PHPager" {
         try {
             "Line 1", "Line 2" | Invoke-PHPager -Title 'Test Pager' -NoColor
         } finally {
-            $env:PHWRITER_TEST_MODE = $null
+            $env:PHWRITER_TEST_MODE = 'true'
         }
     }
 
@@ -303,7 +317,7 @@ Describe "Invoke-PHPager" {
         try {
             "Line 1 with `e[31mRed`e[0m text" | Invoke-PHPager -Title 'Test Color Pager'
         } finally {
-            $env:PHWRITER_TEST_MODE = $null
+            $env:PHWRITER_TEST_MODE = 'true'
         }
     }
 }
@@ -461,7 +475,7 @@ Describe "New-AsciiTokenGradient-and-Color-Support" {
         try {
             $gradient = New-AsciiGradient -Type 'fg' -Steps @(16, 20) -String "World"
             # TrueColor escape code starts with \e[38;2;
-            $gradient | Should -Contain "`e[38;2;"
+            $gradient | Should -Match [regex]::Escape("`e[38;2;")
         } finally {
             $env:COLORTERM = $null
         }
@@ -486,4 +500,27 @@ Describe "New-AsciiTokenGradient-and-Color-Support" {
 
         Show-PHTheme -Name 'aurora' -Gradient -GradientMode Vertical -Minimal
     }
+}
+
+Describe 'Documentation contract' {
+    It 'lists every exported function in the cmdlet data and API reference' {
+        $cmdletData = [System.IO.File]::ReadAllText([System.IO.Path]::Combine($PSScriptRoot, '..', 'docs', '_data', 'cmdlets.yml'))
+        $apiReference = [System.IO.File]::ReadAllText([System.IO.Path]::Combine($PSScriptRoot, '..', 'docs', 'api-reference.md'))
+
+        foreach ($command in Get-Command -Module phwriter) {
+            $cmdletData | Should -Match "(?m)^- name: $([regex]::Escape($command.Name))$"
+            $apiReference | Should -Match [regex]::Escape($command.Name)
+        }
+    }
+
+    It 'does not contain superseded parameter examples or copied package names' {
+        $readme = [System.IO.File]::ReadAllText([System.IO.Path]::Combine($PSScriptRoot, '..', 'README.md'))
+        $metadataPage = [System.IO.File]::ReadAllText([System.IO.Path]::Combine($PSScriptRoot, '..', 'docs', 'metadata-extraction.md'))
+        $routerPage = [System.IO.File]::ReadAllText([System.IO.Path]::Combine($PSScriptRoot, '..', 'docs', 'cli-routing.md'))
+
+        $readme | Should -Not -Match 'commitfusion|Export-PHWriterMetadata -FilePath'
+        $metadataPage | Should -Not -Match 'Export-PHWriterMetadata -FilePath'
+        $routerPage | Should -Not -Match 'New-PHRouter -Routes \$Routes -Args'
+    }
+}
 }

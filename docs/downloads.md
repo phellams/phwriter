@@ -31,7 +31,7 @@ PHWriter is packaged and distributed across several channels to integrate smooth
 
 You can download compiled versions of the module directly for offline distribution or custom embedding:
 
-### Latest Release Assets (v2.0.0)
+### Release Assets
 
 | Format | Description | Download Link |
 |---|---|---|

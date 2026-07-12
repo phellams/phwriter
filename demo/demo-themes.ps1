@@ -26,7 +26,7 @@ Write-Host "Press enter to continue..."
 $null = Read-Host
 
 # 4. Preview all themes in minimal layout mode
-Write-Host "[3/4] Previewing all 41 themes in minimal layout mode..." -ForegroundColor Cyan
+Write-Host "[3/4] Previewing all 50 themes in minimal layout mode..." -ForegroundColor Cyan
 Show-PHTheme -All -Minimal -Layout 'Box'
 Write-Host "Press enter to continue..."
 $null = Read-Host

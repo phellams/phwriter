@@ -1708,7 +1708,9 @@ function Format-ThemeText {
         } else { @() }
     }
 
-    $format = @($rawFormat) | Where-Object { $_ -and $_ -ne 'none' }
+    # Preserve an array for a single format value; under strict mode a scalar
+    # string does not expose Count.
+    $format = @(@($rawFormat) | Where-Object { $_ -and $_ -ne 'none' })
 
     $params = @{
         String  = $String

@@ -7,63 +7,43 @@ permalink: /
 has_toc: true
 ---
 
-## Interactive Terminal Preview (VHS Demo)
+# PHWriter
+
+PHWriter renders structured, themed command help for PowerShell modules and command-line tools.
+
+## Interactive Terminal Preview
 
 Below is a live-rendered visualization of a PHWriter CLI help screen using the **aurora** gradient theme and outer borders:
 
-<image src="./assets/images/aurora.gif" width="848" alt="PHWriter Terminal Preview">
+<img class="ph-demo-image" src="./assets/images/aurora.gif" width="848" height="480" alt="PHWriter terminal preview using the aurora theme">
 
-<div style="background-color: #171b21; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: 'JetBrains Mono', monospace; padding: 15px; margin: 20px 0; overflow: hidden; color: #f8f8f2;">
-  <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-    <div style="display: flex; gap: 6px;">
-      <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #ff5f56;"></span>
-      <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #ffbd2e;"></span>
-      <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #27c93f;"></span>
-    </div>
-    <span style="color: #6272a4; font-size: 13px;">pwsh — Show-PHTheme -Name 'aurora'</span>
-    <span></span>
-  </div>
-  <pre style="margin: 0; background: none; border: none; box-shadow: none; color: #f8f8f2; font-size: 13px; line-height: 1.4;"><span style="color: #ff9f1a; font-weight: bold;">PS &gt; Show-PHTheme -Name 'aurora' -Gradient -OuterBorder -BorderGradient</span>
+<div class="ph-terminal" aria-label="Terminal command example">
+  <div class="ph-terminal__titlebar"><span aria-hidden="true">● ● ●</span><span>pwsh — Show-PHTheme -Name 'aurora'</span></div>
+  <pre><code>PS&gt; Show-PHTheme -Name 'aurora' -Gradient -OuterBorder -BorderGradient
 
-<span style="color: #bd93f9; font-weight: bold;">╭──────────────────────────────────────────────────────────╮</span>
-<span style="color: #bd93f9; font-weight: bold;">│</span>                       <span style="color: #ff79c6; font-weight: bold;">S A M P L E</span>                        <span style="color: #bd93f9; font-weight: bold;">│</span>
-<span style="color: #bd93f9; font-weight: bold;">╰──────────────────────────────────────────────────────────╯</span>
-
-   <span style="background-color: #44475a; color: #8be9fd; font-weight: bold; padding: 1px 6px; border-radius: 3px;">CLI</span>   SAMPLE  <span style="color: #bd93f9;">◈</span>  <span style="background-color: #44475a; color: #50fa7b; font-weight: bold; padding: 1px 6px; border-radius: 3px;">FUNCTION</span>   Get-SampleCmdlet  <span style="color: #bd93f9;">◈</span>  <span style="background-color: #44475a; color: #ff79c6; font-weight: bold; padding: 1px 6px; border-radius: 3px;">VERSION</span>   v1.0.0 
-
-  <span style="color: #50fa7b; font-weight: bold;">◈ SYNTAX</span>
-    Get-SampleCmdlet [-Path &lt;String&gt;] [-Force] [-Verbose]
-
-  <span style="color: #50fa7b; font-weight: bold;">◈ DESCRIPTION</span>
-    This sample cmdlet retrieves configuration data and performs basic
-    validation checks. It is formatted to show the colors and layouts of
-    the theme.
-
-  <span style="color: #50fa7b; font-weight: bold;">◈ PARAMETERS</span>
-     -p|Path    [String]   Path (Req)
-        Specifies the filesystem path to the target config file.
-
-     -f|Force   [Switch]   Force
-        Force the operation to complete without prompting.
-
-  <span style="color: #50fa7b; font-weight: bold;">◈ EXAMPLES</span>
-      Get-SampleCmdlet -Path 'config.json' -Force
-
-      Get-SampleCmdlet -Path '/etc/app/config.json' -Verbose
-
-   <span style="color: #ffb86c; font-weight: bold;">★ Docs: https://gitlab.com/phellams/phwriter for more info</span>
-  </pre>
+╭──────────────────────────────────────────────────────────╮
+│                       S A M P L E                        │
+╰──────────────────────────────────────────────────────────╯</code></pre>
 </div>
 
 ---
 
 ## Feature Overview
 
-* 🎨 **41 Predefined Themes** — Vibrant, gradient-aware, or solid retro styles matching your project's brand.
-* 📦 **AST Metadata Extraction** — Zero-touch parsing of comment-based help blocks directly from source files.
-* 📟 **Interactive TUI Pager** — Alt-buffer terminal scrolling supporting custom width and console resize recalculation.
-* 🚏 **CLI Router Scaffolding** — Subcommand dispatching with fuzzy Levenshtein recommendations and auto-completion.
-* 🔖 **Tag-Padded Headers** — Modern tag blocks for clean, high-impact version metadata.
+- **50 predefined themes** — vibrant, gradient-aware, or solid retro styles matching your project's brand.
+- **AST metadata extraction** — zero-touch parsing of comment-based help blocks directly from source files.
+- **Interactive TUI pager** — alt-buffer terminal scrolling supporting custom width and console resize recalculation.
+- **CLI router scaffolding** — subcommand dispatching with fuzzy Levenshtein recommendations and auto-completion.
+- **Tag-padded headers** — modern tag blocks for clean, high-impact version metadata.
+
+## Explore Theme Families
+
+<div class="ph-theme-families">
+  <a class="ph-theme-family" href="themes.html#1-base-themes-10"><strong>Base</strong><span>Solid palettes for broad terminal compatibility.</span></a>
+  <a class="ph-theme-family" href="themes.html#2-gradient-themes-10"><strong>Gradient</strong><span>Colour ramps for headers and borders.</span></a>
+  <a class="ph-theme-family" href="themes.html#3-extended-themes-20"><strong>Extended</strong><span>Distinctive terminal presentations and colour steps.</span></a>
+  <a class="ph-theme-family" href="themes.html#4-hard-bordered-themes-10"><strong>Hard-bordered</strong><span>Bold frames paired with focused colour treatments.</span></a>
+</div>
 
 ---
 

@@ -278,6 +278,29 @@ codecov_release_coverage:
 #---------------------------------------------
 # ! || Deploy Stage ||
 #==============================================
+pages:
+  stage: deploy
+  image: ruby:3.3
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends brotli
+  script:
+    - cd docs
+    - bundle config set path vendor/bundle
+    - bundle install
+    - bundle exec jekyll build --destination ../public
+    - cd ../public
+    - find . -type f -regextype posix-extended -regex '.*\.(htm|html|xml|txt|text|js|css|svg)$' -exec gzip -9 -k {} \;
+    - find . -type f -regextype posix-extended -regex '.*\.(htm|html|xml|txt|text|js|css|svg)$' -exec brotli -f {} \;
+  artifacts:
+    paths:
+      - public
+  pages: true
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      changes:
+        - docs/**/*
+        - .gitlab-ci.yml
+
 upload_gitlab_package:
   <<: *deploy_template
   needs:
