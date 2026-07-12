@@ -26,7 +26,7 @@ This is the canonical tracker for outstanding work. The historical `devtacker-pe
 - [x] Fix the homepage preview markup. It uses a valid responsive `<img>`, an H1, semantic main landmark, and horizontal scrolling only within the terminal example.
 - [x] Simplify code-block chrome and provide a keyboard-accessible copy control. Just the Docs native copy control remains enabled, has a visible focus state, and block code uses one border treatment.
 - [x] Replace emoji/ambiguous glyphs in the web theme catalogue with a clear decorative-terminal policy. The catalogue no longer renders them as web data; each theme links to an exact terminal preview command instead.
-- [ ] Generate per-theme preview assets from the checked-in VHS tapes. The `vhs_build` CI job now installs VHS and renders the checked-in showcase tapes before the Pages build; per-theme assets under `docs/assets/themes-previews/` still need dedicated tapes and disclosures.
+- [x] Generate per-theme variant preview assets from checked-in VHS sources. `New-ThemeVariantTapes.ps1` derives 200 tapes (Base, Rounded, Double, and Gradient for each public theme) from the `Show-PHTheme` ValidateSet, `vhs_build` renders GIFs under `docs/assets/themes-previews/`, and the themes page exposes every variant and generation command through one reusable include.
 - [x] Audit navigation ordering. Each page now has a unique, sequential `nav_order`.
 - [x] Load JetBrains Mono deliberately for documentation code and retain system fallbacks. The splash layout preconnects to the font host and loads only the required weights.
 

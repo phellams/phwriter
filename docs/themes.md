@@ -62,20 +62,16 @@ These themes combine distinct border treatments with their colour configurations
 
 ---
 
-## 5. Preview Commands
+## 5. Theme Variants
 
-Every listed theme can be previewed directly in the terminal. Expand a theme to copy its exact command; this is the authoritative way to see its glyph and border configuration in your chosen font.
+Every selectable theme has Base, Rounded, Double, and Gradient VHS previews with the exact terminal command used to generate each GIF. The `vhs_build` CI job derives the 200 tapes from `Show-PHTheme -Name`.
 
 {% assign theme_groups = site.data.themes.base_themes | concat: site.data.themes.gradient_themes | concat: site.data.themes.extended_themes | concat: site.data.themes.hard_bordered_themes %}
+<div class="ph-theme-variants">
 {% for theme in theme_groups %}
-<details>
-  <summary><code>{{ theme.name }}</code></summary>
-
-```powershell
-Show-PHTheme -Name '{{ theme.name }}' -Minimal
-```
-</details>
+{% include theme-variant.html theme=theme %}
 {% endfor %}
+</div>
 
 ---
 

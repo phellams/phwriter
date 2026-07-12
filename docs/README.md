@@ -22,6 +22,6 @@ BUNDLE_IGNORE_CONFIG=1 BUNDLE_PATH=/tmp/phwriter-bundle bundle exec jekyll build
 
 ## Deployment
 
-The `vhs_build` job renders every tape in `vhs/` before the `pages` job builds the site into `public/`. The Pages artifact includes the generated GIFs plus GZIP and Brotli variants of HTML, CSS, JavaScript, XML, text, and SVG assets. GitLab Pages selects a compressed variant when the browser supports it.
+The `vhs_build` job renders every tape in `vhs/` before the `pages` job builds the site into `public/`. `New-ThemeVariantTapes.ps1` generates four VHS recordings for every selectable theme: Base, Rounded, Double, and Gradient. The Pages artifact includes the generated GIFs plus GZIP and Brotli variants of HTML, CSS, JavaScript, XML, text, and SVG assets. GitLab Pages selects a compressed variant when the browser supports it.
 
 For regular local development, choose any local Bundler path outside the repository and run `bundle exec jekyll serve` with the same environment variables.

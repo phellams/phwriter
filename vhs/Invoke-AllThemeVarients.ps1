@@ -13,6 +13,9 @@ The built-in theme to render. Defaults to phwriter.
 .PARAMETER Layout
 The logo layout passed to Show-PHTheme. Defaults to Minimal.
 
+.PARAMETER Variant
+The presentation variant to render. Use All to render every variant.
+
 .EXAMPLE
 pwsh ./vhs/Invoke-AllThemeVarients.ps1 -Theme aurora
 #>
@@ -24,7 +27,11 @@ param(
 
     [Parameter()]
     [ValidateSet('Box', 'Classic', 'Minimal', 'Man', 'Terminal', 'Typewriter')]
-    [string]$Layout = 'Minimal'
+    [string]$Layout = 'Minimal',
+
+    [Parameter()]
+    [ValidateSet('All', 'Base', 'Rounded', 'Double', 'Gradient')]
+    [string]$Variant = 'All'
 )
 
 Set-StrictMode -Version Latest
@@ -49,10 +56,11 @@ if ($Theme -notin $validThemeNames) {
 
 $gradientStops = [int[]]@(39, 51, 129, 201)
 $variants = @(
-    [ordered]@{ Label = 'Base'; Parameters = @{} }
-    [ordered]@{ Label = 'Rounded outer border'; Parameters = @{ OuterBorder = $true } }
-    [ordered]@{ Label = 'Double outer border'; Parameters = @{ OuterBorder = $true; OuterBorderStyle = 'Double' } }
+    [ordered]@{ Name = 'Base'; Label = 'Base'; Parameters = @{} }
+    [ordered]@{ Name = 'Rounded'; Label = 'Rounded outer border'; Parameters = @{ OuterBorder = $true } }
+    [ordered]@{ Name = 'Double'; Label = 'Double outer border'; Parameters = @{ OuterBorder = $true; OuterBorderStyle = 'Double' } }
     [ordered]@{
+        Name = 'Gradient'
         Label = 'Custom header and border gradient'
         Parameters = @{
             Gradient = $true
@@ -64,9 +72,13 @@ $variants = @(
     }
 )
 
-foreach ($variant in $variants) {
+if ($Variant -ne 'All') {
+    $variants = @($variants | Where-Object { $_.Name -eq $Variant })
+}
+
+foreach ($variantDefinition in $variants) {
     [Console]::WriteLine()
-    [Console]::WriteLine("=== $Theme : $($variant.Label) ===")
-    $variantParameters = $variant.Parameters
+    [Console]::WriteLine("=== $Theme : $($variantDefinition.Label) ===")
+    $variantParameters = $variantDefinition.Parameters
     Show-PHTheme -Name $Theme -Layout $Layout -Minimal @variantParameters
 }

@@ -1,0 +1,16 @@
+<details class="ph-theme-variant">
+  <summary><code>{{ include.theme.name }}</code><span>{{ include.theme.desc | default: include.theme.style | default: include.theme.direction }}</span></summary>
+  <div class="ph-theme-variant__variants">
+    {% assign variants = 'Base,Rounded,Double,Gradient' | split: ',' %}
+    {% for variant in variants %}
+    {% assign variant_slug = variant | downcase %}
+    <figure class="ph-theme-preview-card">
+      <img loading="lazy" src="{{ '/assets/themes-previews/' | append: include.theme.name | append: '/' | append: variant_slug | append: '.gif' | relative_url }}" width="960" height="600" alt="{{ variant }} preview of the {{ include.theme.name }} PHWriter theme">
+      <figcaption>
+        <strong>{{ variant }}</strong>
+        <code>pwsh ./vhs/Invoke-AllThemeVarients.ps1 -Theme {{ include.theme.name }} -Variant {{ variant }}</code>
+      </figcaption>
+    </figure>
+    {% endfor %}
+  </div>
+</details>

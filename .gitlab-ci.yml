@@ -95,6 +95,7 @@ vhs_build:
   artifacts:
     paths:
       - docs/assets/images/*.gif
+      - docs/assets/themes-previews/**/*.gif
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 

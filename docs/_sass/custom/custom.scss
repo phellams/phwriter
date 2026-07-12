@@ -128,3 +128,17 @@ a.nav-list-link.active {
 .ph-theme-family { background: #171b21; border: 1px solid rgba(255, 159, 26, .3); border-radius: .5rem; color: #e5e9f0; display: grid; gap: .5rem; padding: 1rem; text-decoration: none; }
 .ph-theme-family:hover { border-color: #ff9f1a; color: #fff; }
 .ph-theme-family span { color: #a5adba; font-size: .875rem; }
+.ph-theme-variants { display: grid; gap: .75rem; margin: 1.5rem 0; }
+.ph-theme-variant { background: #171b21; border: 1px solid rgba(255, 159, 26, .2); border-radius: .5rem; overflow: hidden; }
+.ph-theme-variant summary { align-items: center; cursor: pointer; display: flex; gap: .75rem; justify-content: space-between; padding: .85rem 1rem; }
+.ph-theme-variant summary span { color: #a5adba; font-size: .875rem; text-align: right; }
+.ph-theme-variant__variants { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); padding: 0 1rem 1rem; }
+.ph-theme-preview-card { background: #0b0d13; border: 1px solid rgba(255, 159, 26, .2); border-radius: .35rem; margin: 0; overflow: hidden; }
+.ph-theme-preview-card img { display: block; height: auto; max-width: 100%; }
+.ph-theme-preview-card figcaption { display: grid; gap: .5rem; padding: .75rem; }
+.ph-theme-preview-card figcaption strong { color: #ffb86c; }
+.ph-theme-preview-card code { overflow-wrap: anywhere; white-space: normal; }
+@media (max-width: 42rem) {
+  .ph-theme-variant summary { align-items: flex-start; flex-direction: column; }
+  .ph-theme-variant summary span { text-align: left; }
+}

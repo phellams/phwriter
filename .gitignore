@@ -4,7 +4,9 @@ docs/.jekyll-cache/
 docs/.jekyll-metadata
 docs/_site/
 docs/public/
+docs/assets/themes-previews/
 docs/vendor/
+vhs/generated/
 tools/commit-helper.ps1
 tools/VERIFICATION.txt
 build.env
