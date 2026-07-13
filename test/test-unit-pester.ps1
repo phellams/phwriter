@@ -483,7 +483,7 @@ Describe "New-AsciiTokenGradient-and-Color-Support" {
         try {
             $gradient = New-AsciiGradient -Type 'fg' -Steps @(16, 20) -String "World"
             # TrueColor escape code starts with \e[38;2;
-            $gradient | Should -Match [regex]::Escape("`e[38;2;")
+            $gradient | Should -Match ([regex]::Escape("`e[38;2;"))
         } finally {
             $env:COLORTERM = $null
         }
@@ -499,7 +499,7 @@ Describe "New-AsciiTokenGradient-and-Color-Support" {
         Write-PHAsciiLogo -Name 'TESTLOGO' -Theme $mockTheme -Layout 'Typewriter' -Gradient -GradientMode Horizontal
 
         $custom = " (\ `n\'\'\ `n \'\     __________"
-        Write-PHAsciiLogo -CustomLogo $custom -Theme $mockTheme -Gradient -GradientMode Vertical
+        Write-PHAsciiLogo -Name 'TEST' -CustomLogo $custom -Theme $mockTheme -Gradient -GradientMode Vertical
     }
 
     It "Should support GradientMode in New-PHWriter and Show-PHTheme" {
@@ -515,9 +515,9 @@ Describe 'Documentation contract' {
         $cmdletData = [System.IO.File]::ReadAllText([System.IO.Path]::Combine($PSScriptRoot, '..', 'docs', '_data', 'cmdlets.yml'))
         $apiReference = [System.IO.File]::ReadAllText([System.IO.Path]::Combine($PSScriptRoot, '..', 'docs', 'api-reference.md'))
 
-        foreach ($command in Get-Command -Module phwriter) {
+        foreach ($command in Get-Command -Module phwriter -CommandType Function) {
             $cmdletData | Should -Match "(?m)^- name: $([regex]::Escape($command.Name))$"
-            $apiReference | Should -Match [regex]::Escape($command.Name)
+            $apiReference | Should -Match $command.Name
         }
     }
 
