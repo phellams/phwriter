@@ -358,6 +358,32 @@ function New-PHWriter {
         if (!$Name) { $Name = 'PHW' }
         if (!$Version) { $Version = '1.0.0' }
 
+        # Sanitize CommandInfo to prevent strict-mode exceptions on missing properties
+        if ($null -eq $CommandInfo) {
+            $CommandInfo = [ordered]@{
+                cmdlet      = $null
+                synopsis    = $null
+                description = $null
+                source      = $null
+            }
+        } elseif ($CommandInfo -is [hashtable]) {
+            $safeCommandInfo = [ordered]@{
+                cmdlet      = $(if ($CommandInfo.ContainsKey('cmdlet')) { $CommandInfo['cmdlet'] } else { $null })
+                synopsis    = $(if ($CommandInfo.ContainsKey('synopsis')) { $CommandInfo['synopsis'] } else { $null })
+                description = $(if ($CommandInfo.ContainsKey('description')) { $CommandInfo['description'] } else { $null })
+                source      = $(if ($CommandInfo.ContainsKey('source')) { $CommandInfo['source'] } else { $null })
+            }
+            $CommandInfo = $safeCommandInfo
+        } else {
+            $safeCommandInfo = [ordered]@{
+                cmdlet      = $(try { $CommandInfo.cmdlet } catch { $null })
+                synopsis    = $(try { $CommandInfo.synopsis } catch { $null })
+                description = $(try { $CommandInfo.description } catch { $null })
+                source      = $(try { $CommandInfo.source } catch { $null })
+            }
+            $CommandInfo = $safeCommandInfo
+        }
+
         # -Compact takes precedence over -LineSpacing
         if ($Compact) { $LineSpacing = 0 }
 
