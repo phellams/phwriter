@@ -12,13 +12,16 @@
     <a href="https://gitlab.com/phellams/phwriter">GitLab</a>
 </span>
 
+<br/><br/>
+<img src="./phwriter.gif" alt="PHWriter Terminal Demo" width="600" />
+
 </div>
 
 ---
 
 ## Overview
 
-PHWriter (**PowerShell Help Writer**) is modeled in insperation from linux man pages, allows manual or automatic help data json, psdatafiles, and AST parsing, support for themes including colors and and or borders, intelegiant color switching for supported terminals only supporting `3/4bit` and terminal that support full color spectecture, phwriter is performant by utilizing `C#` methods for string cancatination. automatic padding and sizing allowing auto scalling
+PHWriter (PowerShell Help Writer) generates formatted, themed, and ANSI-colored terminal help documentation. Modeled on Linux man pages, it reads manual help data defined in JSON or PowerShell data files, or extracts metadata dynamically via Abstract Syntax Tree (AST) parsing of cmdlet source files. PHWriter supports terminal themes with customizable colors, layout variants, and borders. It features automatic console scaling, layout padding calculations, and runtime environment detection to downgrade color depth when the host terminal lacks true-color (24-bit RGB) support. String formatting and layout generation are optimized using native .NET libraries for performance.
 
 ## Module Features
 
