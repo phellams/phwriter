@@ -1,3 +1,4 @@
+Describe "phwriter Unit Tests" {
 BeforeAll { 
     $env:PHWRITER_TEST_MODE = 'true'
     # Import the module
@@ -74,7 +75,7 @@ BeforeEach {
     }
 }
 
-Describe "Get-PHTheme" {
+Context "Get-PHTheme" {
     It "Should return the default theme by default" {
         $theme = Get-PHTheme
         $theme | Should -Not -BeNullOrEmpty
@@ -106,7 +107,7 @@ Describe "Get-PHTheme" {
     }
 }
 
-Describe "Show-PHTheme" {
+Context "Show-PHTheme" {
     It "Should render a single theme in minimal mode" {
         Show-PHTheme -Name 'default' -Minimal
     }
@@ -120,7 +121,7 @@ Describe "Show-PHTheme" {
     }
 }
 
-Describe "Get-TerminalPalette" {
+Context "Get-TerminalPalette" {
     It "Should return a palette object with functioning Apply and GetStaticColor" {
         $pal = Get-TerminalPalette -ColorPalette @{ 'Fill' = 'red'; 'Accent' = 'green' }
         $pal | Should -Not -BeNullOrEmpty
@@ -149,7 +150,7 @@ Describe "Get-TerminalPalette" {
     }
 }
 
-Describe "Write-PHAsciiLogo" {
+Context "Write-PHAsciiLogo" {
     It "Should render logo with Box layout" {
         Write-PHAsciiLogo -Name 'TestMod' -Version '1.2.3' -Layout 'Box'
     }
@@ -170,7 +171,7 @@ Describe "Write-PHAsciiLogo" {
     }
 }
 
-Describe "New-PHWriter" {
+Context "New-PHWriter" {
     It "Should render standard cmdlet help without throwing" {
         New-PHWriter @params
     }
@@ -188,7 +189,7 @@ Describe "New-PHWriter" {
     }
 }
 
-Describe "New-AsciiColor" {
+Context "New-AsciiColor" {
     It "Should colorize text using ANSI escapes" {
         $redText = New-AsciiColor -String 'Hello' -Color 'red'
         $redText | Should -BeLike '*Hello*'
@@ -201,14 +202,14 @@ Describe "New-AsciiColor" {
     }
 }
 
-Describe "New-AsciiGradient" {
+Context "New-AsciiGradient" {
     It "Should generate foreground gradient successfully" {
         $grad = New-AsciiGradient -Type 'fg' -Steps @(196, 226) -String 'Rainbow'
         $grad | Should -BeLike '*R*'
     }
 }
 
-Describe "Export-PHWriterMetadata" {
+Context "Export-PHWriterMetadata" {
     It "Should extract metadata from Write-PHAsciiLogo.ps1" {
         $meta = Export-PHWriterMetadata -Path "$PSScriptRoot/../Public/Write-PHAsciiLogo.ps1" -FunctionName "Write-PHAsciiLogo"
         $meta | Should -Not -BeNullOrEmpty
@@ -238,9 +239,29 @@ Describe "Export-PHWriterMetadata" {
             }
         }
     }
+
+    It "Should generate smart aliases without conflicts" {
+        $meta = Export-PHWriterMetadata -Path "$PSScriptRoot/../Public/Write-PHAsciiLogo.ps1" -FunctionName "Write-PHAsciiLogo"
+        $paramTable = $meta.paramtable
+
+        $nameParam = $paramTable | Where-Object { $_.name -eq 'Name' }
+        $nameParam.param | Should -Be 'n|Name'
+
+        $versionParam = $paramTable | Where-Object { $_.name -eq 'Version' }
+        $versionParam.param | Should -Be 'v|Version'
+
+        $layoutParam = $paramTable | Where-Object { $_.name -eq 'Layout' }
+        $layoutParam.param | Should -Be 'l|Layout'
+
+        $cgParam = $paramTable | Where-Object { $_.name -eq 'CustomGradient' }
+        $cgParam.param | Should -Be 'cu|CustomGradnet|CustomGradient'
+
+        $gmParam = $paramTable | Where-Object { $_.name -eq 'GradientMode' }
+        $gmParam.param | Should -Be 'gr|GradientMode'
+    }
 }
 
-Describe "New-PHRouter" {
+Context "New-PHRouter" {
     It "Should dispatch exact match subcommand scriptblock" {
         $state = @{ called = $false }
         $routes = @{
@@ -288,7 +309,7 @@ Describe "New-PHRouter" {
     }
 }
 
-Describe "Invoke-PHPager" {
+Context "Invoke-PHPager" {
     It "Should render plain text content without throwing in test mode" {
         $env:PHWRITER_TEST_MODE = 'true'
         try {
@@ -308,7 +329,7 @@ Describe "Invoke-PHPager" {
     }
 }
 
-Describe "Cmdlet-Help-Switches" {
+Context "Cmdlet-Help-Switches" {
     It "Should render help for New-PHWriter without throwing" {
         New-PHWriter -Help
     }
@@ -334,7 +355,7 @@ Describe "Cmdlet-Help-Switches" {
     }
 }
 
-Describe "PHWriter-Priority-1-Features" {
+Context "PHWriter-Priority-1-Features" {
     It "Should support Pad-AnsiString with multi-character/emoji PadChar" {
         $padded = Pad-AnsiString -Text "A" -Width 6 -Align 'Center' -PadChar "🔥"
         $padded | Should -BeLike "*🔥A🔥*"
@@ -366,7 +387,7 @@ Describe "PHWriter-Priority-1-Features" {
     }
 }
 
-Describe "Show-PHTheme-Enhancements" {
+Context "Show-PHTheme-Enhancements" {
     It "Should render Show-PHTheme in compact mode without throwing" {
         Show-PHTheme -Name 'default' -Compact
     }
@@ -388,7 +409,7 @@ Describe "Show-PHTheme-Enhancements" {
     }
 }
 
-Describe "PHWriter-Width-and-Paging-Features" {
+Context "PHWriter-Width-and-Paging-Features" {
     It "Should support Width options ('man', 'full', custom)" {
         $manOut = New-PHWriter @params -Width 'man' -OutMode String
         $manOut | Should -Not -BeNullOrEmpty
@@ -416,7 +437,7 @@ Describe "PHWriter-Width-and-Paging-Features" {
     }
 }
 
-Describe "New-AsciiTokenGradient-and-Color-Support" {
+Context "New-AsciiTokenGradient-and-Color-Support" {
     BeforeAll {
         . ./Public/New-AsciiTokenGradient.ps1
         . ./Private/ConvertTo-AsciiTokens.ps1
@@ -461,7 +482,7 @@ Describe "New-AsciiTokenGradient-and-Color-Support" {
         try {
             $gradient = New-AsciiGradient -Type 'fg' -Steps @(16, 20) -String "World"
             # TrueColor escape code starts with \e[38;2;
-            $gradient | Should -Contain "`e[38;2;"
+            $gradient | Should -Match "`e\[38;2;"
         } finally {
             $env:COLORTERM = $null
         }
@@ -477,7 +498,7 @@ Describe "New-AsciiTokenGradient-and-Color-Support" {
         Write-PHAsciiLogo -Name 'TESTLOGO' -Theme $mockTheme -Layout 'Typewriter' -Gradient -GradientMode Horizontal
 
         $custom = " (\ `n\'\'\ `n \'\     __________"
-        Write-PHAsciiLogo -CustomLogo $custom -Theme $mockTheme -Gradient -GradientMode Vertical
+        Write-PHAsciiLogo -Name 'TESTLOGO' -CustomLogo $custom -Theme $mockTheme -Gradient -GradientMode Vertical
     }
 
     It "Should support GradientMode in New-PHWriter and Show-PHTheme" {
@@ -486,4 +507,5 @@ Describe "New-AsciiTokenGradient-and-Color-Support" {
 
         Show-PHTheme -Name 'aurora' -Gradient -GradientMode Vertical -Minimal
     }
+}
 }
