@@ -4,7 +4,7 @@ This is the canonical tracker for outstanding work. The historical `devtacker-pe
 
 ## P0 — Release blockers
 
-- [ ] Repair the Pester 5 test layout in `test/test-unit-pester.ps1`. `BeforeEach` is currently declared directly in the root container, so Pester 5.8 stops before executing all 56 discovered tests. Move setup into the relevant `Describe`/`Context` blocks and make the test command return a failing exit code when tests fail.
+- [x] Repair the Pester 5 test layout in `test/test-unit-pester.ps1`. `BeforeEach` is currently declared directly in the root container, so Pester 5.8 stops before executing all 56 discovered tests. Move setup into the relevant `Describe`/`Context` blocks and make the test command return a failing exit code when tests fail.
 - [ ] Make the Jekyll site reproducibly buildable on Linux. `bundle exec jekyll build` from `docs/` fails because `docs/vendor/bundle/.../json/ext/parser.so` has an invalid ELF header. Do not commit platform-specific Bundler output; ignore `docs/vendor/`, then install dependencies for the active platform in CI/local setup.
 
 ## P1 — Documentation correctness and release metadata
@@ -31,6 +31,7 @@ This is the canonical tracker for outstanding work. The historical `devtacker-pe
 - [ ] Make source loading deterministic: sort private/public `.ps1` paths before combining them in `phwriter.psm1`, and add an import test that confirms private-helper dependency order.
 - [ ] Declare aliases consistently in both function attributes and the manifest; specifically decide whether the backwards-compatible `Get-TerminalPallete` alias is public and document it if retained.
 - [ ] Remove or relocate the duplicate root `New-AsciiTokenGradiant.ps1` implementation so the module has one authoritative `ConvertTo-AsciiTokens`/gradient implementation and the spelling is consistent.
+- [x] Smart param alias: automatically generate short aliases for cmdlet parameters without conflicting with common parameters or other parameter names.
 
 ## Review evidence
 
