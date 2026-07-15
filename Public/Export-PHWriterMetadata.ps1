@@ -307,6 +307,26 @@ function Export-PHWriterMetadata {
 
             $paramBlock = $funcDef.Body.ParamBlock
             if ($paramBlock -and $paramBlock.Parameters.Count -gt 0) {
+                # Pre-calculate all function parameter names and explicit aliases for collision checking
+                $functionParamNames = [System.Collections.Generic.List[string]]::new()
+                $explicitAliases = [System.Collections.Generic.List[string]]::new()
+                foreach ($pAst in $paramBlock.Parameters) {
+                    $pName = $pAst.Name.VariablePath.UserPath
+                    $functionParamNames.Add($pName)
+                    foreach ($attr in $pAst.Attributes) {
+                        if ($attr.TypeName.Name -in @('Alias', 'AliasAttribute')) {
+                            foreach ($posArg in $attr.PositionalArguments) {
+                                if ($posArg -is [System.Management.Automation.Language.StringConstantExpressionAst]) {
+                                    $explicitAliases.Add($posArg.Value)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                # Keep track of smart aliases generated in this function
+                $generatedSmartAliases = [System.Collections.Generic.List[string]]::new()
+
                 foreach ($paramAst in $paramBlock.Parameters) {
                     $paramVarName = $paramAst.Name.VariablePath.UserPath
 
@@ -352,6 +372,46 @@ function Export-PHWriterMetadata {
                                 }
                             }
                         }
+                    }
+
+                    # ── Generate Smart Alias ──────────────────────────────────
+                    $blockedForParam = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+                    
+                    $commonParams = @(
+                        'Verbose', 'Debug', 'ErrorAction', 'WarningAction', 'InformationAction',
+                        'ErrorVariable', 'WarningVariable', 'InformationVariable', 'OutVariable',
+                        'OutBuffer', 'PipelineVariable', 'WhatIf', 'Confirm', 'UseTransaction'
+                    )
+                    $commonAliases = @(
+                        'vb', 'db', 'ea', 'wa', 'infa', 'ev', 'wv', 'infv', 'ov', 'ob', 'pv'
+                    )
+                    foreach ($cp in $commonParams) { $blockedForParam.Add($cp) | Out-Null }
+                    foreach ($ca in $commonAliases) { $blockedForParam.Add($ca) | Out-Null }
+
+                    foreach ($fp in $functionParamNames) {
+                        if ($fp -ne $paramVarName) { $blockedForParam.Add($fp) | Out-Null }
+                    }
+
+                    foreach ($ea in $explicitAliases) {
+                        if ($ea -notin $aliasList) { $blockedForParam.Add($ea) | Out-Null }
+                    }
+
+                    foreach ($gsa in $generatedSmartAliases) {
+                        $blockedForParam.Add($gsa) | Out-Null
+                    }
+
+                    $smartAlias = $null
+                    for ($len = 1; $len -le $paramVarName.Length; $len++) {
+                        $candidate = $paramVarName.Substring(0, $len)
+                        if (-not $blockedForParam.Contains($candidate)) {
+                            $smartAlias = $candidate
+                            break
+                        }
+                    }
+
+                    if ($smartAlias -and $smartAlias -ne $paramVarName -and $smartAlias -notin $aliasList) {
+                        $aliasList.Insert(0, $smartAlias)
+                        $generatedSmartAliases.Add($smartAlias) | Out-Null
                     }
 
                     # ── Build param field string ──────────────────────────────
