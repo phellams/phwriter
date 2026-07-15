@@ -77,9 +77,9 @@ New-PHWriter -Name "MyModule" -Version "1.0.0" -Theme "phwriter"
 ```
 
 ### 2. Extracting Metadata Statically
-Extract comment-based help and parameters from your script:
+Extract comment-based help, parameters, and conflict-free smart parameter aliases from your script:
 ```powershell
-$Meta = Export-PHWriterMetadata -FilePath "./Public/Get-MyData.ps1"
+$Meta = Export-PHWriterMetadata -Path "./Public/Get-MyData.ps1"
 New-PHWriter @Meta
 ```
 
