@@ -4,13 +4,13 @@
 
 <h1><b>Powershell Help Writer(PHWriter)</b></h1>
 
-<a href="https://gitlab.com/phellams/phwriter/-/blob/main/readme.md"><img src="https://img.shields.io/badge/License-mit-License?style=flat-square&labelColor=%23383838&color=%237A5ACF23CD5C5C" alt="MIT License" /></a> <a href="https://gitlab.com/phellams/phwriter/-/pipelines"><img src="https://img.shields.io/gitlab/pipeline-status/phellams%2Fphwriter?style=flat-square&logo=Gitlab&logoColor=%233478BD&labelColor=%232D2D34" alt="Build Status"></a> <a href="https://codecov.io/gh/phellams/phwriter"><img src="https://img.shields.io/codecov/c/gitlab/phellams/phwriter?style=flat-square&logo=codecov&logoColor=%23E6746B&logoSize=auto&labelColor=%234A7A82" alt="Coverage"></a> <a href="https://gitlab.com/phellams/phwriter/-/issues"><img src="https://img.shields.io/gitlab/issues/open/phellams%2Fphwriter?style=flat-square&logo=gitlab&logoColor=red&labelColor=%23ffffff&color=%236B8D29" alt="Open Issues"></a>
+<a href='https://gitlab.com/phellams' target='_blank'><img src='https://img.shields.io/gitlab/license/phellams/psshields?style=flat-square&logo=gitlab&labelColor=%23303030&color=%23d0d0d0&logoColor=%23ffffff' alt='gitlab-license' /></a> <a href='https://gitlab.com/phellams' target='_blank'><img src='https://img.shields.io/gitlab/pipeline-status/phellams/psshields?style=flat-square&logo=gitlab&labelColor=%23303030&color=%23d0d0d0&logoColor=%23ffffff' alt='gitlab-pipeline' /></a> <a href='https://gitlab.com/phellams' target='_blank'><img src='https://img.shields.io/gitlab/issues/open/phellams/psshields?style=flat-square&logo=gitlab&labelColor=%23303030&color=%23d0d0d0&logoColor=%23ffffff' alt='gitlab-issues' /></a> <a href='https://www.powershellgallery.com/packages/psshields' target='_blank'><img src='https://img.shields.io/powershellgallery/v/@phellams/psshields?style=flat-square&logo=powershell&labelColor=%23303030&color=%23d0d0d0&logoColor=%23ffffff' alt='powershell-version' /></a> <a href='https://community.chocolatey.org/packages/psshields' target='_blank'><img src='https://img.shields.io/chocolatey/v/@phellams/psshields?style=flat-square&logo=chocolatey&labelColor=%23303030&color=%23d0d0d0&logoColor=%23ffffff' alt='choco-version' /></a> <a href='https://img.shields.io/codecov/c/github/phellams/psshields?style=flat-square&logo=codecov&labelColor=%23303030&color=%23d0d0d0&logoColor=%23ffffff' target='_blank'><img src='https://img.shields.io/codecov/c/github/phellams/psshields?style=flat-square&logo=codecov&labelColor=%23303030&color=%23d0d0d0&logoColor=%23ffffff' alt='codecov-coverage' /></a> 
 
 <span>
-    <a href="https://phellams.gitlab.io/phwriter">🧷 <strong>Docs</strong></a>
-    <a href="https://www.powershellgallery.com/packages/PHWriter">🧷 <strong>PSGallery</strong></a>
-    <a href="https://chocolatey.org/packages/phwriter">🧷 <strong>Chocolatey</strong></a>
-    <a href="https://gitlab.com/phellams/phwriter">🧷 <strong>GitLab</strong></a>
+    <a href="https://phellams.gitlab.io/phwriter"> <strong>Docs</strong></a>
+    <a href="https://www.powershellgallery.com/packages/PHWriter">| <strong>PSGallery</strong></a>
+    <a href="https://chocolatey.org/packages/phwriter">| <strong>Chocolatey</strong></a>
+    <a href="https://gitlab.com/phellams/phwriter">| <strong>GitLab</strong></a>
 </span>
 
 <br/><br/>
