@@ -8,7 +8,7 @@ has_toc: true
 
 # API Reference
 
-Complete parameter tables for all PHWriter public cmdlets. For executable code examples and real-world usage patterns, see the [Cmdlet Reference](./cmdlet-reference) page.
+Complete parameter tables for all PHWriter public cmdlets. For executable code examples and real-world usage patterns, see the [Cmdlet Reference](./cmdlet-reference.md) page.
 
 ---
 
