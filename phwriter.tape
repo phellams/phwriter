@@ -1,36 +1,65 @@
-# VHS Tape for phwriter.gif (Main module demo)
+# VHS Tape — phwriter.gif (main module showcase)
 # Run with: vhs phwriter.tape
+# Showcases: theme preview, pipeline, global config, HelpParam, router dispatch
 
 Output phwriter.gif
 
 Set Shell "pwsh"
-Set FontSize 24
-Set Width 1380
-Set Height 600
+Set FontSize 22
+Set Width 1400
+Set Height 700
 Set Padding 20
 Set Theme "Dracula"
 Set WindowBar Colorful
 
-# Hide setup steps
+# ── Hidden setup ──────────────────────────────────────────────────────────────
 Hide
 Type "Import-Module ./phwriter.psd1 -Force" Enter
 Type "Clear-Host" Enter
 Show
 
-# Render module help with default Box layout
-Type "show-phTheme -Name cosmic -OuterBorder -BorderGradient -Layout Terminal -GradientMode Vertical -OuterBorderStyle Square -Gradient -SourceType module -Compact"
-Sleep 4s
+# ── Example 1: Show-PHTheme — cosmic with gradient border and Terminal layout ─
+Type "Show-PHTheme -Name cosmic -Layout Terminal -Gradient -OuterBorder -BorderGradient -OuterBorderStyle Double -Compact" Sleep 200ms Enter
+Sleep 5s
 
-# Clear screen for second example
+# ── Clear ─────────────────────────────────────────────────────────────────────
 Hide
 Type "Clear-Host" Enter
 Show
 
-# Render module help in Compact mode
-Type "New-PHWriter -Name 'MyModule' -Theme 'cyberpunk' -Layout 'man' -OuterBorder" Sleep 500ms Enter
+# ── Example 2: Export-PHWriterMetadata piped directly to New-PHWriter ─────────
+Type "Export-PHWriterMetadata -Path ./Public/New-PHWriter.ps1 -FunctionName New-PHWriter | New-PHWriter -Theme aurora -OuterBorder -OutMode Standard" Sleep 200ms Enter
 Sleep 6s
 
+# ── Clear ─────────────────────────────────────────────────────────────────────
+Hide
+Type "Clear-Host" Enter
+Show
 
-# Render module help in Compact mode
-Type "New-PHWriter -Name 'MyModule' -Theme 'cyberpunk' -Layout 'man' -OuterBorder -OuterBorderStyle box" Sleep 500ms Enter
-Sleep 6s
+# ── Example 3: Global config — set theme once, all calls inherit it ───────────
+Type '$global:__phwriter = @{ theme_config = @{ theme = "neon-noir"; gradient = $true } }' Sleep 200ms Enter
+Sleep 1s
+Type "Show-PHTheme -Name neon-noir -OuterBorder -BorderGradient -Layout Box" Sleep 200ms Enter
+Sleep 5s
+
+# ── Clear ─────────────────────────────────────────────────────────────────────
+Hide
+Type "Clear-Host" Enter
+Show
+
+# ── Example 4: -HelpParam — single param lookup ───────────────────────────────
+Type "Export-PHWriterMetadata -Path ./Public/New-PHWriter.ps1 -FunctionName New-PHWriter | New-PHWriter -Theme cyberpunk -OutMode Standard -HelpParam Theme" Sleep 200ms Enter
+Sleep 5s
+
+# ── Clear ─────────────────────────────────────────────────────────────────────
+Hide
+Type "Clear-Host" Enter
+Show
+
+# ── Example 5: New-PHRouter CLI dispatch ─────────────────────────────────────
+Type '$routes = @{ build = { "Building project..." }; test = { "Running tests..." }; default = { New-PHWriter -Name "mycli" -Theme "phwriter" -SourceType "router" -OutMode Standard } }' Sleep 200ms Enter
+Sleep 500ms
+Type "New-PHRouter -Routes `$routes -ArgumentList @('build') -ModuleName mycli" Sleep 200ms Enter
+Sleep 4s
+Type "New-PHRouter -Routes `$routes -ArgumentList @() -ModuleName mycli" Sleep 200ms Enter
+Sleep 5s
