@@ -611,8 +611,12 @@ Context "Documentation-Contract-Test" {
                     $resolvedPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($fileDir, $cleanLink))
                 }
 
-                # Assert that the file or directory exists
+                # Assert that the file or directory exists (mapping .html to .md if needed)
                 $exists = [System.IO.File]::Exists($resolvedPath) -or [System.IO.Directory]::Exists($resolvedPath)
+                if (-not $exists -and $resolvedPath -match '\.html$') {
+                    $mdPath = $resolvedPath -replace '\.html$', '.md'
+                    $exists = [System.IO.File]::Exists($mdPath)
+                }
                 if (-not $exists) {
                     Write-Error "Broken link in '$file': '$link' (resolved to '$resolvedPath')"
                 }
