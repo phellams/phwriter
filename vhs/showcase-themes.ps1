@@ -48,4 +48,4 @@ foreach ($theme in $ShowcaseThemes) {
 }
 
 Clear-Host
-Write-Host "Showcase finished! Explore all 41 themes using 'Show-PHTheme -All'." -ForegroundColor Green
+Write-Host "Showcase finished! Explore all 50 themes using 'Show-PHTheme -All'." -ForegroundColor Green

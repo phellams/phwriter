@@ -17,7 +17,7 @@
   alias: "—"
   purpose: "Preview built-in and custom themes"
 - name: Get-TerminalPalette
-  alias: "terpal"
+  alias: "terpal, Get-TerminalPallete"
   purpose: "Generate dynamic solid, conditional, or gradient palette objects"
 - name: New-AsciiTokenGradient
   alias: "—"

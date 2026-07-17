@@ -34,4 +34,3 @@ Sleep 6s
 # Render module help in Compact mode
 Type "New-PHWriter -Name 'MyModule' -Theme '' -Layout 'Terminal' -Compact" Sleep 500ms Enter
 Sleep 6s
-e

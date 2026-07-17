@@ -1,7 +1,7 @@
 ---
 layout: default
 title: TUI Pager
-nav_order: 3
+nav_order: 6
 description: "Interactive terminal pager for viewing long cmdlet help pages."
 ---
 

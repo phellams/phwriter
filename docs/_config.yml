@@ -23,7 +23,8 @@ gh_edit_branch: "main"
 gh_edit_source: "docs"
 
 # Version Tag in Sidebar
-project_version: "v0.7.0"
+project_version: "v0.19.0"
+
 
 search:
   tokenizer: separator

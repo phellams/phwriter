@@ -87,7 +87,8 @@ function New-AsciiTokenGradient {
 
         # Check color support
         $colorEnabled = $true
-        if ($env:NO_COLOR -or $env:PHWRITER_NO_COLOR -or $global:PHWriterNoColor) {
+        $noColorPreference = Get-Variable -Name PHWriterNoColor -Scope Global -ValueOnly -ErrorAction Ignore
+        if ($env:NO_COLOR -or $env:PHWRITER_NO_COLOR -or $noColorPreference) {
             $colorEnabled = $false
         }
 

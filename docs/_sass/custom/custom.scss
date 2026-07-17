@@ -1,9 +1,6 @@
-// Google Fonts import for JetBrains Mono
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
-
-// JetBrains Mono for code blocks and inline code
+// System monospace stack for code blocks and inline code.
 code, pre, kbd, samp {
-  font-family: 'JetBrains Mono', monospace !important;
+  font-family: 'JetBrains Mono', ui-monospace, 'Cascadia Code', 'SFMono-Regular', Consolas, monospace !important;
 }
 
 // Custom retro-terminal sidebar styling to match module logo
@@ -17,18 +14,64 @@ code.highlighter-rouge {
   background-color: #171b21;
 }
 
-pre.highlight {
-  border: 1px solid rgba(255, 255, 255, 0.06) !important;
-  border-left: 3px solid #ff9f1a !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-  border-radius: 8px;
-  background-color: #0b0d13 !important;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+div.highlighter-rouge {
+  background: #0b0d13;
+  border: 1px solid rgba(255, 159, 26, .32);
+  border-radius: .65rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .35);
+  overflow: hidden;
+  padding-top: 2.75rem;
+}
 
-  &:hover {
-    border-color: rgba(255, 159, 26, 0.4) !important;
-    box-shadow: 0 10px 32px rgba(255, 159, 26, 0.08), 0 8px 24px rgba(0, 0, 0, 0.6);
-  }
+div.highlighter-rouge::before {
+  background: #ff5f56;
+  border-radius: 50%;
+  box-shadow: 1.2rem 0 #ffbd2e, 2.4rem 0 #27c93f;
+  content: '';
+  height: .65rem;
+  left: 1rem;
+  position: absolute;
+  top: 1rem;
+  width: .65rem;
+}
+
+div.highlighter-rouge::after {
+  color: #a5adba;
+  content: attr(data-language);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: .72rem;
+  letter-spacing: .08em;
+  position: absolute;
+  right: 3.5rem;
+  text-transform: uppercase;
+  top: .88rem;
+}
+
+div.highlighter-rouge div.highlight,
+div.highlighter-rouge pre.highlight,
+div.highlighter-rouge pre.highlight code {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+div.highlighter-rouge div.highlight {
+  overflow-x: auto;
+  padding: 0 1.25rem 1.25rem;
+}
+
+div.highlighter-rouge pre.highlight {
+  margin: 0;
+  padding: 0;
+}
+
+div.highlighter-rouge > button {
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: .35rem;
+  color: #e5e9f0;
+  right: .75rem;
+  top: .52rem;
 }
 
 // Heavy shadows for titles to bring high impact/contrast
@@ -53,4 +96,49 @@ h1, h2, h3, h4 {
 a.nav-list-link.active {
   color: #ff9f1a !important;
   font-weight: bold;
+}
+
+.copy-code-button:focus-visible,
+.ph-button:focus-visible,
+.ph-theme-family:focus-visible {
+  outline: 3px solid #ffb86c;
+  outline-offset: 3px;
+}
+
+.ph-splash { background: #0d0f12; color: #e5e9f0; min-height: 100vh; }
+.ph-splash__container { max-width: 1000px; margin: 0 auto; padding: clamp(1.25rem, 4vw, 2.5rem); }
+.ph-button { background: #ff9f1a; border: 1px solid #ff9f1a; border-radius: .25rem; color: #0d0f12; display: inline-block; font-weight: 700; padding: .5rem 1rem; text-decoration: none; }
+.ph-button--secondary { background: transparent; color: #ffb86c; }
+.ph-button:hover { background: #ffb86c; color: #0d0f12; }
+.ph-splash__content { max-width: 75rem; }
+.ph-splash__footer { border-top: 1px solid rgba(255, 159, 26, 0.2); color: #a5adba; font-size: .875rem; margin-top: 3rem; padding-top: 1.5rem; text-align: center; }
+.ph-hero { align-items: center; display: grid; gap: clamp(1.5rem, 5vw, 4rem); grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); min-height: 32rem; }
+.ph-hero h1 { color: #ffb86c; font-size: clamp(2.75rem, 7vw, 5rem); letter-spacing: -.05em; line-height: 1; margin: .25rem 0 1rem; }
+.ph-eyebrow { color: #ff9f1a; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: .8rem; font-weight: 700; letter-spacing: .12em; margin: 0; text-transform: uppercase; }
+.ph-hero__summary { color: #c7ced8; font-size: clamp(1.1rem, 2vw, 1.35rem); line-height: 1.6; max-width: 36rem; }
+.ph-hero__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.5rem; }
+.ph-hero__media, .ph-showcase-card { margin: 0; }
+.ph-demo-image, .ph-showcase-card img { border: 1px solid rgba(255, 159, 26, 0.3); border-radius: .5rem; display: block; height: auto; max-width: 100%; }
+.ph-hero__media figcaption, .ph-showcase-card figcaption { color: #a5adba; font-size: .875rem; margin-top: .75rem; }
+.ph-showcase-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); margin: 1.5rem 0 2.5rem; }
+.ph-showcase-card { background: #171b21; border: 1px solid rgba(255, 159, 26, .18); border-radius: .65rem; overflow: hidden; padding: .75rem; }
+.ph-showcase-card figcaption { display: grid; gap: .25rem; }
+.ph-showcase-card figcaption strong { color: #ffb86c; }
+.ph-theme-families { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); margin: 1.5rem 0; }
+.ph-theme-family { background: #171b21; border: 1px solid rgba(255, 159, 26, .3); border-radius: .5rem; color: #e5e9f0; display: grid; gap: .5rem; padding: 1rem; text-decoration: none; }
+.ph-theme-family:hover { border-color: #ff9f1a; color: #fff; }
+.ph-theme-family span { color: #a5adba; font-size: .875rem; }
+.ph-theme-variants { display: grid; gap: .75rem; margin: 1.5rem 0; }
+.ph-theme-variant { background: #171b21; border: 1px solid rgba(255, 159, 26, .2); border-radius: .5rem; overflow: hidden; }
+.ph-theme-variant summary { align-items: center; cursor: pointer; display: flex; gap: .75rem; justify-content: space-between; padding: .85rem 1rem; }
+.ph-theme-variant summary span { color: #a5adba; font-size: .875rem; text-align: right; }
+.ph-theme-variant__variants { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); padding: 0 1rem 1rem; }
+.ph-theme-preview-card { background: #0b0d13; border: 1px solid rgba(255, 159, 26, .2); border-radius: .35rem; margin: 0; overflow: hidden; }
+.ph-theme-preview-card img { display: block; height: auto; max-width: 100%; }
+.ph-theme-preview-card figcaption { display: grid; gap: .5rem; padding: .75rem; }
+.ph-theme-preview-card figcaption strong { color: #ffb86c; }
+.ph-theme-preview-card code { overflow-wrap: anywhere; white-space: normal; }
+@media (max-width: 42rem) {
+  .ph-theme-variant summary { align-items: flex-start; flex-direction: column; }
+  .ph-theme-variant summary span { text-align: left; }
 }

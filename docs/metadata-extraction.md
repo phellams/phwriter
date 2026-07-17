@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Metadata Extraction
-nav_order: 2
+nav_order: 3
 description: "How to use Export-PHWriterMetadata to extract cmdlet help content statically via AST."
 ---
 

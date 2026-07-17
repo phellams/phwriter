@@ -1,3 +1,6 @@
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+
 # Enable UTF-8 Encoding
 $OutputEncoding = [Console]::InputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 
@@ -15,6 +18,7 @@ $codeBuilder = [System.Text.StringBuilder]::new()
 $privatePath = [System.IO.Path]::Combine($PSScriptRoot, 'Private')
 if ([System.IO.Directory]::Exists($privatePath)) {
     $files = [System.IO.Directory]::GetFiles($privatePath, '*.ps1', [System.IO.SearchOption]::AllDirectories)
+    [System.Array]::Sort($files, [System.StringComparer]::Ordinal)
     foreach ($file in $files) {
         [void]$codeBuilder.AppendLine([System.IO.File]::ReadAllText($file))
     }
@@ -24,6 +28,7 @@ if ([System.IO.Directory]::Exists($privatePath)) {
 $publicPath = [System.IO.Path]::Combine($PSScriptRoot, 'Public')
 if ([System.IO.Directory]::Exists($publicPath)) {
     $files = [System.IO.Directory]::GetFiles($publicPath, '*.ps1', [System.IO.SearchOption]::TopDirectoryOnly)
+    [System.Array]::Sort($files, [System.StringComparer]::Ordinal)
     foreach ($file in $files) {
         [void]$codeBuilder.AppendLine([System.IO.File]::ReadAllText($file))
     }
@@ -43,4 +48,4 @@ Export-ModuleMember -Function `
     Show-PHTheme,
     Get-TerminalPalette, `
     New-AsciiTokenGradient `
-    -Alias phextract, phpager, phroute, terpal
+    -Alias phextract, phpager, phroute, terpal, Get-TerminalPallete

@@ -3,7 +3,7 @@ function New-PHWriter {
     .SYNOPSIS
       Generates formatted, ANSI-colored help text for PowerShell cmdlets and router functions.
     .DESCRIPTION
-      Outputs man-page style documentation with customizable layout, alignment, and 41 built-in themes.
+      Outputs man-page style documentation with customizable layout, alignment, and 50 built-in themes.
       Supports documenting both parameters and router subcommands. All output is ANSI/VT100 formatted
       and rendered via [System.Console]::WriteLine for cross-platform compatibility and raw performance.
 
@@ -115,7 +115,9 @@ function New-PHWriter {
                 'midnight', 'gold', 'rose', 'steel', 'phwriter', 'glitch', 'cosmic',
                 'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust',
                 'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal',
-                'copper', 'royal', 'desert-heat', 'sheriff', 'frost'
+                'copper', 'royal', 'desert-heat', 'sheriff', 'frost',
+                'drift-blue-orange', 'steel-plate', 'cyber-grid', 'retro-blocks', 'gothic-crypt',
+                'acid-shards', 'aurora-borealis', 'solar-flare', 'subspace', 'neon-horizon'
             )
             if ($_ -is [string] -and $validNames -contains $_) { return $true }
             throw "Invalid -Theme value '$_'. Provide a valid built-in theme name or a custom theme hashtable."
@@ -288,7 +290,7 @@ function New-PHWriter {
             $phwriter_commandinfo = @{
                 cmdlet      = "New-PHWriter"
                 synopsis    = "New-PHWriter [-Name <String>] [-CommandInfo <Hashtable>] [-ParamTable <Hashtable[]>] [-Theme <String>] [-Layout <String>] [-LineSpacing <Int>] [-SourceType <String>]"
-                description = "Generates beautifully formatted, colorized help text for cmdlets and router functions. Supports 20 built-in themes, 6 layouts, compact/spacious line spacing, and dynamic source-type header labeling."
+                description = "Generates beautifully formatted, colorized help text for cmdlets and router functions. Supports 50 built-in themes, 6 layouts, compact/spacious line spacing, and dynamic source-type header labeling."
                 source      = "https://gitlab.com/phellams/phwriter/blob/main/README.md"
             }
             $phwriter_examples = @(
@@ -355,6 +357,32 @@ function New-PHWriter {
         # Fallbacks
         if (!$Name) { $Name = 'PHW' }
         if (!$Version) { $Version = '1.0.0' }
+
+        # Sanitize CommandInfo to prevent strict-mode exceptions on missing properties
+        if ($null -eq $CommandInfo) {
+            $CommandInfo = [ordered]@{
+                cmdlet      = $null
+                synopsis    = $null
+                description = $null
+                source      = $null
+            }
+        } elseif ($CommandInfo -is [hashtable]) {
+            $safeCommandInfo = [ordered]@{
+                cmdlet      = $(if ($CommandInfo.ContainsKey('cmdlet')) { $CommandInfo['cmdlet'] } else { $null })
+                synopsis    = $(if ($CommandInfo.ContainsKey('synopsis')) { $CommandInfo['synopsis'] } else { $null })
+                description = $(if ($CommandInfo.ContainsKey('description')) { $CommandInfo['description'] } else { $null })
+                source      = $(if ($CommandInfo.ContainsKey('source')) { $CommandInfo['source'] } else { $null })
+            }
+            $CommandInfo = $safeCommandInfo
+        } else {
+            $safeCommandInfo = [ordered]@{
+                cmdlet      = $(try { $CommandInfo.cmdlet } catch { $null })
+                synopsis    = $(try { $CommandInfo.synopsis } catch { $null })
+                description = $(try { $CommandInfo.description } catch { $null })
+                source      = $(try { $CommandInfo.source } catch { $null })
+            }
+            $CommandInfo = $safeCommandInfo
+        }
 
         # -Compact takes precedence over -LineSpacing
         if ($Compact) { $LineSpacing = 0 }
@@ -644,7 +672,7 @@ function New-PHWriter {
                         [string]$ExText,
                         $Theme
                     )
-                    $cmdletFormat = if ($Theme.AccentFormat) { @($Theme.AccentFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
+                    [string[]]$cmdletFormat = if ($Theme.AccentFormat) { @($Theme.AccentFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
                     $cParams = @{ String = "X"; Color = $Theme.AccentColor }
                     $cFormatList = [System.Collections.Generic.List[string]]::new()
                     foreach ($f in $cmdletFormat) { [void]$cFormatList.Add($f) }
@@ -653,13 +681,13 @@ function New-PHWriter {
                     $cmdletColor = New-AsciiColor @cParams
                     $cmdletSeq = if ($cmdletColor.EndsWith("[0m")) { $cmdletColor.Substring(0, $cmdletColor.Length - 5) } else { "" }
 
-                    $pFormat = if ($Theme.ParamNameFormat) { @($Theme.ParamNameFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
+                    [string[]]$pFormat = if ($Theme.ParamNameFormat) { @($Theme.ParamNameFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
                     $pParams = @{ String = "X"; Color = $Theme.ParamNameFg }
                     if ($pFormat -and $pFormat.Count -gt 0) { $pParams['Format'] = $pFormat }
                     $pEsc = New-AsciiColor @pParams
                     $paramSeq = if ($pEsc.EndsWith("[0m")) { $pEsc.Substring(0, $pEsc.Length - 5) } else { "" }
 
-                    $sFormat = if ($Theme.ParamTypeFormat) { @($Theme.ParamTypeFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
+                    [string[]]$sFormat = if ($Theme.ParamTypeFormat) { @($Theme.ParamTypeFormat -split ',') | Where-Object { $_ -and $_ -ne 'none' } } else { @() }
                     $sParams = @{ String = "X"; Color = $Theme.ParamTypeFg }
                     if ($sFormat -and $sFormat.Count -gt 0) { $sParams['Format'] = $sFormat }
                     $sEsc = New-AsciiColor @sParams

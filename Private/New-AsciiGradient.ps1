@@ -43,7 +43,8 @@ function New-AsciiGradient {
 
     begin {
         $ColorSupported = $true
-        if ($env:NO_COLOR -or $env:PHWRITER_NO_COLOR -or $global:PHWriterNoColor) {
+        $noColorPreference = Get-Variable -Name PHWriterNoColor -Scope Global -ValueOnly -ErrorAction Ignore
+        if ($env:NO_COLOR -or $env:PHWRITER_NO_COLOR -or $noColorPreference) {
             $ColorSupported = $false
         }
         $TrueColorSupported = $false

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: API Reference
-nav_order: 3
+nav_order: 4
 description: "Detailed parameter references and usage syntax for PHWriter public cmdlets."
 has_toc: true
 ---
@@ -90,7 +90,7 @@ Show-PHTheme [-Name <String>] [-Layout <String>] [-All] [-Minimal] [-Compact]
 |---|---|---|---|
 | `-Name` | String | `'phwriter'` | Theme name to preview, or `'all'`, or `'custom-rgb'`. |
 | `-Layout` | String | `'Box'` | Title layout preview style. |
-| `-All` | Switch | — | Previews all 41 built-in themes sequentially. |
+| `-All` | Switch | — | Previews all 50 built-in themes sequentially. |
 | `-Minimal` | Switch | — | Skips description/parameters; renders header title only. |
 | `-Compact` | Switch | — | Shortcut for compact parameter line spacing. |
 | `-Gradient` | Switch | — | Preview header gradient. |
@@ -170,7 +170,7 @@ New-PHRouter [-Routes] <Hashtable> [-ArgumentList] <String[]> [-ModuleName <Stri
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `-Routes` | Hashtable | *(Mandatory)* | Subcommand mapping: name (string) ➔ scriptblock or function name. |
-| `-ArgumentList` | String[] | *(Mandatory)* | Arguments list to process (typically `$args`). |
+| `-ArgumentList` | String[] | Current argument list | Arguments list to process (typically `$args`). |
 | `-ModuleName` | String | `'PHRouter'` | CLI name used in error prompts. |
 | `-RegisterCompleter` | Switch | — | Auto-registers argument tab completion. |
 | `-Metadata` | Hashtable | — | Optional PHWriter metadata hashtable for route verification. |
@@ -205,7 +205,7 @@ Write-PHAsciiLogo [-Name] <String> [-Layout <String>] [-Theme <Object>] [-Versio
 
 ---
 
-## 7. Get-TerminalPalette (Alias: `terpal`)
+## 7. Get-TerminalPalette (Aliases: `terpal`, `Get-TerminalPallete`)
 
 Helper to compile dynamic palette color maps.
 

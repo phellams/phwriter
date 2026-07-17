@@ -1,4 +1,12 @@
 dist
+docs/.bundle/
+docs/.jekyll-cache/
+docs/.jekyll-metadata
+docs/_site/
+docs/public/
+docs/assets/themes-previews/
+docs/vendor/
+vhs/generated/
 tools/commit-helper.ps1
 tools/VERIFICATION.txt
 build.env
@@ -6,6 +14,4 @@ coverage.xml
 testResults.xml
 libs/help_metadata
 automator-devops
-vhs/generated/
 tasks.md
-docs/public

@@ -52,7 +52,7 @@ function Show-PHTheme {
       Previews the 'cyberpunk' theme with the default 'Box' layout.
     .EXAMPLE
       Show-PHTheme -All -Layout 'Terminal' -Minimal
-      Previews all 41 themes using the 'Terminal' layout in minimal mode.
+      Previews all 50 themes using the 'Terminal' layout in minimal mode.
     .EXAMPLE
       Show-PHTheme -Name 'custom-rgb' -Layout 'Classic'
       Previews a custom RGB/TrueColor theme using the 'Classic' banner layout.
@@ -76,6 +76,8 @@ function Show-PHTheme {
                 'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust',
                 'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal',
                 'copper', 'royal', 'desert-heat', 'sheriff', 'frost',
+                'drift-blue-orange', 'steel-plate', 'cyber-grid', 'retro-blocks', 'gothic-crypt',
+                'acid-shards', 'aurora-borealis', 'solar-flare', 'subspace', 'neon-horizon',
                 'custom-rgb', 'all'
         )]
         [string]$Name = 'phwriter',
@@ -194,7 +196,7 @@ function Show-PHTheme {
                     name        = "All"
                     param       = "a|All"
                     type        = "Switch"
-                    description = "Preview all 41 built-in themes sequentially."
+                    description = "Preview all 50 built-in themes sequentially."
                     required    = $false
                     inline      = $true
                 },
@@ -283,7 +285,9 @@ function Show-PHTheme {
                 'midnight', 'gold', 'rose', 'steel', 'phwriter', 'glitch', 'cosmic',
                 'forest-mist', 'blood-moon', 'retro-arcade', 'abyss', 'zen', 'blaze', 'rust',
                 'matrix-neon', 'quantum', 'radioactive', 'vaporwave', 'nebula', 'crystal',
-                'copper', 'royal', 'desert-heat', 'sheriff', 'frost'
+                'copper', 'royal', 'desert-heat', 'sheriff', 'frost',
+                'drift-blue-orange', 'steel-plate', 'cyber-grid', 'retro-blocks', 'gothic-crypt',
+                'acid-shards', 'aurora-borealis', 'solar-flare', 'subspace', 'neon-horizon'
             )
         } elseif ($Name -eq 'custom-rgb') {
             $isCustomRgb = $true
