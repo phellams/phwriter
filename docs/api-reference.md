@@ -1,14 +1,14 @@
 ---
 layout: default
 title: API Reference
-nav_order: 4
-description: "Detailed parameter references and usage syntax for PHWriter public cmdlets."
+nav_order: 5
+description: "Full parameter reference tables for all PHWriter public cmdlets."
 has_toc: true
 ---
 
 # API Reference
 
-This page provides the comprehensive cmdlet API reference for PHWriter.
+Complete parameter tables for all PHWriter public cmdlets. For executable code examples and real-world usage patterns, see the [Cmdlet Reference](./cmdlet-reference) page.
 
 ---
 
@@ -24,7 +24,7 @@ This page provides the comprehensive cmdlet API reference for PHWriter.
 
 ## 1. New-PHWriter
 
-Generates the fully styled terminal help layouts.
+Generates fully styled terminal help output. Accepts direct parameter input, JSON file, or piped `Export-PHWriterMetadata` output via `-InputObject`. Theme resolution follows: explicit `-Theme` param > `$global:__phwriter.theme_config` > built-in default `'phwriter'`.
 
 ### Syntax
 ```powershell
