@@ -508,4 +508,96 @@ Context "New-AsciiTokenGradient-and-Color-Support" {
         Show-PHTheme -Name 'aurora' -Gradient -GradientMode Vertical -Minimal
     }
 }
+
+Context "Documentation-Contract-Test" {
+    BeforeAll {
+        $docsDir = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, "..", "docs"))
+        $apiRefPath = [System.IO.Path]::Combine($docsDir, "api-reference.md")
+        $cmdletsYmlPath = [System.IO.Path]::Combine($docsDir, "_data", "cmdlets.yml")
+    }
+
+    It "Should have all public cmdlets documented in cmdlets.yml" {
+        $module = Get-Module -Name phwriter
+        $exportedCmdlets = $module.ExportedFunctions.Keys
+
+        $ymlContent = [System.IO.File]::ReadAllText($cmdletsYmlPath)
+        $documentedCmdlets = [System.Text.RegularExpressions.Regex]::Matches($ymlContent, '(?m)^\s*-\s*name:\s*(\S+)') | ForEach-Object { $_.Groups[1].Value }
+
+        foreach ($cmdlet in $exportedCmdlets) {
+            $documentedCmdlets | Should -Contain $cmdlet
+        }
+    }
+
+    It "Should have all cmdlet parameters documented in api-reference.md" {
+        $module = Get-Module -Name phwriter
+        $exportedCmdlets = $module.ExportedFunctions.Keys
+        $apiRefContent = [System.IO.File]::ReadAllText($apiRefPath)
+
+        $commonParams = @(
+            'Verbose', 'Debug', 'ErrorAction', 'WarningAction', 'InformationAction',
+            'ErrorVariable', 'WarningVariable', 'InformationVariable', 'OutVariable',
+            'OutBuffer', 'PipelineVariable', 'WhatIf', 'Confirm', 'UseTransaction',
+            'ProgressAction'
+        )
+
+        foreach ($cmdlet in $exportedCmdlets) {
+            $command = Get-Command -Name $cmdlet -Module phwriter
+            $parameters = $command.Parameters.Keys | Where-Object { $_ -notin $commonParams }
+
+            foreach ($param in $parameters) {
+                # Look for parameter name formatted as -ParamName in api-reference.md
+                $apiRefContent | Should -Match "(?i)-${param}\b"
+            }
+        }
+    }
+
+    It "Should validate all local Markdown links and assets in documentation pages" {
+        $mdFiles = [System.IO.Directory]::GetFiles($docsDir, "*.md", [System.IO.SearchOption]::AllDirectories)
+        # Avoid vendor directory
+        $mdFiles = $mdFiles | Where-Object { $_ -notmatch 'docs/vendor/' }
+
+        foreach ($file in $mdFiles) {
+            $content = [System.IO.File]::ReadAllText($file)
+            $fileDir = [System.IO.Path]::GetDirectoryName($file)
+
+            # Match markdown links: [text](link) and images: ![alt](link)
+            $matches = [System.Text.RegularExpressions.Regex]::Matches($content, '(?i)(?:!\[.*?\]|\[.*?\])\(([^:\)]+?)\)')
+            foreach ($match in $matches) {
+                $link = $match.Groups[1].Value.Trim()
+
+                # Ignore empty links, web URLs, mailto links, anchor-only links, and Jekyll/Liquid templates
+                if ([string]::IsNullOrWhiteSpace($link) -or 
+                    $link -match '^(http|https|mailto):' -or 
+                    $link -match '^#' -or
+                    $link -match '\{\{.*?\}\}' -or
+                    $link -match '\{%.*?%\}') {
+                    continue
+                }
+
+                # Remove query string or anchors if any
+                $cleanLink = $link -replace '#.*$', '' -replace '\?.*$', ''
+                if ([string]::IsNullOrWhiteSpace($cleanLink)) {
+                    continue
+                }
+
+                # Resolve local path
+                $resolvedPath = $null
+                if ($cleanLink.StartsWith("/")) {
+                    # Relative to Jekyll site root (docs/)
+                    $resolvedPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($docsDir, $cleanLink.TrimStart("/")))
+                } else {
+                    # Relative to the current markdown file's directory
+                    $resolvedPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($fileDir, $cleanLink))
+                }
+
+                # Assert that the file or directory exists
+                $exists = [System.IO.File]::Exists($resolvedPath) -or [System.IO.Directory]::Exists($resolvedPath)
+                if (-not $exists) {
+                    Write-Error "Broken link in '$file': '$link' (resolved to '$resolvedPath')"
+                }
+                $exists | Should -Be $true
+            }
+        }
+    }
+}
 }

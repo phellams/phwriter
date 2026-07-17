@@ -1,5 +1,5 @@
 @{
-    ModuleVersion     = '0.5.0'
+    ModuleVersion     = '0.7.0'
     GUID              = '083f04e0-3fe0-42ec-a918-f799e1f1df39'
     Author            = 'Garvey K. Snow'
     CompanyName       = 'Phallems'
@@ -21,20 +21,21 @@
     AliasesToExport   = @('phextract', 'phpager', 'phroute', 'terpal')
     PrivateData       = @{
         PSData = @{
-            Tags         = @('Help', 'Formatting', 'CLI', 'PowerShell', 'Documentation', 'AST', 'TUI', 'Router', 'Themes', 'Pager')
+            Tags         = @('Help', 'Formatting', 'CLI', 'PowerShell', 'Documentation', 'AST', 'TUI', 'Router', 'Themes', 'Pager', 'man')
             ReleaseNotes = @()
             RequireLicenseAcceptance = $false
             IconUri                  = 'https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png'
             LicenseUrl               = 'https://choosealicense.com/licenses/mit'
-            ProjectUrl               = 'https://github.com/phellams/phwriter'
+            ProjectUrl               = 'https://gitlab.com/phellams/phwriter'
             # CHOCOLATE ---------------------
             LicenseUri               = 'https://choosealicense.com/licenses/mit'
+            ChocoTitle               = 'Phwriter - Colored help text with a man-page-like layout.'
             ProjectUri               = 'https://gitlab.com/phellams/phwriter.git'
             IconUrl                  = 'https://raw.githubusercontent.com/phellams/phellams-general-resources/main/logos/phwriter/dist/png/phwriter-logo-128x128.png'
-            Docsurl                  = 'https://pages.gitlab.io/sgkens/ptoml'
-            MailingListUrl           = 'https://github.com/phellams/phwriter/issues'
-            projectSourceUrl         = 'https://github.com/phellams/phwriter'
-            bugTrackerUrl            = 'https://github.com/phellams/phwriter/issues'
+            Docsurl                  = 'https://phellams.gitlab.io/phwriter'
+            MailingListUrl           = 'https://gitlab.com/phellams/phwriter/-/issues'
+            projectSourceUrl         = 'https://gitlab.com/phellams/phwriter.git'
+            bugTrackerUrl            = 'https://gitlab.com/phellams/phwriter/-/issues'
             Summary                  = 'A PowerShell module for generating custom, colored help text with a man-page-like layout.'
             chocoDescription         = @"
 ## Overview
@@ -43,7 +44,7 @@ PHWriter(_**Powershell Help Writer**_) is a PowerShell module designed to genera
 Features
 
  - **Customizable Layout**: Control indentation and spacing between parameter elements.
- - Colored Output: Enhance readability with distinct colors for different help sections and parameter components.
+ - **Colored Output**: Enhance readability with distinct colors for different help sections and parameter components.
  - **ASCII Art Logo**: Includes a simple, elegant ASCII art banner for visual appeal, or you can provide your own ascii art.
  - **Inline/Newline Descriptions**: Choose whether parameter descriptions appear on the same line or a new line.
  - **Automatic Alignment**: Dynamically calculates padding to ensure perfect alignment of parameter types and descriptions.

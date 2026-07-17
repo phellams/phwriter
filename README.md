@@ -8,9 +8,9 @@
 
 <span>
     <a href="https://phellams.gitlab.io/phwriter">🧷 <strong>Docs</strong></a>
-    <a href="https://www.powershellgallery.com/packages/PWSL">🧷 <strong>PSGallery</strong></a>
-    <a href="https://chocolatey.org/packages/pwphwritersl">🧷 <strong>Chocolatey</strong></a>
-    <a href="https://github.com/phellams/phwriter">🧷 <strong>GitHub</strong></a>
+    <a href="https://www.powershellgallery.com/packages/PHWriter">🧷 <strong>PSGallery</strong></a>
+    <a href="https://chocolatey.org/packages/phwriter">🧷 <strong>Chocolatey</strong></a>
+    <a href="https://gitlab.com/phellams/phwriter">🧷 <strong>GitLab</strong></a>
 </span>
 
 </div>
@@ -33,7 +33,7 @@ PHWriter (**PowerShell Help Writer**) is modeled in insperation from linux man p
 
 ## **Installation**
 
-Phellams modules are available from [**PowerShell Gallery**](https://www.powershellgallery.com/packages/commitfusion) and [**Chocolatey**](https://chocolatey.org/packages/commitfusion). you can access the raw assets via [**Gitlab Generic Assets**](https://gitlab.com/phellams/commitfusion/-/packages?orderBy=name&sort=desc&search[]=commitfusion) or nuget repository via [**Gitlab Packages**](https://gitlab.com/phellams/commitfusion/-/packages/?orderBy=name&sort=desc&search[]=commitfusion&type=NuGet).
+Phellams modules are available from [**PowerShell Gallery**](https://www.powershellgallery.com/packages/PHWriter) and [**Chocolatey**](https://chocolatey.org/packages/phwriter). you can access the raw assets via [**Gitlab Generic Assets**](https://gitlab.com/phellams/phwriter/-/packages?orderBy=name&sort=desc&search[]=phwriter) or nuget repository via [**Gitlab Packages**](https://gitlab.com/phellams/phwriter/-/packages/?orderBy=name&sort=desc&search[]=phwriter&type=NuGet).
 
 |▓▓▓▓▒▒▒▒░░░|▓▓▓▓▒▒▒▒░░░|▓▓▓▓▒▒▒▒░░░|
 |-|-|-|
@@ -50,7 +50,7 @@ Phellams modules are available from [**PowerShell Gallery**](https://www.powersh
 
 Using `nuget`: See the [**packages**](https://gitlab.com/phellams/phwriter/-/packages?orderBy=name&sort=asc&search[]=phwriter&type=NuGet) page for installation instructions.
 
-> For instructions on adding `nuget` **sources** packages from *GitLab* see [**Releases**](https://github.com/sgkens/phwriter/releases) artifacts or via the [**Packages**](https://gitlab.com/phellams/phwriter/-/packages?orderBy=name&sort=asc&search[]=phwriter&type=NuGet) page.
+> For instructions on adding `nuget` **sources** packages from *GitLab* see [**Releases**](https://gitlab.com/phellams/phwriter/-/releases) artifacts or via the [**Packages**](https://gitlab.com/phellams/phwriter/-/packages?orderBy=name&sort=asc&search[]=phwriter&type=NuGet) page.
 
 #### Generic Asset
 

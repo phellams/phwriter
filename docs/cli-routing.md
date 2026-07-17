@@ -25,7 +25,7 @@ function Invoke-MyCli {
         'default' = { Write-Host "Usage: mycli <build|test>" }
     }
 
-    New-PHRouter -Routes $Routes -Args $Args
+    New-PHRouter -Routes $Routes -ArgumentList $Args
 }
 ```
 

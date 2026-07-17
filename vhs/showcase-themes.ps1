@@ -9,6 +9,13 @@ if (Test-Path $ParentModule) {
     Import-Module $ParentModule -Force
 }
 
+$ManifestPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($ScriptDir, "..", "phwriter.psd1"))
+$Version = "unknown"
+if (Test-Path $ManifestPath) {
+    $Manifest = Import-PowerShellDataFile $ManifestPath
+    $Version = $Manifest.ModuleVersion
+}
+
 $ShowcaseThemes = @(
     'phwriter',
     'cyberpunk',
@@ -23,7 +30,7 @@ $ShowcaseThemes = @(
 Clear-Host
 Write-Host "==========================================================" -ForegroundColor Yellow
 Write-Host "         PHWriter Live Color Themes Showcase" -ForegroundColor Yellow -NoNewline
-Write-Host " v2.0.0" -ForegroundColor Cyan
+Write-Host " v$Version" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor Yellow
 Write-Host "This script will preview 8 highly-styled terminal themes." -ForegroundColor Gray
 Write-Host "Press any key to start..." -ForegroundColor Gray

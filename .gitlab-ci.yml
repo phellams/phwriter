@@ -1,7 +1,7 @@
 #---------------------------------------------
 # Default values for all jobs unless overridden
 default:
-  image: docker.io/sgkens/phellams-automator:{$AUTOMATOR_VERSION}
+  image: docker.io/sgkens/phellams-automator:${AUTOMATOR_VERSION}
   tags:
     - docker
   artifacts:
@@ -22,6 +22,7 @@ stages:
   - build
   - release
   - deploy
+  - notify
 #---------------------------------------------
 # Define pipeline-wide workflow control
 workflow:
@@ -335,3 +336,57 @@ upload_psgallery:
   script:
     - |
       pwsh -c ./automator-devops/scripts/deploy/deploy-psgallary.ps1 || exit 1
+
+pages:
+  # The Docker image that will be used to build your app
+  image: ruby:3.1
+  <<: *deploy_template
+  before_script: []
+  script:
+    - cd docs
+    - ruby inject-version.rb
+    - bundle config set path 'vendor/bundle'
+    - bundle install
+    - bundle exec jekyll build -d public
+  artifacts:
+    paths:
+      - docs/public
+  pages:
+    publish: docs/public
+
+generate-runtime-badge:
+  stage: notify
+  image: sgkens/phellams-automator:$AUTOMATOR_VERSION
+  rules:
+    - when: always
+  tags:
+    - docker
+  script:
+    - chmod +x ./scripts/Calculate-Runtime.ps1 ./scripts/Generate-Badge.ps1
+    - |
+      pwsh -NoProfile -Command '
+        $runtime = & ./scripts/Calculate-Runtime.ps1
+
+        ./scripts/Generate-Badge.ps1 `
+          -Label "runtime" `
+          -Message $runtime `
+          -Style "flat" `
+          -IncludeIcon `
+          -LabelColor "#555" `
+          -MessageColor "#007acc" `
+          -OutputPath "runtime-badge-flat.svg"
+
+        ./scripts/Generate-Badge.ps1 `
+          -Label "runtime" `
+          -Message $runtime `
+          -Style "for-the-badge" `
+          -IncludeIcon `
+          -LabelColor "#555" `
+          -MessageColor "#007acc" `
+          -OutputPath "runtime-badge-for-the-badge.svg"
+      '
+  artifacts:
+    paths:
+      - runtime-badge-flat.svg
+      - runtime-badge-for-the-badge.svg
+    expire_in: never

@@ -19,3 +19,6 @@
 - name: Get-TerminalPalette
   alias: "terpal"
   purpose: "Generate dynamic solid, conditional, or gradient palette objects"
+- name: New-AsciiTokenGradient
+  alias: "—"
+  purpose: "Apply TrueColor gradients to ASCII art based on tokenized 2D shapes"
