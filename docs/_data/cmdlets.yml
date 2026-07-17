@@ -14,8 +14,8 @@
   alias: "phroute"
   purpose: "Dispatch CLI subcommands with tab-completion"
 - name: Show-PHTheme
-  alias: "—"
-  purpose: "Preview built-in and custom themes"
+  alias: "shldc"
+  purpose: "Preview built-in and custom themes in the terminal"
 - name: Get-TerminalPalette
   alias: "terpal, Get-TerminalPallete"
   purpose: "Generate dynamic solid, conditional, or gradient palette objects"
