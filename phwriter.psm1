@@ -48,4 +48,4 @@ Export-ModuleMember -Function `
     Show-PHTheme,
     Get-TerminalPalette, `
     New-AsciiTokenGradient `
-    -Alias phextract, phpager, phroute, terpal, Get-TerminalPallete
+    -Alias phextract, phpager, phroute, terpal, Get-TerminalPallete, shldc

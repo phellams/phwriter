@@ -59,14 +59,27 @@ function New-PHWriter {
       An ordered array of two or more xterm-256 color indices defining the border gradient stops.
     .PARAMETER OuterBorderStyle
       Selects the corner and side glyph style for the outer border. One of: 'Rounded' (default, ╭╮╰╯│),
-      'Square' (┌┐└┘│), 'Double' (╔╗╚╝║═), 'Block' (██▓▓), 'Simple' (++--).
+      'Square' (┌┐└┘│), 'Double' (╔╗╚╝║║═), 'Block' (██▓▓), 'Simple' (++--).
       Only takes effect when -OuterBorder is specified.
+    .PARAMETER InputObject
+      A metadata hashtable or PSCustomObject produced by Export-PHWriterMetadata. When piped,
+      all recognised fields (name, commandinfo, paramtable, sourcetype, examples, version) are
+      mapped into the corresponding New-PHWriter parameters. Any explicitly provided parameters
+      take precedence over the piped values.
+    .PARAMETER HelpParam
+      When specified, restricts the rendered PARAMETERS section to the single entry whose name
+      or alias contains this string (case-insensitive, partial match). The header, syntax, and
+      description sections are still rendered. Useful for quick targeted lookups.
     .PARAMETER Help
       Switch to display help information for New-PHWriter itself.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Default')]
     [OutputType('void')]
     param(
+        # ── Pipeline input from Export-PHWriterMetadata ───────────────────────
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true, HelpMessage = "Metadata object from Export-PHWriterMetadata.")]
+        [object]$InputObject,
+
         [Parameter(Mandatory = $false, HelpMessage = "Json File to import help data from.")]
         [string]$JsonFile,
 
@@ -165,6 +178,9 @@ function New-PHWriter {
 
         [Parameter(HelpMessage = "Keep help output on stdout when leaving alternate screen buffer pager.")]
         [switch]$KeepOutput = $true,
+
+        [Parameter(HelpMessage = "Filter PARAMETERS output to entries matching this string (partial, case-insensitive).")]
+        [string]$HelpParam,
 
         [Parameter(HelpMessage = "Display Help for New-PHWriter.")]
         [switch]$Help
@@ -303,12 +319,79 @@ function New-PHWriter {
             return
         }
 
-        # Resolve Theme
+        # ── Pipeline / InputObject mapping ───────────────────────────────────
+        # Accept metadata produced by Export-PHWriterMetadata. Explicit params take precedence.
+        if ($null -ne $InputObject) {
+            # Normalise: support both hashtable and PSCustomObject
+            $meta = if ($InputObject -is [hashtable]) { $InputObject } else {
+                $ht = @{}
+                foreach ($p in $InputObject.PSObject.Properties) { $ht[$p.Name.ToLower()] = $p.Value }
+                $ht
+            }
+
+            # Map fields only when the caller has NOT explicitly provided the corresponding param.
+            if (-not $PSBoundParameters.ContainsKey('Name')        -and $meta.ContainsKey('name'))        { $Name        = [string]$meta['name'] }
+            if (-not $PSBoundParameters.ContainsKey('CommandInfo')  -and $meta.ContainsKey('commandinfo')) { $CommandInfo  = $meta['commandinfo'] }
+            if (-not $PSBoundParameters.ContainsKey('ParamTable')   -and $meta.ContainsKey('paramtable'))  { $ParamTable   = @($meta['paramtable']) }
+            if (-not $PSBoundParameters.ContainsKey('Examples')     -and $meta.ContainsKey('examples'))    { $Examples     = @($meta['examples']) }
+            if (-not $PSBoundParameters.ContainsKey('Version')      -and $meta.ContainsKey('version'))     { $Version      = [string]$meta['version'] }
+            if (-not $PSBoundParameters.ContainsKey('SourceType')   -and $meta.ContainsKey('sourcetype'))  {
+                $st = [string]$meta['sourcetype']
+                $validST = @('module','script','tool','plugin','cli','function','workflow','router')
+                if ($st -in $validST) { $SourceType = $st }
+            }
+            # Theme from metadata only when neither explicit param nor global config supplies one
+            if (-not $PSBoundParameters.ContainsKey('Theme') -and $meta.ContainsKey('theme')) {
+                $Theme = $meta['theme']
+            }
+        }
+
+        # ── Global config resolution: $global:__phwriter.theme_config ─────────
+        # Priority: explicit -Theme param > global config > built-in default 'phwriter'
+        $globalCfg = $null
+        try {
+            $gv = $ExecutionContext.SessionState.PSVariable.Get('__phwriter')
+            if ($null -ne $gv -and $gv.Value -is [hashtable] -and $gv.Value.ContainsKey('theme_config')) {
+                $globalCfg = $gv.Value['theme_config']
+            }
+        } catch {}
+
+        if (-not $PSBoundParameters.ContainsKey('Theme') -and $null -ne $globalCfg) {
+            # Apply global theme name if not already set by InputObject or explicit param
+            if ($globalCfg -is [hashtable] -and $globalCfg.ContainsKey('theme')) {
+                $Theme = $globalCfg['theme']
+            } elseif ($globalCfg -is [string]) {
+                $Theme = $globalCfg
+            }
+            # Apply other global rendering preferences (only when caller has not set them)
+            if ($globalCfg -is [hashtable]) {
+                if (-not $PSBoundParameters.ContainsKey('Gradient')    -and $globalCfg.ContainsKey('gradient'))    { $Gradient    = [bool]$globalCfg['gradient'] }
+                if (-not $PSBoundParameters.ContainsKey('OuterBorder') -and $globalCfg.ContainsKey('outerborder')) { $OuterBorder = [bool]$globalCfg['outerborder'] }
+                if (-not $PSBoundParameters.ContainsKey('Layout')      -and $globalCfg.ContainsKey('layout'))      { $Layout      = [string]$globalCfg['layout'] }
+                if (-not $PSBoundParameters.ContainsKey('Compact')     -and $globalCfg.ContainsKey('compact'))     { $Compact     = [bool]$globalCfg['compact'] }
+            }
+        }
+
+        # ── Resolve Theme object ──────────────────────────────────────────────
         $themeObj = $null
         if ($Theme -is [hashtable]) {
             $themeObj = $Theme
         } else {
             $themeObj = Get-PHTheme -Name $Theme
+        }
+
+        # Allow global config to partially override individual theme keys (deep-merge)
+        if ($null -ne $globalCfg -and $globalCfg -is [hashtable]) {
+            $themeOverrideKeys = @('AccentColor','AccentFormat','BorderColor','BorderFormat',
+                'HeaderBg','HeaderFg','ModuleBg','ModuleFg','VersionBg','VersionFg',
+                'SyntaxFg','SyntaxFormat','DescriptionFg','ParamNameFg','ParamNameFormat',
+                'ParamTypeFg','ParamTypeFormat','ParamReqFg','ParamReqFormat','ParamDescFg',
+                'ExampleFg','DocsFg','DocsFormat','SectionChar','HeaderChar')
+            foreach ($k in $themeOverrideKeys) {
+                if ($globalCfg.ContainsKey($k)) {
+                    $themeObj[$k] = $globalCfg[$k]
+                }
+            }
         }
 
         if ($PSBoundParameters.ContainsKey('GradientMode')) {
@@ -574,13 +657,31 @@ function New-PHWriter {
 
             # 4. PARAMETERS Section
             if ($ParamTable -and $ParamTable.Count -gt 0) {
+                # ── -HelpParam filter: restrict to matching entries ────────────
+                $activeParamTable = $ParamTable
+                if (-not [string]::IsNullOrWhiteSpace($HelpParam)) {
+                    $needle = $HelpParam.ToLower()
+                    $filtered = @($ParamTable | Where-Object {
+                        ($_.name  -and $_.name.ToLower()  -like "*${needle}*") -or
+                        ($_.param -and $_.param.ToLower() -like "*${needle}*")
+                    })
+                    if ($filtered.Count -gt 0) {
+                        $activeParamTable = $filtered
+                    } else {
+                        # No match — emit a themed warning row instead of silently showing nothing
+                        $noMatchMsg = Format-ThemeText -String "  No parameter matching '$HelpParam' found." -Theme $themeObj -Element 'ParamDesc'
+                        [console]::WriteLine($noMatchMsg)
+                        $activeParamTable = @()
+                    }
+                }
+
                 $paramTitle = Format-ThemeText -String "PARAMETERS" -Theme $themeObj -Element 'Accent'
                 [console]::WriteLine("${indentString}${styledSecChar}${paramTitle}")
 
                 $maxParamLength = 0
                 $maxTypeLength = 0
 
-                foreach ($paramInfo in $ParamTable) {
+                foreach ($paramInfo in $activeParamTable) {
                     if (-not ($paramInfo.name -and $paramInfo.param -and $paramInfo.type -and $paramInfo.description)) {
                         continue
                     }
@@ -594,7 +695,7 @@ function New-PHWriter {
                     }
                 }
 
-                foreach ($paramInfo in $ParamTable) {
+                foreach ($paramInfo in $activeParamTable) {
                     if (-not ($paramInfo.name -and $paramInfo.param -and $paramInfo.type -and $paramInfo.description)) {
                         continue
                     }

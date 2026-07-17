@@ -18,7 +18,7 @@
     )
     CmdletsToExport   = @()
     VariablesToExport = @()
-    AliasesToExport   = @('phextract', 'phpager', 'phroute', 'terpal', 'Get-TerminalPallete')
+    AliasesToExport   = @('phextract', 'phpager', 'phroute', 'terpal', 'Get-TerminalPallete', 'shldc')
     PrivateData       = @{
         PSData = @{
             Tags         = @('Help', 'Formatting', 'CLI', 'PowerShell', 'Documentation', 'AST', 'TUI', 'Router', 'Themes', 'Pager', 'man')

@@ -67,6 +67,7 @@ function Show-PHTheme {
       Previews all themes in compact minimal mode — useful for rapid visual comparison.
     #>
     [CmdletBinding()]
+    [Alias('shldc')]
     param(
         [Parameter(Position = 0, ValueFromPipeline = $true)]
         [ValidateSet(
@@ -133,18 +134,23 @@ function Show-PHTheme {
         [ValidateSet('Rounded', 'Square', 'Double', 'Block', 'Simple')]
         [string]$OuterBorderStyle = 'Rounded',
 
+        [Parameter(HelpMessage = "Filter the PARAMETERS section to entries matching this string (partial, case-insensitive).")]
+        [string]$HelpParam,
+
         [Parameter(HelpMessage = "Display Help for Show-PHTheme.")]
         [switch]$Help
     )
 
-    begin {
+    begin {}
+
+    process {
+        # Rebuild per-call mock and layout values so pipeline input refreshes them for every theme
         $mockCommandInfo = @{
             cmdlet      = "Get-SampleCmdlet"
             synopsis    = "Get-SampleCmdlet [-Path <String>] [-Force] [-Verbose]"
             description = "This sample cmdlet retrieves configuration data and performs basic validation checks. It is formatted to show the colors and layouts of the theme."
             source      = "https://gitlab.com/phellams/phwriter"
         }
-
         $mockParams = @(
             @{
                 name        = "Path"
@@ -163,17 +169,12 @@ function Show-PHTheme {
                 inline      = $true
             }
         )
-
         $mockExamples = @(
             "Get-SampleCmdlet -Path 'config.json' -Force",
             "Get-SampleCmdlet -Path '/etc/app/config.json' -Verbose"
         )
-
-        # Resolve compact → LineSpacing value
         $resolvedLineSpacing = if ($Compact) { 0 } else { 1 }
-    }
 
-    process {
         if ($Help) {
             $showtheme_ParamTable = @(
                 @{
@@ -380,6 +381,7 @@ function Show-PHTheme {
                 if ($BorderGradient)  { $writerParams['BorderGradient']   = $true }
                 if ($BorderCustomGradient) { $writerParams['BorderCustomGradient'] = $BorderCustomGradient }
                 if ($OuterBorderStyle -ne 'Rounded') { $writerParams['OuterBorderStyle'] = $OuterBorderStyle }
+                if (-not [string]::IsNullOrWhiteSpace($HelpParam)) { $writerParams['HelpParam'] = $HelpParam }
 
                 New-PHWriter @writerParams
             }

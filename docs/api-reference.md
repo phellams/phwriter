@@ -28,15 +28,15 @@ Generates the fully styled terminal help layouts.
 
 ### Syntax
 ```powershell
-New-PHWriter [-Name <String>] [-CommandInfo <Hashtable>] [-ParamTable <Hashtable[]>] 
-             [-Subcommands <Hashtable[]>] [-Examples <String[]>] [-Version <String>]
-             [-Padding <Int>] [-Indent <Int>] [-LineSpacing <Int>] [-Compact] 
-             [-SourceType <String>] [-Theme <Object>] [-Layout <String>] 
+New-PHWriter [-InputObject <Object>] [-Name <String>] [-CommandInfo <Hashtable>] 
+             [-ParamTable <Hashtable[]>] [-Subcommands <Hashtable[]>] [-Examples <String[]>] 
+             [-Version <String>] [-Padding <Int>] [-Indent <Int>] [-LineSpacing <Int>] 
+             [-Compact] [-SourceType <String>] [-Theme <Object>] [-Layout <String>] 
              [-CustomLogo <String>] [-Gradient] [-CustomGradient <Int[]>] 
              [-GradientMode <String>] [-OuterBorder] [-BorderGradient] 
              [-BorderCustomGradient <Int[]>] [-OuterBorderStyle <String>] 
              [-Width <Object>] [-JsonFile <String>] [-OutMode <String>] 
-             [-KeepOutput] [-Help]
+             [-KeepOutput] [-HelpParam <String>] [-Help]
 ```
 
 ### Parameters
@@ -44,6 +44,7 @@ New-PHWriter [-Name <String>] [-CommandInfo <Hashtable>] [-ParamTable <Hashtable
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `-JsonFile` | String | — | Path to a `.json` configuration file. |
+| `-InputObject` | Object | — | Metadata hashtable or PSCustomObject from `Export-PHWriterMetadata`. Piped; explicit params take precedence. |
 | `-Name` | String | `'PHW'` | Module, script, or tool name displayed in the banner. |
 | `-CommandInfo` | Hashtable | — | Contains `cmdlet`, `synopsis`, `description`, and `source` URL keys. |
 | `-ParamTable` | Hashtable[] | — | Array of parameters defining names, types, mandatory flags, and descriptions. |
@@ -55,7 +56,7 @@ New-PHWriter [-Name <String>] [-CommandInfo <Hashtable>] [-ParamTable <Hashtable
 | `-LineSpacing` | Int | `1` | Empty lines between parameters (0=compact, 1=default, 2=spacious). |
 | `-Compact` | Switch | — | Convenience switch for `-LineSpacing 0`. |
 | `-SourceType` | String | `'module'` | Layout header label: module, script, tool, plugin, cli, function, workflow, or router. |
-| `-Theme` | Object | `'phwriter'` | Target theme name or custom theme hashtable. |
+| `-Theme` | Object | `'phwriter'` | Target theme name or custom theme hashtable. Resolved from `$global:__phwriter.theme_config` if not provided. |
 | `-Layout` | String | `'Box'` | ASCII title layout style: Box, Classic, Minimal, Man, Terminal, Typewriter. |
 | `-CustomLogo` | String | — | Overrides logo with custom ASCII text. |
 | `-Gradient` | Switch | — | Enables title gradient shading. |
@@ -68,6 +69,7 @@ New-PHWriter [-Name <String>] [-CommandInfo <Hashtable>] [-ParamTable <Hashtable
 | `-Width` | Object | `'full'` | Width in columns: 'man' (80), 'full' (console width), or a custom integer. |
 | `-OutMode` | String | `'Auto'` | Render mode: Standard (stdout), Alt (pager), String (returns text), or Auto. |
 | `-KeepOutput` | Switch | `$true` | Keeps help on stdout when exiting pager. |
+| `-HelpParam` | String | — | Restricts the PARAMETERS section to entries whose name or alias contains this string (partial, case-insensitive). |
 | `-Help` | Switch | — | Displays help for New-PHWriter itself. |
 
 ---
@@ -81,7 +83,8 @@ DX utility to preview theme combinations directly in the shell.
 Show-PHTheme [-Name <String>] [-Layout <String>] [-All] [-Minimal] [-Compact] 
              [-Gradient] [-CustomGradient <Int[]>] [-GradientMode <String>] 
              [-OuterBorder] [-BorderGradient] [-BorderCustomGradient <Int[]>] 
-             [-OuterBorderStyle <String>] [-SourceType <String>] [-TextSpacing] [-Help]
+             [-OuterBorderStyle <String>] [-SourceType <String>] [-TextSpacing] 
+             [-HelpParam <String>] [-Help]
 ```
 
 ### Parameters
@@ -102,6 +105,7 @@ Show-PHTheme [-Name <String>] [-Layout <String>] [-All] [-Minimal] [-Compact]
 | `-OuterBorderStyle` | String | `'Rounded'` | Corner style: Rounded, Square, Double, Block, Simple. |
 | `-SourceType` | String | `'module'` | Header layout category parameter. |
 | `-TextSpacing` | Switch | — | Adjust spacing layout density. |
+| `-HelpParam` | String | — | Restricts the PARAMETERS section to entries matching this string (partial, case-insensitive). Passed through to `New-PHWriter`. |
 | `-Help` | Switch | — | Displays help for Show-PHTheme itself. |
 
 ---
