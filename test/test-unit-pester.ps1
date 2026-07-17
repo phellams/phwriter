@@ -328,6 +328,28 @@ Context "New-PHRouter" {
             Remove-Item -Path "function:\Invoke-TestRouterTarget" -ErrorAction SilentlyContinue
         }
     }
+
+    It "Should dispatch default route to built-in cmdlets when routes parameter is empty" {
+        $module = Get-Module phwriter
+        $origSB = $module.Invoke({ Get-Command Show-PHTheme -ErrorAction SilentlyContinue | Select-Object -ExpandProperty ScriptBlock })
+        
+        $global:themeCalled = $false
+        $module.Invoke({
+            Set-Item function:\Show-PHTheme -Value { $global:themeCalled = $true }
+        })
+        try {
+            New-PHRouter -ArgumentList @('show-phtheme')
+            $global:themeCalled | Should -Be $true
+        } finally {
+            $global:themeCalled = $null
+            if ($null -ne $origSB) {
+                $module.Invoke({
+                    param($sb)
+                    Set-Item function:\Show-PHTheme -Value $sb
+                }, $origSB)
+            }
+        }
+    }
 }
 
 Context "Invoke-PHPager" {

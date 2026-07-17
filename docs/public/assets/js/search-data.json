@@ -1,305 +1,382 @@
 {"0": {
     "doc": "API Reference",
     "title": "API Reference",
-    "content": "This page provides the comprehensive cmdlet API reference for PHWriter. ",
+    "content": "Complete parameter tables for all PHWriter public cmdlets. For executable code examples and real-world usage patterns, see the Cmdlet Reference page. ",
     "url": "/api-reference.html",
     
     "relUrl": "/api-reference.html"
   },"1": {
     "doc": "API Reference",
     "title": "Public Cmdlets Summary",
-    "content": "| Cmdlet | Alias | Purpose / Description | . | New-PHWriter | — | Render full help documentation | . | Write-PHAsciiLogo | — | Render the themed ASCII banner only | . | Export-PHWriterMetadata | phextract | Extract cmdlet metadata from source via AST | . | Invoke-PHPager | phpager | Display content in an interactive TUI pager | . | New-PHRouter | phroute | Dispatch CLI subcommands with tab-completion | . | Show-PHTheme | — | Preview built-in and custom themes | . | Get-TerminalPalette | terpal, Get-TerminalPallete | Generate dynamic solid, conditional, or gradient palette objects | . | New-AsciiTokenGradient | — | Apply token-aware ANSI gradients to ASCII art | . ",
+    "content": "| Cmdlet | Alias | Purpose / Description | . | New-PHWriter | — | Render full help documentation | . | Write-PHAsciiLogo | — | Render the themed ASCII banner only | . | Export-PHWriterMetadata | phextract | Extract cmdlet metadata from source via AST | . | Invoke-PHPager | phpager | Display content in an interactive TUI pager | . | New-PHRouter | phroute | Dispatch CLI subcommands with tab-completion | . | Show-PHTheme | shldc | Preview built-in and custom themes in the terminal | . | Get-TerminalPalette | terpal, Get-TerminalPallete | Generate dynamic solid, conditional, or gradient palette objects | . | New-AsciiTokenGradient | — | Apply TrueColor gradients to ASCII art based on tokenized 2D shapes | . ",
     "url": "/api-reference.html#public-cmdlets-summary",
     
     "relUrl": "/api-reference.html#public-cmdlets-summary"
   },"2": {
     "doc": "API Reference",
     "title": "1. New-PHWriter",
-    "content": "Generates the fully styled terminal help layouts. Syntax . New-PHWriter [-Name &lt;String&gt;] [-CommandInfo &lt;Hashtable&gt;] [-ParamTable &lt;Hashtable[]&gt;] [-Subcommands &lt;Hashtable[]&gt;] [-Examples &lt;String[]&gt;] [-Version &lt;String&gt;] [-Padding &lt;Int&gt;] [-Indent &lt;Int&gt;] [-LineSpacing &lt;Int&gt;] [-Compact] [-SourceType &lt;String&gt;] [-Theme &lt;String|Hashtable&gt;] [-Layout &lt;String&gt;] [-CustomLogo &lt;String&gt;] [-Gradient] [-CustomGradient &lt;Int[]&gt;] [-GradientMode &lt;String&gt;] [-OuterBorder] [-BorderGradient] [-BorderCustomGradient &lt;Int[]&gt;] [-OuterBorderStyle &lt;String&gt;] [-Width &lt;Object&gt;] [-JsonFile &lt;String&gt;] [-OutMode &lt;String&gt;] [-KeepOutput] [-Help] . Parameters . | Parameter | Type | Default | Description | . | -Name | String | 'PHW' | Module, script, or tool name displayed in the banner. | . | -CommandInfo | Hashtable | — | Contains cmdlet, synopsis, description, and source URL keys. | . | -ParamTable | Hashtable[] | — | Array of parameters defining names, types, mandatory flags, and descriptions. | . | -Subcommands | Hashtable[] | — | Array of router subcommands for router layouts. | . | -Examples | String[] | — | Array of sample usage commands. | . | -Version | String | '1.0.0' | Version number string. | . | -Padding | Int | 3 | Columns layout spacing. | . | -Indent | Int | 1 | Left padding offset. | . | -LineSpacing | Int | 1 | Empty lines between parameters (0=compact, 1=default, 2=spacious). | . | -Compact | Switch | — | Convenience switch for -LineSpacing 0. | . | -SourceType | String | 'module' | Layout header label: module, script, tool, plugin, cli, function, or workflow. | . | -Theme | String|Hashtable | 'phwriter' | Target theme name or custom theme hashtable. | . | -Layout | String | 'Box' | ASCII title layout style: Box, Classic, Minimal, Man, Terminal, Typewriter. | . | -CustomLogo | String | — | Overrides logo with custom ASCII text. | . | -Gradient | Switch | — | Enables title gradient shading. | . | -CustomGradient | Int[] | — | Custom gradient color-index stops. | . | -GradientMode | String | 'Horizontal' | Gradient distribution: Horizontal, Vertical, or PerToken. | . | -OuterBorder | Switch | — | Wraps layout in an outer border frame. | . | -BorderGradient | Switch | — | Gradient shader for the outer border. | . | -BorderCustomGradient | Int[] | — | Custom border gradient stops. | . | -OuterBorderStyle | String | 'Rounded' | Border glyph set: Rounded, Square, Double, Block, or Simple. | . | -Width | Object | 'full' | full, man, or a custom column width. | . | -JsonFile | String | — | Path to a .json configuration file. | . | -OutMode | String | 'Auto' | Render mode: Standard (stdout), Alt (pager), String (returns text), or Auto. | . | -KeepOutput | Switch | Enabled | Keeps pager output in the standard buffer after exit. | . | -Help | Switch | — | Renders PHWriter-formatted command help. | . ",
+    "content": "Generates fully styled terminal help output. Accepts direct parameter input, JSON file, or piped Export-PHWriterMetadata output via -InputObject. Theme resolution follows: explicit -Theme param &gt; $global:__phwriter.theme_config &gt; built-in default 'phwriter'. Syntax . New-PHWriter [-InputObject &lt;Object&gt;] [-Name &lt;String&gt;] [-CommandInfo &lt;Hashtable&gt;] [-ParamTable &lt;Hashtable[]&gt;] [-Subcommands &lt;Hashtable[]&gt;] [-Examples &lt;String[]&gt;] [-Version &lt;String&gt;] [-Padding &lt;Int&gt;] [-Indent &lt;Int&gt;] [-LineSpacing &lt;Int&gt;] [-Compact] [-SourceType &lt;String&gt;] [-Theme &lt;Object&gt;] [-Layout &lt;String&gt;] [-CustomLogo &lt;String&gt;] [-Gradient] [-CustomGradient &lt;Int[]&gt;] [-GradientMode &lt;String&gt;] [-OuterBorder] [-BorderGradient] [-BorderCustomGradient &lt;Int[]&gt;] [-OuterBorderStyle &lt;String&gt;] [-Width &lt;Object&gt;] [-JsonFile &lt;String&gt;] [-OutMode &lt;String&gt;] [-KeepOutput] [-HelpParam &lt;String&gt;] [-Help] . Parameters . | Parameter | Type | Default | Description | . | -JsonFile | String | — | Path to a .json configuration file. | . | -InputObject | Object | — | Metadata hashtable or PSCustomObject from Export-PHWriterMetadata. Piped; explicit params take precedence. | . | -Name | String | 'PHW' | Module, script, or tool name displayed in the banner. | . | -CommandInfo | Hashtable | — | Contains cmdlet, synopsis, description, and source URL keys. | . | -ParamTable | Hashtable[] | — | Array of parameters defining names, types, mandatory flags, and descriptions. | . | -Subcommands | Hashtable[] | — | Array of router subcommands for router layouts. | . | -Examples | String[] | — | Array of sample usage commands. | . | -Version | String | — | Version number string. | . | -Padding | Int | 3 | Columns layout spacing. | . | -Indent | Int | 1 | Left padding offset. | . | -LineSpacing | Int | 1 | Empty lines between parameters (0=compact, 1=default, 2=spacious). | . | -Compact | Switch | — | Convenience switch for -LineSpacing 0. | . | -SourceType | String | 'module' | Layout header label: module, script, tool, plugin, cli, function, workflow, or router. | . | -Theme | Object | 'phwriter' | Target theme name or custom theme hashtable. Resolved from $global:__phwriter.theme_config if not provided. | . | -Layout | String | 'Box' | ASCII title layout style: Box, Classic, Minimal, Man, Terminal, Typewriter. | . | -CustomLogo | String | — | Overrides logo with custom ASCII text. | . | -Gradient | Switch | — | Enables title gradient shading. | . | -CustomGradient | Int[] | — | Custom gradient color-index stops. | . | -GradientMode | String | 'Horizontal' | Gradient mode: Horizontal, Vertical, or PerToken. | . | -OuterBorder | Switch | — | Wraps layout in an outer border frame. | . | -BorderGradient | Switch | — | Gradient shader for the outer border. | . | -BorderCustomGradient | Int[] | — | Custom border gradient stops. | . | -OuterBorderStyle | String | 'Rounded' | Corner style: Rounded, Square, Double, Block, Simple. | . | -Width | Object | 'full' | Width in columns: ‘man’ (80), ‘full’ (console width), or a custom integer. | . | -OutMode | String | 'Auto' | Render mode: Standard (stdout), Alt (pager), String (returns text), or Auto. | . | -KeepOutput | Switch | $true | Keeps help on stdout when exiting pager. | . | -HelpParam | String | — | Restricts the PARAMETERS section to entries whose name or alias contains this string (partial, case-insensitive). | . | -Help | Switch | — | Displays help for New-PHWriter itself. | . ",
     "url": "/api-reference.html#1-new-phwriter",
     
     "relUrl": "/api-reference.html#1-new-phwriter"
   },"3": {
     "doc": "API Reference",
     "title": "2. Show-PHTheme",
-    "content": "DX utility to preview theme combinations directly in the shell. Syntax . Show-PHTheme [-Name &lt;String&gt;] [-Layout &lt;String&gt;] [-All] [-Minimal] [-Compact] [-Gradient] [-CustomGradient &lt;Int[]&gt;] [-OuterBorder] [-BorderGradient] [-BorderCustomGradient &lt;Int[]&gt;] [-GradientMode &lt;String&gt;] [-SourceType &lt;String&gt;] [-TextSpacing] [-OuterBorderStyle &lt;String&gt;] [-Help] . Parameters . | Parameter | Type | Default | Description | . | -Name | String | 'phwriter' | Theme name to preview, or 'all', or 'custom-rgb'. | . | -Layout | String | 'Box' | Title layout preview style. | . | -All | Switch | — | Previews all 50 built-in themes sequentially. | . | -Minimal | Switch | — | Skips description/parameters; renders header title only. | . | -Compact | Switch | — | Shortcut for compact parameter line spacing. | . | -Gradient | Switch | — | Preview header gradient. | . | -CustomGradient | Int[] | — | Custom gradient stops. | . | -GradientMode | String | 'Horizontal' | Gradient distribution: Horizontal, Vertical, or PerToken. | . | -OuterBorder | Switch | — | Renders border frame outline. | . | -BorderGradient | Switch | — | Gradient shader for border frame. | . | -BorderCustomGradient | Int[] | — | Custom border gradient stops. | . | -SourceType | String | 'module' | Header layout category parameter. | . | -TextSpacing | Switch | — | Adjust spacing layout density. | . | -OuterBorderStyle | String | 'Rounded' | Border glyph set for -OuterBorder. | . | -Help | Switch | — | Renders PHWriter-formatted command help. | . ",
+    "content": "DX utility to preview theme combinations directly in the shell. Syntax . Show-PHTheme [-Name &lt;String&gt;] [-Layout &lt;String&gt;] [-All] [-Minimal] [-Compact] [-Gradient] [-CustomGradient &lt;Int[]&gt;] [-GradientMode &lt;String&gt;] [-OuterBorder] [-BorderGradient] [-BorderCustomGradient &lt;Int[]&gt;] [-OuterBorderStyle &lt;String&gt;] [-SourceType &lt;String&gt;] [-TextSpacing] [-HelpParam &lt;String&gt;] [-Help] . Parameters . | Parameter | Type | Default | Description | . | -Name | String | 'phwriter' | Theme name to preview, or 'all', or 'custom-rgb'. | . | -Layout | String | 'Box' | Title layout preview style. | . | -All | Switch | — | Previews all 50 built-in themes sequentially. | . | -Minimal | Switch | — | Skips description/parameters; renders header title only. | . | -Compact | Switch | — | Shortcut for compact parameter line spacing. | . | -Gradient | Switch | — | Preview header gradient. | . | -CustomGradient | Int[] | — | Custom gradient stops. | . | -GradientMode | String | 'Horizontal' | Gradient mode: Horizontal, Vertical, or PerToken. | . | -OuterBorder | Switch | — | Renders border frame outline. | . | -BorderGradient | Switch | — | Gradient shader for border frame. | . | -BorderCustomGradient | Int[] | — | Custom border gradient stops. | . | -OuterBorderStyle | String | 'Rounded' | Corner style: Rounded, Square, Double, Block, Simple. | . | -SourceType | String | 'module' | Header layout category parameter. | . | -TextSpacing | Switch | — | Adjust spacing layout density. | . | -HelpParam | String | — | Restricts the PARAMETERS section to entries matching this string (partial, case-insensitive). Passed through to New-PHWriter. | . | -Help | Switch | — | Displays help for Show-PHTheme itself. | . ",
     "url": "/api-reference.html#2-show-phtheme",
     
     "relUrl": "/api-reference.html#2-show-phtheme"
   },"4": {
     "doc": "API Reference",
     "title": "3. Export-PHWriterMetadata (Alias: phextract)",
-    "content": "Statically parses .ps1/.psm1 source code using the AST parser to compile documentation metadata. Syntax . Export-PHWriterMetadata [-Path] &lt;String&gt; [-FunctionName &lt;String&gt;] [-OutputJson &lt;String&gt;] [-ModuleName &lt;String&gt;] [-Version &lt;String&gt;] [-Source &lt;String&gt;] . Parameters . | Parameter | Type | Default | Description | . | -Path | String | (Mandatory) | Path to the PowerShell file. | . | -FunctionName | String | — | Restricts extraction to a specific function name. | . | -OutputJson | String | — | Serializes extracted metadata directly to a JSON file. | . | -ModuleName | String | — | Overrides module name in metadata. | . | -Version | String | '1.0.0' | Overrides version metadata. | . | -Source | String | — | Documentation link URL. | . | -Help | Switch | — | Renders PHWriter-formatted command help. | . ",
+    "content": "Statically parses .ps1/.psm1 source code using the AST parser to compile documentation metadata. Syntax . Export-PHWriterMetadata [-Path] &lt;String&gt; [-FunctionName &lt;String&gt;] [-OutputJson &lt;String&gt;] [-ModuleName &lt;String&gt;] [-Version &lt;String&gt;] [-Source &lt;String&gt;] [-Help] . Parameters . | Parameter | Type | Default | Description | . | -Path | String | (Mandatory) | Path to the PowerShell file. | . | -FunctionName | String | — | Restricts extraction to a specific function name. | . | -OutputJson | String | — | Serializes extracted metadata directly to a JSON file. | . | -ModuleName | String | — | Overrides module name in metadata. | . | -Version | String | '1.0.0' | Overrides version metadata. | . | -Source | String | — | Documentation link URL. | . | -Help | Switch | — | Displays help for Export-PHWriterMetadata itself. | . ",
     "url": "/api-reference.html#3-export-phwritermetadata-alias-phextract",
     
     "relUrl": "/api-reference.html#3-export-phwritermetadata-alias-phextract"
   },"5": {
     "doc": "API Reference",
     "title": "4. Invoke-PHPager (Alias: phpager)",
-    "content": "Renders text streams in an interactive TUI paging container. Syntax . Invoke-PHPager [-Content] &lt;String[]&gt; [-Title &lt;String&gt;] [-PageSize &lt;Int&gt;] [-NoColor] [-Theme &lt;String|Hashtable&gt;] [-OnResize &lt;ScriptBlock&gt;] [-KeepOutput] [-Help] . Parameters . | Parameter | Type | Default | Description | . | -Content | String[] | (Mandatory) | Array of strings representing screen pages. | . | -Title | String | 'PH Pager' | Title text displayed in the header chrome. | . | -PageSize | Int | Console height | Optional number of visible content rows. | . | -Theme | String | 'phwriter' | Style theme applied to border and footer controls. | . | -NoColor | Switch | — | Disables ANSI coloring sequences. | . | -OnResize | ScriptBlock | — | Callback invoked when console dimensions change. | . | -KeepOutput | Switch | Enabled | Keeps the rendered page in the standard buffer after exit. | . | -Help | Switch | — | Renders PHWriter-formatted command help. | . ",
+    "content": "Renders text streams in an interactive TUI paging container. Syntax . Invoke-PHPager [-Content] &lt;Object[]&gt; [-Title &lt;String&gt;] [-PageSize &lt;Int&gt;] [-NoColor] [-Theme &lt;Object&gt;] [-OnResize &lt;ScriptBlock&gt;] [-KeepOutput] [-Help] . Parameters . | Parameter | Type | Default | Description | . | -Content | Object[] | — | Content string(s) to display. | . | -Title | String | 'PHWriter Pager' | Title text displayed in the header chrome. | . | -PageSize | Int | 0 | Height override in lines (0 for auto). | . | -NoColor | Switch | — | Disables ANSI coloring sequences. | . | -Theme | Object | 'phwriter' | Theme applied to border and footer controls. | . | -OnResize | ScriptBlock | — | Callback executed on console resize. | . | -KeepOutput | Switch | $true | Keep output on stdout when pager exits. | . | -Help | Switch | — | Displays help for Invoke-PHPager itself. | . ",
     "url": "/api-reference.html#4-invoke-phpager-alias-phpager",
     
     "relUrl": "/api-reference.html#4-invoke-phpager-alias-phpager"
   },"6": {
     "doc": "API Reference",
     "title": "5. New-PHRouter (Alias: phroute)",
-    "content": "Configures CLI subcommand dispatching and fuzzy recommendations. Syntax . New-PHRouter [-Routes] &lt;Hashtable&gt; [-ArgumentList &lt;String[]&gt;] [-ModuleName &lt;String&gt;] [-RegisterCompleter] [-Metadata &lt;Object&gt;] [-Theme &lt;String|Hashtable&gt;] [-Help] . Parameters . | Parameter | Type | Default | Description | . | -Routes | Hashtable | (Mandatory) | Subcommand mapping: name (string) ➔ scriptblock or function name. | . | -ArgumentList | String[] | Current argument list | Arguments list to process (typically $args). | . | -ModuleName | String | 'PHRouter' | CLI name used in error prompts. | . | -RegisterCompleter | Switch | — | Auto-registers argument tab completion. | . | -Metadata | Object | — | Optional PHWriter metadata used for router help. | . | -Theme | String | 'phwriter' | Theme applied to error message recommendations. | . | -Help | Switch | — | Renders PHWriter-formatted command help. | . ",
+    "content": "Configures CLI subcommand dispatching and fuzzy recommendations. Syntax . New-PHRouter [-Routes] &lt;Hashtable&gt; [-ArgumentList] &lt;String[]&gt; [-ModuleName &lt;String&gt;] [-RegisterCompleter] [-Metadata &lt;Hashtable&gt;] [-Help] . Parameters . | Parameter | Type | Default | Description | . | -Routes | Hashtable | (Mandatory) | Subcommand mapping: name (string) ➔ scriptblock or function name. | . | -ArgumentList | String[] | Current argument list | Arguments list to process (typically $args). | . | -ModuleName | String | 'PHRouter' | CLI name used in error prompts. | . | -RegisterCompleter | Switch | — | Auto-registers argument tab completion. | . | -Metadata | Hashtable | — | Optional PHWriter metadata hashtable for route verification. | . | -Help | Switch | — | Displays help for New-PHRouter itself. | . ",
     "url": "/api-reference.html#5-new-phrouter-alias-phroute",
     
     "relUrl": "/api-reference.html#5-new-phrouter-alias-phroute"
   },"7": {
     "doc": "API Reference",
     "title": "6. Write-PHAsciiLogo",
-    "content": "Renders the themed ASCII logo banner alone. Syntax . Write-PHAsciiLogo [-Name] &lt;String&gt; [-Layout &lt;String&gt;] [-Theme &lt;String&gt;] [-Version &lt;String&gt;] [-Gradient] [-CustomGradient &lt;Int[]&gt;] [-GradientMode &lt;String&gt;] [-Help] . ",
+    "content": "Renders the themed ASCII logo banner alone. Syntax . Write-PHAsciiLogo [-Name] &lt;String&gt; [-Layout &lt;String&gt;] [-Theme &lt;Object&gt;] [-Version &lt;String&gt;] [-CustomLogo &lt;String&gt;] [-Gradient] [-CustomGradient &lt;Int[]&gt;] [-GradientMode &lt;String&gt;] [-Help] . Parameters . | Parameter | Type | Default | Description | . | -Name | String | — | The name of the module/tool to display. | . | -Version | String | '' | Optional version string of the module. | . | -Theme | Object | 'phwriter' | Theme name string or custom theme hashtable. | . | -Layout | String | 'Box' | Title layout style: Box, Classic, Minimal, Man, Terminal, Typewriter. | . | -CustomLogo | String | — | Custom ASCII logo banner string. | . | -Gradient | Switch | — | Enables title gradient shading. | . | -CustomGradient | Int[] | — | Custom gradient color-index stops. | . | -GradientMode | String | 'Horizontal' | Gradient mode: Horizontal, Vertical, or PerToken. | . | -Help | Switch | — | Displays help for Write-PHAsciiLogo itself. | . ",
     "url": "/api-reference.html#6-write-phasciilogo",
     
     "relUrl": "/api-reference.html#6-write-phasciilogo"
   },"8": {
     "doc": "API Reference",
     "title": "7. Get-TerminalPalette (Aliases: terpal, Get-TerminalPallete)",
-    "content": "Helper to compile dynamic palette color maps. Syntax . Get-TerminalPalette [-ColorMode] &lt;String&gt; [-GradientStart &lt;Int[]&gt;] [-GradientEnd &lt;Int[]&gt;] [-ColorPalette &lt;Hashtable&gt;] [-ColorThresholds &lt;Hashtable&gt;] [-CurrentValue &lt;Int&gt;] [-MaxValue &lt;Int&gt;] ### Parameters | Parameter | Type | Default | Description |---|---|---|---| `-ColorPalette` | Hashtable | — | Static named colour map. | `-ColorMode` | String | — | `Solid`, `Conditional`, or `Gradient`. | `-ColorThresholds` | Hashtable | — | Threshold-to-colour map for conditional mode. | `-GradientStart` | Int[] | — | RGB start triplet. | `-GradientEnd` | Int[] | — | RGB end triplet. | `-CurrentValue` | Int | `0` | Value evaluated in conditional mode. | `-MaxValue` | Int | `100` | Upper bound used by callers. | --- ## 8. New-AsciiTokenGradient Applies a colour gradient per glyph position or connected ASCII-art token. ```powershell New-AsciiTokenGradient [-Lines] &lt;String[]&gt; [-StartColor &lt;Object&gt;] [-EndColor &lt;Object&gt;] [-Mode &lt;String&gt;] [-Connectivity &lt;Int&gt;] . | Parameter | Type | Default | Description |—|—|—|—| -Lines | String[] | (Mandatory) | ASCII-art lines accepted from the pipeline. | -StartColor | Object | 0,150,255 | Named colour or RGB triplet at the gradient start. | -EndColor | Object | 255,0,150 | Named colour or RGB triplet at the gradient end. | -Mode | String | 'Horizontal' | Horizontal, Vertical, or PerToken. | -Connectivity | Int | 8 | Connected-component neighbourhood: 4 or 8. | ``` . ",
+    "content": "Helper to compile dynamic palette color maps. Syntax . Get-TerminalPalette [-ColorPalette &lt;Hashtable&gt;] [-ColorMode &lt;String&gt;] [-ColorThresholds &lt;Hashtable&gt;] [-GradientStart &lt;Int[]&gt;] [-GradientEnd &lt;Int[]&gt;] [-CurrentValue &lt;Int&gt;] [-MaxValue &lt;Int&gt;] . Parameters . | Parameter | Type | Default | Description | . | -ColorPalette | Hashtable | — | Static colors lookup hashtable. | . | -ColorMode | String | — | Palette mode: 'Solid', 'Conditional', or 'Gradient'. | . | -ColorThresholds | Hashtable | — | Numeric threshold maps for Conditional mode. | . | -GradientStart | Int[] | — | RGB array [R, G, B] for starting gradient stop. | . | -GradientEnd | Int[] | — | RGB array [R, G, B] for ending gradient stop. | . | -CurrentValue | Int | — | Current value used in Conditional mode check. | . | -MaxValue | Int | 100 | Maximum limit for gradient/conditional maps. | . ",
     "url": "/api-reference.html#7-get-terminalpalette-aliases-terpal-get-terminalpallete",
     
     "relUrl": "/api-reference.html#7-get-terminalpalette-aliases-terpal-get-terminalpallete"
   },"9": {
+    "doc": "API Reference",
+    "title": "8. New-AsciiTokenGradient",
+    "content": "Applies TrueColor gradients to ASCII art based on tokenized 2D shapes. Syntax . New-AsciiTokenGradient [-Lines] &lt;String[]&gt; [[-StartColor] &lt;Object&gt;] [[-EndColor] &lt;Object&gt;] [[-Mode] &lt;String&gt;] [-Connectivity &lt;Int&gt;] . Parameters . | Parameter | Type | Default | Description | . | -Lines | String[] | (Mandatory) | The input string array representing the ASCII art to colorize. | . | -StartColor | Object | 0, 150, 255 | Starting color as an RGB array or a named color. | . | -EndColor | Object | 255, 0, 150 | Ending color as an RGB array or a named color. | . | -Mode | String | 'Horizontal' | Gradient mapping mode: 'Horizontal', 'Vertical', or 'PerToken'. | . | -Connectivity | Int | 8 | Connection connectivity (4 or 8) for shape detection. | . ",
+    "url": "/api-reference.html#8-new-asciitokengradient",
+    
+    "relUrl": "/api-reference.html#8-new-asciitokengradient"
+  },"10": {
     "doc": "CLI Routing",
     "title": "CLI Routing",
     "content": "PHWriter provides a lightweight router helper New-PHRouter (aliased as phroute) to build command-line tools with complex subcommand hierarchies and built-in help. Use it when a PowerShell command is a CLI entrypoint with a stable subcommand surface. Route values can be scriptblocks or function names; default handles missing input and unknown commands receive a closest-match suggestion. ",
     "url": "/cli-routing.html",
     
     "relUrl": "/cli-routing.html"
-  },"10": {
+  },"11": {
     "doc": "CLI Routing",
     "title": "Example CLI Entrypoint",
     "content": "function Invoke-MyCli { [CmdletBinding()] param( [Parameter(ValueFromRemainingArguments = $true)] [string[]]$Args ) $Routes = @{ 'build' = { param($Remaining) Write-Host \"Building project...\" } 'test' = { param($Remaining) Invoke-Pester } 'default' = { Write-Host \"Usage: mycli &lt;build|test&gt;\" } } New-PHRouter -Routes $Routes -ArgumentList $Args } . ",
     "url": "/cli-routing.html#example-cli-entrypoint",
     
     "relUrl": "/cli-routing.html#example-cli-entrypoint"
-  },"11": {
+  },"12": {
     "doc": "CLI Routing",
     "title": "Fuzzy Command Matching",
     "content": "If the user types a command that doesn’t match exactly, the routing engine calculates Levenshtein distances and recommends the closest subcommand automatically. ",
     "url": "/cli-routing.html#fuzzy-command-matching",
     
     "relUrl": "/cli-routing.html#fuzzy-command-matching"
-  },"12": {
+  },"13": {
     "doc": "CLI Routing",
     "title": "Router Help",
     "content": "Pass -Metadata when the router needs PHWriter-formatted help. This keeps CLI dispatch separate from help rendering while allowing a command to expose standard help as a route. ",
     "url": "/cli-routing.html#router-help",
     
     "relUrl": "/cli-routing.html#router-help"
-  },"13": {
+  },"14": {
+    "doc": "Cmdlet Reference",
+    "title": "Cmdlet Reference",
+    "content": "Complete usage examples for all PHWriter public cmdlets. Each section covers the primary use-case, pipeline integration, common option combinations, and real-world patterns. ",
+    "url": "/cmdlet-reference.html",
+    
+    "relUrl": "/cmdlet-reference.html"
+  },"15": {
+    "doc": "Cmdlet Reference",
+    "title": "New-PHWriter",
+    "content": "Renders ANSI-formatted terminal help output directly to the console or an interactive pager. Minimal invocation . # pwsh — module must be imported first Import-Module PHWriter $commandInfo = @{ cmdlet = 'Get-SystemData' synopsis = 'Get-SystemData [-Path &lt;String&gt;] [-Force]' description = 'Retrieves operating system configuration data from the specified path.' source = 'https://gitlab.com/example/systemtools' } $paramTable = @( @{ name = 'Path'; param = 'p|Path'; type = 'String'; required = $true; description = 'Path to the configuration directory.'; inline = $false }, @{ name = 'Force'; param = 'f|Force'; type = 'Switch'; required = $false; description = 'Suppress confirmation prompts.'; inline = $true } ) New-PHWriter -Name 'SystemTools' -Version '2.1.0' -CommandInfo $commandInfo -ParamTable $paramTable -Theme 'aurora' . Pipeline input from Export-PHWriterMetadata . # Pipe AST-extracted metadata directly — no manual hashtable required. Export-PHWriterMetadata -Path ./Public/Get-SystemData.ps1 -FunctionName 'Get-SystemData' | New-PHWriter -Theme 'cyberpunk' -OuterBorder -Layout 'Terminal' . Global config — set theme once for the session . # Priority: explicit -Theme &gt; global config &gt; built-in default 'phwriter' $global:__phwriter = @{ theme_config = @{ theme = 'aurora' gradient = $true outerborder = $true layout = 'Box' # Override individual theme keys — AccentColor merged into resolved theme AccentColor = '201' } } # All subsequent New-PHWriter calls in this session inherit the global config. Export-PHWriterMetadata -Path ./Public/My-Cmdlet.ps1 | New-PHWriter . Param-level focused lookup with -HelpParam . # Render only the -Theme parameter row; all other parameters suppressed. Export-PHWriterMetadata -Path ./Public/New-PHWriter.ps1 -FunctionName 'New-PHWriter' | New-PHWriter -Theme 'phwriter' -HelpParam 'Theme' -OutMode 'Standard' . Gradient header with outer border . New-PHWriter ` -Name 'MyCLI' ` -Version '1.0.0' ` -CommandInfo $commandInfo ` -ParamTable $paramTable ` -Theme 'neon-noir' ` -Layout 'Terminal' ` -Gradient ` -OuterBorder ` -BorderGradient ` -OuterBorderStyle 'Double' ` -OutMode 'Standard' . Load from JSON file . # Serialize metadata to JSON and load at runtime — useful for pre-built docs bundles. Export-PHWriterMetadata -Path ./Public/Get-SystemData.ps1 -OutputJson ./libs/help/get-systemdata.json New-PHWriter -JsonFile './libs/help/get-systemdata.json' -Theme 'matrix' . Router layout — document CLI subcommands . $subcommands = @( @{ name = 'build'; syntax = 'build [-Release]'; description = 'Compile the project.' }, @{ name = 'test'; syntax = 'test [-Coverage]'; description = 'Execute the test suite.' }, @{ name = 'deploy'; syntax = 'deploy -Env &lt;String&gt;'; description = 'Deploy to target environment.' } ) New-PHWriter -Name 'mycli' -SourceType 'router' -Subcommands $subcommands -Theme 'phwriter' -OutMode 'Standard' . ",
+    "url": "/cmdlet-reference.html#new-phwriter",
+    
+    "relUrl": "/cmdlet-reference.html#new-phwriter"
+  },"16": {
+    "doc": "Cmdlet Reference",
+    "title": "Show-PHTheme",
+    "content": "Renders a mock help page for any built-in theme, enabling visual comparison before committing to a theme in production code. Preview a single theme . Show-PHTheme -Name 'aurora' . Preview with gradient header and double border . Show-PHTheme -Name 'cyberpunk' -Gradient -OuterBorder -BorderGradient -OuterBorderStyle 'Double' . Preview all 50 themes sequentially in compact mode . Show-PHTheme -All -Compact -Layout 'Minimal' . Pipeline — preview a set of named themes . 'aurora', 'neon-noir', 'matrix', 'cosmic', 'phwriter' | Show-PHTheme -OuterBorder -Compact . Use the shldc alias . # shldc is the registered short alias for Show-PHTheme. shldc -Name 'drift-blue-orange' -Gradient -OuterBorder -BorderGradient -Layout 'Terminal' . Focused parameter lookup via -HelpParam . # Show only parameters whose name or alias matches 'grad'. Show-PHTheme -Name 'phwriter' -HelpParam 'grad' . ",
+    "url": "/cmdlet-reference.html#show-phtheme",
+    
+    "relUrl": "/cmdlet-reference.html#show-phtheme"
+  },"17": {
+    "doc": "Cmdlet Reference",
+    "title": "Export-PHWriterMetadata",
+    "content": "Parses a .ps1 or .psm1 file using the PowerShell AST engine and extracts all function definitions, parameter blocks, CBH help, and syntax automatically. Extract a single function . Export-PHWriterMetadata -Path './Public/Get-SystemData.ps1' -FunctionName 'Get-SystemData' . Extract and serialize to JSON . Export-PHWriterMetadata ` -Path './Public/Get-SystemData.ps1' ` -OutputJson './libs/help_metadata/get-systemdata.json' ` -Source 'https://gitlab.com/example/systemtools' . Batch extract all public cmdlets . Get-ChildItem -Path ./Public/*.ps1 | ForEach-Object { Export-PHWriterMetadata ` -Path $_.FullName ` -OutputJson \"./libs/help_metadata/$($_.BaseName).json\" } . Pipe directly to New-PHWriter . # No intermediate variables required. Export-PHWriterMetadata -Path ./Public/Invoke-Deploy.ps1 -FunctionName 'Invoke-Deploy' | New-PHWriter -Theme 'steel-plate' -OuterBorder -OuterBorderStyle 'Square' . Override module name and version . Export-PHWriterMetadata ` -Path './Public/Invoke-Deploy.ps1' ` -ModuleName 'DeployTools' ` -Version '3.0.0' ` -Source 'https://internal.docs/deploytools' . Inspect the returned metadata object . $meta = Export-PHWriterMetadata -Path './Public/Get-SystemData.ps1' # Enumerate extracted parameters $meta.paramtable | Format-Table name, type, required . ",
+    "url": "/cmdlet-reference.html#export-phwritermetadata",
+    
+    "relUrl": "/cmdlet-reference.html#export-phwritermetadata"
+  },"18": {
+    "doc": "Cmdlet Reference",
+    "title": "Invoke-PHPager",
+    "content": "Displays pre-formatted content in a full-screen, scrollable TUI paging view with keyboard navigation. Display a string in the pager . $content = New-PHWriter -Name 'MyCLI' -CommandInfo $commandInfo -ParamTable $paramTable -Theme 'phwriter' -OutMode 'String' Invoke-PHPager -Content $content -Title 'MyCLI Help' . Pipe file content . Get-Content './README.md' | Invoke-PHPager -Title 'README' . Use the phpager alias with a custom theme . $text = Export-PHWriterMetadata -Path ./Public/Get-SystemData.ps1 | New-PHWriter -Theme 'matrix' -OutMode 'String' phpager -Content $text -Title 'Get-SystemData' -Theme 'matrix' . Keyboard controls reference . | Key | Action | . | u / d | Scroll up / down one line | . | PgUp / PgDn | Scroll up / down one page | . | Home / End | Jump to first / last line | . | l / r | Horizontal scroll left / right | . | q / ESC | Exit pager | . ",
+    "url": "/cmdlet-reference.html#invoke-phpager",
+    
+    "relUrl": "/cmdlet-reference.html#invoke-phpager"
+  },"19": {
+    "doc": "Cmdlet Reference",
+    "title": "New-PHRouter",
+    "content": "Dispatches CLI subcommands from a route map hashtable. Includes fuzzy match suggestions, tab-completion registration, and optional metadata-driven help. Basic dispatch . function Invoke-MyCLI { param([string]$Mode, [string[]]$Args) $Routes = @{ build = { param($a) Write-Host \"Building... args: $a\" } test = { param($a) Write-Host \"Testing...\" } default = { New-PHWriter -Name 'mycli' -SourceType 'router' -Subcommands $subcommands -Theme 'phwriter' -OutMode 'Standard' } } New-PHRouter -Routes $Routes -ArgumentList $Args -ModuleName 'Invoke-MyCLI' } . Register tab-completion . $Routes = @{ build = {}; test = {}; deploy = {}; default = {} } # Registers tab-completion for the 'mycli' command in the current session. New-PHRouter -Routes $Routes -ArgumentList @() -ModuleName 'mycli' -RegisterCompleter . Full router entrypoint pattern . function Invoke-FetchTvdb { [CmdletBinding()] param( [Parameter(Position = 0)] [string]$Mode, [Parameter(ValueFromRemainingArguments = $true)] [string[]]$Args ) $subcommandsList = @( @{ name = 'search'; syntax = 'search &lt;query&gt;'; description = 'Search the TVDB catalogue by series title.' }, @{ name = 'get-series'; syntax = 'get-series &lt;id&gt;'; description = 'Retrieve full series metadata by TVDB ID.' }, @{ name = 'get-episodes';syntax = 'get-episodes &lt;id&gt;'; description = 'Retrieve episode list for a series.' }, @{ name = 'export-data'; syntax = 'export-data &lt;id&gt; -Path'; description = 'Export series metadata to JSON or CSV.' } ) $CommandInfo = @{ cmdlet = 'Invoke-FetchTvdb' synopsis = 'Invoke-FetchTvdb -Mode &lt;String&gt; [&lt;Args&gt;]' description = 'CLI client for the TVDB REST API.' source = 'https://gitlab.com/phellams/fetchtvdb' } $Routes = @{ 'search' = { param($a) Search-TvdbSeries -Query $a[0] } 'get-series' = { param($a) Get-TvdbSeries -Id $a[0] } 'get-episodes' = { param($a) Get-TvdbEpisodes -Id $a[0] } default = { New-PHWriter -Name 'FetchTVDB' -Version '1.0.0' ` -CommandInfo $CommandInfo -Subcommands $subcommandsList ` -Theme 'phwriter' -SourceType 'router' -OutMode 'Standard' } } $routerArgs = @() if ($Mode) { $routerArgs += $Mode } if ($Args) { $routerArgs += $Args } New-PHRouter -Routes $Routes -ArgumentList $routerArgs -ModuleName 'Invoke-FetchTvdb' -Theme 'phwriter' } . ",
+    "url": "/cmdlet-reference.html#new-phrouter",
+    
+    "relUrl": "/cmdlet-reference.html#new-phrouter"
+  },"20": {
+    "doc": "Cmdlet Reference",
+    "title": "Write-PHAsciiLogo",
+    "content": "Renders only the ASCII banner header — without the parameter table or sections. Useful for splash screens and custom help entrypoints. Render a named banner . Write-PHAsciiLogo -Name 'MYCLI' -Version '2.0.0' -Theme 'aurora' . Gradient banner with vertical mode . Write-PHAsciiLogo -Name 'DEPLOY' -Version '1.0.0' -Theme 'neon-noir' -Layout 'Terminal' -Gradient -GradientMode 'Vertical' . All six layout styles compared . foreach ($layout in @('Box', 'Classic', 'Minimal', 'Man', 'Terminal', 'Typewriter')) { Write-PHAsciiLogo -Name 'DEMO' -Version '1.0.0' -Theme 'phwriter' -Layout $layout Start-Sleep -Milliseconds 800 } . Custom ASCII logo string . $logo = @' ____ _ _ | _ \\| | |_) |_| |____/ \\__, | __/ |___/ '@ Write-PHAsciiLogo -Name 'MYAPP' -Version '0.1.0' -Theme 'cyberpunk' -CustomLogo $logo . ",
+    "url": "/cmdlet-reference.html#write-phasciilogo",
+    
+    "relUrl": "/cmdlet-reference.html#write-phasciilogo"
+  },"21": {
+    "doc": "Cmdlet Reference",
+    "title": "Get-TerminalPalette",
+    "content": "Generates a dynamic color lookup object for use in themed TUI components. Supports solid, conditional threshold, and linear gradient modes. Solid palette . $palette = Get-TerminalPalette -ColorMode 'Solid' -ColorPalette @{ primary = 'cyan' secondary = 'darkgray' accent = '201' error = 'red' } # Use resolved colors in ANSI output: Write-Host \"$([char]27)[38;5;$($palette.accent)mAccent text$([char]27)[0m\" . Conditional threshold palette . # Returns a color from the map based on the CurrentValue relative to thresholds. $palette = Get-TerminalPalette ` -ColorMode 'Conditional' ` -ColorThresholds @{ 25 = 'green'; 75 = 'yellow'; 100 = 'red' } ` -CurrentValue 60 ` -MaxValue 100 . Gradient palette . # Returns an interpolated color between Start and End based on CurrentValue / MaxValue. $palette = Get-TerminalPalette ` -ColorMode 'Gradient' ` -GradientStart @(0, 200, 255) ` -GradientEnd @(255, 0, 150) ` -CurrentValue 40 ` -MaxValue 100 . ",
+    "url": "/cmdlet-reference.html#get-terminalpalette",
+    
+    "relUrl": "/cmdlet-reference.html#get-terminalpalette"
+  },"22": {
+    "doc": "Cmdlet Reference",
+    "title": "New-AsciiTokenGradient",
+    "content": "Applies TrueColor RGB gradient coloring to multi-line ASCII art. Uses a 2D flood-fill tokenizer to identify connected character shapes and maps gradient stops across them. Horizontal gradient on ASCII art . $art = @( ' ██████╗ ██╗ ██╗', '██╔════╝ ██║ ██║', '██║ ███████║', '██║ ██╔══██║', '╚██████╗ ██║ ██║', ' ╚═════╝ ╚═╝ ╚═╝' ) New-AsciiTokenGradient -Lines $art -StartColor @(0, 200, 255) -EndColor @(255, 0, 150) -Mode 'Horizontal' . Vertical gradient . New-AsciiTokenGradient -Lines $art -StartColor @(0, 255, 128) -EndColor @(128, 0, 255) -Mode 'Vertical' . Per-token gradient (each disconnected shape independently colored) . New-AsciiTokenGradient -Lines $art -StartColor @(255, 200, 0) -EndColor @(255, 50, 0) -Mode 'PerToken' . Integration with Write-PHAsciiLogo . # Custom logo rendered with full TrueColor gradient via token gradient engine. $logo = @( '██████╗ ██╗ ██╗██╗ ██╗', '██╔══██╗██║ ██║██║ ██║', '██████╔╝███████║██║ █╗ ██║', '██╔═══╝ ██╔══██║██║███╗██║', '██║ ██║ ██║╚███╔███╔╝', '╚═╝ ╚═╝ ╚═╝ ╚══╝╚══╝ ' ) $gradientLogo = New-AsciiTokenGradient -Lines $logo -StartColor @(0,180,255) -EndColor @(255,0,180) -Mode 'Horizontal' Write-PHAsciiLogo -Name 'PHW' -Version '1.0.0' -Theme 'phwriter' -CustomLogo ($gradientLogo -join \"`n\") . ",
+    "url": "/cmdlet-reference.html#new-asciitokengradient",
+    
+    "relUrl": "/cmdlet-reference.html#new-asciitokengradient"
+  },"23": {
     "doc": "Installation & Downloads",
     "title": "Installation &amp; Downloads",
     "content": "PHWriter is packaged and distributed across several channels to integrate smoothly into any development environment or automated CI/CD pipeline. ",
     "url": "/downloads.html#installation--downloads",
     
     "relUrl": "/downloads.html#installation--downloads"
-  },"14": {
+  },"24": {
     "doc": "Installation & Downloads",
     "title": "Package Managers",
     "content": "1. PowerShell Gallery . The easiest way to install PHWriter. Works on Windows, macOS, and Linux. Install-Module -Name PHWriter -Scope CurrentUser -Force . | ➔ Link to Registry | . 2. Chocolatey (Windows) . Chocolatey repository package for Windows system-wide environments. choco install phwriter . | ➔ Link to Registry | . 3. GitLab NuGet Registry . Enterprise package distribution repository integration. nuget install PHWriter -Source \"https://gitlab.com/api/v4/projects/71983492/packages/nuget/index.json\" . | ➔ Link to Registry | . ",
     "url": "/downloads.html#package-managers",
     
     "relUrl": "/downloads.html#package-managers"
-  },"15": {
+  },"25": {
     "doc": "Installation & Downloads",
     "title": "Manual Downloads",
     "content": "You can download compiled versions of the module directly for offline distribution or custom embedding: . Release Assets . | Format | Description | Download Link | . | 📦 GitLab releases | Versioned source archives and published release assets. | Release assets | . | 📦 GitLab packages | Published package artifacts for the active release. | Package registry | . ",
     "url": "/downloads.html#manual-downloads",
     
     "relUrl": "/downloads.html#manual-downloads"
-  },"16": {
+  },"26": {
     "doc": "Installation & Downloads",
     "title": "Release Pipeline",
     "content": "Every commit to the main branch undergoes automated testing via GitLab CI/CD, which generates release notes, runs compliance checks, compiles the binary dependencies, and publishes release packages. | ➔ GitLab Releases Page | ➔ GitLab CI/CD Pipeline Runs | . ",
     "url": "/downloads.html#release-pipeline",
     
     "relUrl": "/downloads.html#release-pipeline"
-  },"17": {
+  },"27": {
     "doc": "Installation & Downloads",
     "title": "Installation & Downloads",
     "content": " ",
     "url": "/downloads.html",
     
     "relUrl": "/downloads.html"
-  },"18": {
+  },"28": {
     "doc": "Home",
     "title": "PHWriter",
     "content": "Render structured, themed command help for PowerShell modules and command-line tools. Install PHWriter Browse 50 themes Inspect variants Terminal preview generated from the checked-in VHS tape. ",
     "url": "/#phwriter",
     
     "relUrl": "/#phwriter"
-  },"19": {
+  },"29": {
     "doc": "Home",
     "title": "VHS Showcase",
     "content": "Each recording is generated from a tape in the repository and shows a distinct PHWriter workflow. AuroraGradient header and border rendering. CyberpunkFull themed command help output. MatrixCustom border-gradient configuration. Custom RGBTrue-colour theme and classic layout. Compact outputDense layout for terminal workflows. ",
     "url": "/#vhs-showcase",
     
     "relUrl": "/#vhs-showcase"
-  },"20": {
+  },"30": {
     "doc": "Home",
     "title": "Feature Overview",
     "content": ". | 50 predefined themes — vibrant, gradient-aware, or solid retro styles matching your project’s brand. | AST metadata extraction — zero-touch parsing of comment-based help blocks directly from source files. | Interactive TUI pager — alt-buffer terminal scrolling supporting custom width and console resize recalculation. | CLI router scaffolding — subcommand dispatching with fuzzy Levenshtein recommendations and auto-completion. | Tag-padded headers — modern tag blocks for clean, high-impact version metadata. | . ",
     "url": "/#feature-overview",
     
     "relUrl": "/#feature-overview"
-  },"21": {
+  },"31": {
     "doc": "Home",
     "title": "Explore Theme Families",
     "content": "BaseSolid palettes for broad terminal compatibility. GradientColour ramps for headers and borders. ExtendedDistinctive terminal presentations and colour steps. Hard-borderedBold frames paired with focused colour treatments. ",
     "url": "/#explore-theme-families",
     
     "relUrl": "/#explore-theme-families"
-  },"22": {
+  },"32": {
     "doc": "Home",
     "title": "Quick Start",
     "content": "Initialize, render, and page help details in seconds: . # Import the module Import-Module PHWriter # Render the built-in theme preview Show-PHTheme -Name 'phwriter' # Generate documentation with a specific theme and compact layout New-PHWriter @MyMetadata -Theme 'cyberpunk' -Compact . ",
     "url": "/#quick-start",
     
     "relUrl": "/#quick-start"
-  },"23": {
+  },"33": {
     "doc": "Home",
     "title": "Learning More",
     "content": "Use the sidebar navigation to read deep-dives on individual features, or explore: . | ➔ API Reference — Fully documented parameters and syntax for all cmdlets. | ➔ Installation &amp; Downloads — PowerShell Gallery, Chocolatey, and release assets. | . ",
     "url": "/#learning-more",
     
     "relUrl": "/#learning-more"
-  },"24": {
+  },"34": {
     "doc": "Home",
     "title": "Home",
     "content": "PowerShell terminal documentation . ",
     "url": "/",
     
     "relUrl": "/"
-  },"25": {
+  },"35": {
     "doc": "Metadata Extraction",
     "title": "Metadata Extraction",
     "content": "PHWriter includes an AST-powered extraction engine called Export-PHWriterMetadata (aliased as phextract) that extracts parameters, descriptions, and syntax information from your PowerShell cmdlet files statically. ",
     "url": "/metadata-extraction.html",
     
     "relUrl": "/metadata-extraction.html"
-  },"26": {
+  },"36": {
     "doc": "Metadata Extraction",
     "title": "Usage",
     "content": "Export-PHWriterMetadata -Path \"./Public/Get-MyData.ps1\" . ",
     "url": "/metadata-extraction.html#usage",
     
     "relUrl": "/metadata-extraction.html#usage"
-  },"27": {
+  },"37": {
     "doc": "Metadata Extraction",
     "title": "How It Works",
     "content": ". | AST Parsing: The cmdlet parses the PowerShell script’s Abstract Syntax Tree (AST). | CBH Association: It parses Comment-Based Help (CBH) blocks placed immediately preceding the param(...) block inside the function body. | Module Detection: It automatically walks up directory trees to find a .psd1 manifest file, setting the sourcetype metadata to module or script accordingly. | . ",
     "url": "/metadata-extraction.html#how-it-works",
     
     "relUrl": "/metadata-extraction.html#how-it-works"
-  },"28": {
+  },"38": {
     "doc": "Metadata Extraction",
     "title": "Placement Rules",
     "content": "To extract help comments correctly, place the comment block inside the function body, immediately before the parameter declarations: . function Get-MyData { &lt;# .SYNOPSIS Gets some data.PARAMETER Path The path to check. #&gt; param( [string]$Path ) } . ",
     "url": "/metadata-extraction.html#placement-rules",
     
     "relUrl": "/metadata-extraction.html#placement-rules"
-  },"29": {
+  },"39": {
+    "doc": "Metadata Extraction",
+    "title": "Smart Parameter Aliasing",
+    "content": "To improve the terminal command-line user experience, Export-PHWriterMetadata automatically generates conflict-free short aliases for all cmdlet parameters during AST parsing. How It Resolves Aliases . | Length-1 Default: It attempts to take the first character of the parameter name (e.g., -p for -Path). | Conflict Checking: It cross-checks the generated candidate alias against a blocked list: . | Common Parameters: standard PowerShell common parameters (Verbose, Debug, ErrorAction, WarningAction, InformationAction, ErrorVariable, WarningVariable, InformationVariable, OutVariable, OutBuffer, PipelineVariable, WhatIf, Confirm, UseTransaction) and their standard short aliases (vb, db, ea, wa, infa, ev, wv, infv, ov, ob, pv). | Other Cmdlet Parameters: full parameter names defined on the function. | Other Explicit Aliases: any aliases explicitly declared on the cmdlet’s other parameters. | Previously Generated Aliases: smart aliases assigned to preceding parameters. | . | Length-N Expansion: If a collision is detected, the engine increments the candidate length by 1 character (e.g., trying the first 2 characters, then 3, and so on) until a unique short alias is resolved. | . The resolved smart alias is prepended to the parameter’s alias list. This allows New-PHWriter to display them as primary shortcuts (e.g., -p | -Path) in the rendered help layouts. ",
+    "url": "/metadata-extraction.html#smart-parameter-aliasing",
+    
+    "relUrl": "/metadata-extraction.html#smart-parameter-aliasing"
+  },"40": {
     "doc": "Theme Variant Gallery",
     "title": "Theme Variant Gallery",
     "content": "Every selectable PHWriter theme has Base, Rounded, Double, and Gradient recordings generated through New-PHWriter. defaultRetro Modern — neon cyan and dark green Base New-PHWriter @metadata -Theme 'default' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'default' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'default' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'default' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 matrixCyberpunk Green — high-contrast bright green Base New-PHWriter @metadata -Theme 'matrix' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'matrix' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'matrix' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'matrix' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 cyberpunkNeon Synthwave — hot pink, yellow, and cyan Base New-PHWriter @metadata -Theme 'cyberpunk' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'cyberpunk' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'cyberpunk' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'cyberpunk' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 draculaDracula Dark — purple, pink, green, and yellow Base New-PHWriter @metadata -Theme 'dracula' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'dracula' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'dracula' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'dracula' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 nordNordic Frost — icy blues and clean white Base New-PHWriter @metadata -Theme 'nord' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'nord' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'nord' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'nord' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 monokaiMonokai — classic pink, yellow, green, and orange Base New-PHWriter @metadata -Theme 'monokai' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'monokai' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'monokai' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'monokai' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 solarizedSolarized Dark — muted cyan and green on dark Base New-PHWriter @metadata -Theme 'solarized' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'solarized' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'solarized' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'solarized' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 sunsetGolden Hour — deep reds, oranges, and gold Base New-PHWriter @metadata -Theme 'sunset' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'sunset' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'sunset' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'sunset' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 forestNatural Autumn — forest greens and warm gold Base New-PHWriter @metadata -Theme 'forest' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'forest' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'forest' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'forest' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 classicOld-School Man — monochrome bold and underline Base New-PHWriter @metadata -Theme 'classic' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'classic' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'classic' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'classic' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 auroraCyan to purple Base New-PHWriter @metadata -Theme 'aurora' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'aurora' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'aurora' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'aurora' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 neon-noirMagenta to pink Base New-PHWriter @metadata -Theme 'neon-noir' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'neon-noir' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'neon-noir' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'neon-noir' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 lavaRed to yellow Base New-PHWriter @metadata -Theme 'lava' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'lava' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'lava' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'lava' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 oceanBlue to cyan Base New-PHWriter @metadata -Theme 'ocean' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'ocean' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'ocean' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'ocean' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 toxicAcid Greens Base New-PHWriter @metadata -Theme 'toxic' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'toxic' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'toxic' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'toxic' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 midnightIndigo to violet Base New-PHWriter @metadata -Theme 'midnight' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'midnight' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'midnight' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'midnight' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 goldGold to yellow Base New-PHWriter @metadata -Theme 'gold' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'gold' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'gold' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'gold' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 roseDeep to light pink Base New-PHWriter @metadata -Theme 'rose' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'rose' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'rose' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'rose' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 steelDark to light grey Base New-PHWriter @metadata -Theme 'steel' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'steel' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'steel' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'steel' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 phwriterClassic orange/yellow Base New-PHWriter @metadata -Theme 'phwriter' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'phwriter' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'phwriter' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'phwriter' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 glitchCyberpunk Glitchy Base New-PHWriter @metadata -Theme 'glitch' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'glitch' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'glitch' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'glitch' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 cosmicSpace &amp; Starry Night Base New-PHWriter @metadata -Theme 'cosmic' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'cosmic' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'cosmic' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'cosmic' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 forest-mistMoss Green / Earthy Base New-PHWriter @metadata -Theme 'forest-mist' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'forest-mist' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'forest-mist' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'forest-mist' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 blood-moonDark Vampire Red Base New-PHWriter @metadata -Theme 'blood-moon' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'blood-moon' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'blood-moon' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'blood-moon' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 retro-arcade80s Synthwave Arcade Base New-PHWriter @metadata -Theme 'retro-arcade' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'retro-arcade' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'retro-arcade' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'retro-arcade' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 abyssDeep Ocean Trench Base New-PHWriter @metadata -Theme 'abyss' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'abyss' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'abyss' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'abyss' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 zenMinimalist Zen Base New-PHWriter @metadata -Theme 'zen' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'zen' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'zen' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'zen' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 blazeIntense Fire Base New-PHWriter @metadata -Theme 'blaze' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'blaze' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'blaze' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'blaze' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 rustIndustrial Rust Base New-PHWriter @metadata -Theme 'rust' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'rust' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'rust' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'rust' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 matrix-neonCode Stream Base New-PHWriter @metadata -Theme 'matrix-neon' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'matrix-neon' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'matrix-neon' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'matrix-neon' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 quantumSubatomic Scientific Base New-PHWriter @metadata -Theme 'quantum' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'quantum' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'quantum' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'quantum' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 radioactiveToxic Nuclear Fallout Base New-PHWriter @metadata -Theme 'radioactive' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'radioactive' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'radioactive' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'radioactive' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 vaporwave80s Teal/Pink Base New-PHWriter @metadata -Theme 'vaporwave' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'vaporwave' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'vaporwave' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'vaporwave' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 nebulaStar Dust Base New-PHWriter @metadata -Theme 'nebula' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'nebula' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'nebula' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'nebula' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 crystalDiamond &amp; Glacier Ice Base New-PHWriter @metadata -Theme 'crystal' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'crystal' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'crystal' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'crystal' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 copperCopper / Orange Base New-PHWriter @metadata -Theme 'copper' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'copper' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'copper' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'copper' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 royalGold on Royal Blue Base New-PHWriter @metadata -Theme 'royal' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'royal' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'royal' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'royal' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 desert-heatWarm Sands Base New-PHWriter @metadata -Theme 'desert-heat' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'desert-heat' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'desert-heat' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'desert-heat' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 sheriffWestern Leather Base New-PHWriter @metadata -Theme 'sheriff' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'sheriff' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'sheriff' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'sheriff' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 frostArctic Blizzard Base New-PHWriter @metadata -Theme 'frost' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'frost' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'frost' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'frost' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 drift-blue-orangeDouble border with sky-blue and orange accents Base New-PHWriter @metadata -Theme 'drift-blue-orange' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'drift-blue-orange' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'drift-blue-orange' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'drift-blue-orange' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 steel-plateHeavy industrial border and steel-grey palette Base New-PHWriter @metadata -Theme 'steel-plate' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'steel-plate' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'steel-plate' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'steel-plate' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 cyber-gridGrid border with magenta and yellow accents Base New-PHWriter @metadata -Theme 'cyber-grid' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'cyber-grid' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'cyber-grid' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'cyber-grid' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 retro-blocksSolid block border with a retro palette Base New-PHWriter @metadata -Theme 'retro-blocks' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'retro-blocks' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'retro-blocks' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'retro-blocks' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 gothic-cryptDark red gothic border treatment Base New-PHWriter @metadata -Theme 'gothic-crypt' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'gothic-crypt' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'gothic-crypt' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'gothic-crypt' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 acid-shardsAngular border with lime and green accents Base New-PHWriter @metadata -Theme 'acid-shards' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'acid-shards' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'acid-shards' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'acid-shards' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 aurora-borealisRounded border with an aurora gradient Base New-PHWriter @metadata -Theme 'aurora-borealis' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'aurora-borealis' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'aurora-borealis' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'aurora-borealis' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 solar-flareDiamond border with orange and gold accents Base New-PHWriter @metadata -Theme 'solar-flare' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'solar-flare' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'solar-flare' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'solar-flare' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 subspaceDeep-space teal border treatment Base New-PHWriter @metadata -Theme 'subspace' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'subspace' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'subspace' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'subspace' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 neon-horizonBlock-and-shade border with pink and cyan accents Base New-PHWriter @metadata -Theme 'neon-horizon' -Layout Minimal -Compact Rounded New-PHWriter @metadata -Theme 'neon-horizon' -Layout Minimal -Compact -OuterBorder Double New-PHWriter @metadata -Theme 'neon-horizon' -Layout Minimal -Compact -OuterBorder -OuterBorderStyle Double Gradient New-PHWriter @metadata -Theme 'neon-horizon' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 ",
     "url": "/theme-variant-gallery.html",
     
     "relUrl": "/theme-variant-gallery.html"
-  },"30": {
+  },"41": {
     "doc": "Theme Variant Gallery",
     "title": "Generate a variant preview",
     "content": "$metadata = @{ Name = 'SAMPLE' CommandInfo = @{ cmdlet = 'Get-SampleData'; synopsis = 'Get-SampleData [-Path &lt;String&gt;]'; description = 'Sample output.'; source = 'https://gitlab.com/phellams/phwriter' } } New-PHWriter @metadata -Theme 'aurora' -Layout Minimal -Compact -Gradient -CustomGradient 39,51,129,201 -OuterBorder -BorderGradient -BorderCustomGradient 39,51,129,201 . The gallery’s command cards show the specific flags for Base, Rounded, Double, and Gradient output. Use any value accepted by Show-PHTheme -Name; New-PHWriter accepts the same 50 built-in theme names. ",
     "url": "/theme-variant-gallery.html#generate-a-variant-preview",
     
     "relUrl": "/theme-variant-gallery.html#generate-a-variant-preview"
-  },"31": {
+  },"42": {
     "doc": "Theme Variant Gallery",
     "title": "VHS source",
     "content": "New-ThemeVariantTapes.ps1 derives 200 tapes from the Show-PHTheme ValidateSet: four variants for each of the 50 public theme names. The vhs_build job renders them before the Pages build, so both theme pages use current module output rather than committed generated media. ",
     "url": "/theme-variant-gallery.html#vhs-source",
     
     "relUrl": "/theme-variant-gallery.html#vhs-source"
-  },"32": {
+  },"43": {
     "doc": "Themes & Customization",
     "title": "Themes &amp; Customization",
     "content": "PHWriter features 50 built-in themes spanning four categories. ",
     "url": "/themes.html#themes--customization",
     
     "relUrl": "/themes.html#themes--customization"
-  },"33": {
+  },"44": {
     "doc": "Themes & Customization",
     "title": "1. Base Themes (10)",
     "content": "These use solid 16-color or 256-color palettes designed for maximum compatibility across various terminal emulators. | Theme | Style Description | . | default | Retro Modern — neon cyan and dark green | . | matrix | Cyberpunk Green — high-contrast bright green | . | cyberpunk | Neon Synthwave — hot pink, yellow, and cyan | . | dracula | Dracula Dark — purple, pink, green, and yellow | . | nord | Nordic Frost — icy blues and clean white | . | monokai | Monokai — classic pink, yellow, green, and orange | . | solarized | Solarized Dark — muted cyan and green on dark | . | sunset | Golden Hour — deep reds, oranges, and gold | . | forest | Natural Autumn — forest greens and warm gold | . | classic | Old-School Man — monochrome bold and underline | . ",
     "url": "/themes.html#1-base-themes-10",
     
     "relUrl": "/themes.html#1-base-themes-10"
-  },"34": {
+  },"45": {
     "doc": "Themes & Customization",
     "title": "2. Gradient Themes (10)",
     "content": "These themes declare specific gradient steps and color ramps. | Theme | Palette Stops | Accent Color | . | aurora | [51, 93, 129, 201] | Cyan to purple | . | neon-noir | [201, 198, 196, 200] | Magenta to pink | . | lava | [196, 202, 214, 220] | Red to yellow | . | ocean | [17, 20, 27, 39, 51] | Blue to cyan | . | toxic | [46, 82, 118, 154] | Acid Greens | . | midnight | [17, 54, 91, 128, 165] | Indigo to violet | . | gold | [136, 172, 214, 220, 226] | Gold to yellow | . | rose | [161, 197, 199, 207, 213] | Deep to light pink | . | steel | [233, 238, 243, 248, 253] | Dark to light grey | . | phwriter | flat | Classic orange/yellow | . ",
     "url": "/themes.html#2-gradient-themes-10",
     
     "relUrl": "/themes.html#2-gradient-themes-10"
-  },"35": {
+  },"46": {
     "doc": "Themes & Customization",
     "title": "3. Extended Themes (20)",
     "content": "These use additional colour ramps and terminal-defined presentation characters. The website deliberately does not reproduce those characters: they are decorative terminal output and their appearance varies with the installed terminal font. | Theme | Gradient Stops | Description | . | glitch | [196, 201, 45, 51] | Cyberpunk Glitchy | . | cosmic | [17, 21, 57, 93, 129] | Space &amp; Starry Night | . | forest-mist | [22, 28, 64, 106, 244] | Moss Green / Earthy | . | blood-moon | [232, 52, 88, 124, 160] | Dark Vampire Red | . | retro-arcade | [196, 201, 93, 39] | 80s Synthwave Arcade | . | abyss | [232, 17, 18, 19, 21] | Deep Ocean Trench | . | zen | [245, 248, 252, 255] | Minimalist Zen | . | blaze | [196, 202, 208, 214, 220] | Intense Fire | . | rust | [52, 94, 130, 166] | Industrial Rust | . | matrix-neon | [22, 28, 34, 40, 46] | Code Stream | . | quantum | [57, 93, 129, 81] | Subatomic Scientific | . | radioactive | [232, 190, 226, 190] | Toxic Nuclear Fallout | . | vaporwave | [201, 165, 129, 81, 51] | 80s Teal/Pink | . | nebula | [129, 135, 163, 199, 201] | Star Dust | . | crystal | [159, 195, 231, 255] | Diamond &amp; Glacier Ice | . | copper | [130, 136, 172, 214] | Copper / Orange | . | royal | [17, 20, 21, 220, 226] | Gold on Royal Blue | . | desert-heat | [130, 166, 202, 214, 220] | Warm Sands | . | sheriff | [52, 94, 137, 180] | Western Leather | . | frost | [240, 244, 248, 117, 159] | Arctic Blizzard | . ",
     "url": "/themes.html#3-extended-themes-20",
     
     "relUrl": "/themes.html#3-extended-themes-20"
-  },"36": {
+  },"47": {
     "doc": "Themes & Customization",
     "title": "4. Hard-Bordered Themes (10)",
     "content": "These themes combine distinct border treatments with their colour configurations. | Theme | Description | . | drift-blue-orange | Double border with sky-blue and orange accents | . | steel-plate | Heavy industrial border and steel-grey palette | . | cyber-grid | Grid border with magenta and yellow accents | . | retro-blocks | Solid block border with a retro palette | . | gothic-crypt | Dark red gothic border treatment | . | acid-shards | Angular border with lime and green accents | . | aurora-borealis | Rounded border with an aurora gradient | . | solar-flare | Diamond border with orange and gold accents | . | subspace | Deep-space teal border treatment | . | neon-horizon | Block-and-shade border with pink and cyan accents | . ",
     "url": "/themes.html#4-hard-bordered-themes-10",
     
     "relUrl": "/themes.html#4-hard-bordered-themes-10"
-  },"37": {
+  },"48": {
     "doc": "Themes & Customization",
     "title": "5. Theme Variants",
     "content": "Every selectable theme has Base, Rounded, Double, and Gradient VHS previews. Browse the Theme Variant Gallery to inspect the generated output and copy the corresponding New-PHWriter command. ",
     "url": "/themes.html#5-theme-variants",
     
     "relUrl": "/themes.html#5-theme-variants"
-  },"38": {
+  },"49": {
     "doc": "Themes & Customization",
     "title": "6. Custom Theme Configurations",
     "content": "You can define a custom theme by passing a hashtable containing the layout color and formatting variables: . $CustomTheme = @{ AccentColor = 'yellow' AccentFormat = 'bold' BorderColor = 'darkgray' BorderFormat = 'none' HeaderFg = 'white' SyntaxFg = 'white' DescriptionFg = 'white' ParamNameFg = 'cyan' ParamTypeFg = 'darkcyan' ParamReqFg = 'red' ParamReqFormat = 'bold' ParamDescFg = 'gray' ExampleFg = 'yellow' DocsFg = 'cyan' SectionChar = '◆' HeaderChar = '»' BorderTop = '┌────────────────────────────────────────────────────────┐' BorderBottom = '└────────────────────────────────────────────────────────┘' BorderMiddle = ' ' } New-PHWriter -Name 'MyModule' -Theme $CustomTheme . ",
     "url": "/themes.html#6-custom-theme-configurations",
     
     "relUrl": "/themes.html#6-custom-theme-configurations"
-  },"39": {
+  },"50": {
     "doc": "Themes & Customization",
     "title": "Themes & Customization",
     "content": " ",
     "url": "/themes.html",
     
     "relUrl": "/themes.html"
-  },"40": {
+  },"51": {
     "doc": "TUI Pager",
     "title": "TUI Pager",
     "content": "Invoke-PHPager (aliased as phpager) provides an interactive, terminal-native paging view for reading long help pages without cluttered text overflow. ",
     "url": "/tui-pager.html",
     
     "relUrl": "/tui-pager.html"
-  },"41": {
+  },"52": {
     "doc": "TUI Pager",
     "title": "Keyboard Controls",
     "content": "| Key | Action | . | Up / Down / PgUp / PgDn | Scroll lines or pages up/down | . | Home / End | Go to the top / bottom of the content | . | q / Escape | Exit pager | . ",
     "url": "/tui-pager.html#keyboard-controls",
     
     "relUrl": "/tui-pager.html#keyboard-controls"
-  },"42": {
+  },"53": {
     "doc": "TUI Pager",
     "title": "Alternate Screen Buffer",
     "content": "By default, the pager runs inside the alternate screen buffer, meaning when you exit, the original terminal contents are restored cleanly. ",
     "url": "/tui-pager.html#alternate-screen-buffer",
     
     "relUrl": "/tui-pager.html#alternate-screen-buffer"
-  },"43": {
+  },"54": {
     "doc": "TUI Pager",
     "title": "Non-Interactive Host Bypass",
     "content": "To prevent blocking in non-interactive environments (like CI/CD pipelines), set the following environment variable: . $env:PHWRITER_TEST_MODE = 'true' . This forces the pager to print all contents directly to standard output and exit immediately. ",

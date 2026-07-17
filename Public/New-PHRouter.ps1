@@ -148,8 +148,42 @@ function New-PHRouter {
         return
     }
 
+    # ── Populate default routes for built-in cmdlets ─────────────────────────
+    $defaultRoutes = @{
+        'show-phtheme'            = 'Show-PHTheme'
+        'shldc'                   = 'Show-PHTheme'
+        'theme'                   = 'Show-PHTheme'
+        'themes'                  = 'Show-PHTheme'
+        'new-phwriter'            = 'New-PHWriter'
+        'phwriter'                = 'New-PHWriter'
+        'write-phasciilogo'       = 'Write-PHAsciiLogo'
+        'logo'                    = 'Write-PHAsciiLogo'
+        'export-phwritermetadata' = 'Export-PHWriterMetadata'
+        'phextract'               = 'Export-PHWriterMetadata'
+        'invoke-phpager'          = 'Invoke-PHPager'
+        'phpager'                 = 'Invoke-PHPager'
+        'new-phrouter'            = 'New-PHRouter'
+        'phroute'                 = 'New-PHRouter'
+        'get-terminalpalette'     = 'Get-TerminalPalette'
+        'terpal'                  = 'Get-TerminalPalette'
+        'new-asciitokengradient'  = 'New-AsciiTokenGradient'
+    }
+
     if ($null -eq $Routes) {
-        throw [System.ArgumentException]::new("Routes parameter is mandatory when -Help is not specified.")
+        $Routes = @{}
+    }
+
+    foreach ($entry in $defaultRoutes.GetEnumerator()) {
+        $exists = $false
+        foreach ($k in $Routes.Keys) {
+            if ($k.ToLower() -eq $entry.Key.ToLower()) {
+                $exists = $true
+                break
+            }
+        }
+        if (-not $exists) {
+            $Routes[$entry.Key] = $entry.Value
+        }
     }
 
     # ── Auto-register tab completer ───────────────────────────────────────────
