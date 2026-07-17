@@ -2,6 +2,41 @@
 
 This is the canonical tracker for outstanding work. The historical `devtacker-pending.md` remains untouched for reference.
 
+## EPIC — PHWriter Core Hardening & Pipeline Integration
+
+> Epic: Make `New-PHWriter` pipeline-compatible with `Export-PHWriterMetadata`, add global theme config,
+> param-level help search, and fix `Show-PHTheme` static preview bug.
+
+### Tasks
+
+- [ ] 🌀 **[EPIC/COMPAT]** `Export-PHWriterMetadata` → `New-PHWriter` pipeline: property names from the
+      metadata object (`name`, `commandinfo`, `paramtable`, `sourcetype`, `examples`, `version`) do not
+      map 1-to-1 with `New-PHWriter` parameters (`Name`, `CommandInfo`, `ParamTable`, `SourceType`,
+      `Examples`, `Version`). Add a `ValueFromPipeline` parameter set to `New-PHWriter` that accepts a
+      metadata hashtable/PSObject directly and maps all fields internally.
+- [ ] 🌀 **[EPIC/GLOBALCFG]** `$global:__phwriter` config variable: Allow users to set a module-wide
+      default theme and rendering preferences via `$global:__phwriter = @{ theme_config = @{ theme = 'aurora'; gradient = $true } }`. 
+      `New-PHWriter` resolves theme in precedence order: explicit `-Theme` param > global config > built-in default `'phwriter'`.
+      Allow partial override (e.g. user sets global theme but passes `-Gradient` explicitly — both apply).
+- [ ] 🌀 **[EPIC/HELPSEARCH]** Param-level help search: add `-HelpParam <string>` to `New-PHWriter` and
+      `Show-PHTheme`. When specified, filter the rendered output to show only the matching parameter row
+      (or scroll to it in pager mode). Support partial/fuzzy match on the param name.
+- [ ] 🟡 **[BUG]** `Show-PHTheme`: first preview is static — the `begin {}` block captures `$resolvedLineSpacing`
+      once and mock objects are never refreshed when called via pipeline or router. Move all per-call
+      state into the `process {}` block. Also the `ThemePreview:` label does not update with each new
+      `-Name` call in some router invocations.
+- [ ] 🟡 **[FEATURE]** `Show-PHTheme`: add alias `shldc`; export via `phwriter.psm1`.
+- [ ] 🟡 **[FEATURE]** `New-PHRouter`: allow `Show-PHTheme` and other public cmdlets to be addressable
+      as subcommand routes in the default router dispatch table.
+- [ ] 🟢 **[QOL]** `New-PHWriter` pipeline param set: accept `-InputObject` (pipeline) of type
+      `[hashtable]` or `[PSCustomObject]` mapping metadata fields, with `-Theme` as an additional
+      pipeline-side parameter to set the theme at call site.
+- [ ] 🟢 **[QOL]** Global config merging: when `$global:__phwriter.theme_config` is a hashtable,
+      deep-merge it with the resolved theme object so users can override individual theme keys
+      (e.g. `AccentColor`) without replacing the whole theme.
+- [ ] 🟢 **[QOL]** `-HelpParam` route search: support `Show-PHTheme -HelpParam <name>` to display only
+      a param-filtered view, bypassing the full preview loop.
+
 ## P0 — Release blockers
 
 - [ ] OuterBorderType block and char that take up more vertiacal space add padding of 1 line below to make the MODEName Line have proper spacing
