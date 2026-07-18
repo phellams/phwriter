@@ -51,10 +51,10 @@ function Get-TerminalPalette {
             if ([string]::IsNullOrWhiteSpace($Code) -or [string]::IsNullOrEmpty($Text)) { return $Text }
             return "$esc[$Code`m$Text$reset"
         }.GetNewClosure()
-        
+
         GetFillColor = {
             param([int]$Index, [int]$TotalFill)
-            
+
             if ($ColorMode -eq 'Conditional') {
                 $matchingThreshold = $null
                 $minKey = [int]::MaxValue
@@ -64,12 +64,12 @@ function Get-TerminalPalette {
                         $matchingThreshold = $k
                     }
                 }
-                if ($null -ne $matchingThreshold) { 
+                if ($null -ne $matchingThreshold) {
                     return (& $parseColor $ColorThresholds[$matchingThreshold])
                 }
                 return $null
             }
-            
+
             if ($ColorMode -eq 'Gradient') {
                 $ratio = 0
                 if ($TotalFill -gt 1) { $ratio = $Index / ($TotalFill - 1) }
@@ -81,7 +81,7 @@ function Get-TerminalPalette {
 
             # Default Solid
             foreach ($k in $ColorPalette.Keys) {
-                if ($k -ieq 'Fill') { 
+                if ($k -ieq 'Fill') {
                     return (& $parseColor $ColorPalette[$k])
                 }
             }
@@ -91,13 +91,13 @@ function Get-TerminalPalette {
         GetStaticColor = {
             param([string]$Key)
             foreach ($k in $ColorPalette.Keys) {
-                if ($k -ieq $Key) { 
+                if ($k -ieq $Key) {
                     return (& $parseColor $ColorPalette[$k])
                 }
             }
             return $null
         }.GetNewClosure()
     }
-    
+
     return $paletteObj
 }

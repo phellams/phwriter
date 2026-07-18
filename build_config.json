@@ -2,7 +2,6 @@
     "PSModule": {
         "modulename": "phwriter",
         "releasetype": "public",
-        "versioning" : "conventional",
         "gituser": "sgkens",
         "gitgroup": "phellams",
         "gitlabid": "",
@@ -12,27 +11,9 @@
         "phwriter": false,
         "versioning": "conventional",
         "phwriter_source": "https://gitlab.com/phellams/phwriter/-/blob/main/readme.md",
-        "pester_test_files": [
-            ".\\Public\\*.ps1",
-            ".\\Private\\*.ps1",
-            ".\\phwriter.psm1"
-        ], 
-        "modulefiles": [
-            "phwriter.psm1",
-            "phwriter.psd1",
-            "LICENSE",
-            "icon.png",
-            "README.md",
-            "readme.txt"
-        ],
-        "modulefolders": [
-            "Public",
-            "Private",
-            "libs",
-            "tools"
-        ],
-        "moduleexclude": [
-            "commit-helper.ps1"
-        ]
+        "pester_test_files": [".\\Public\\*.ps1", ".\\Private\\*.ps1", ".\\phwriter.psm1"],
+        "modulefiles": ["phwriter.psm1", "phwriter.psd1", "LICENSE", "icon.png", "README.md", "readme.txt"],
+        "modulefolders": ["Public", "Private", "libs", "tools"],
+        "moduleexclude": ["commit-helper.ps1"]
     }
 }
